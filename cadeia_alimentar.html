@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexão Natureza - Cadeia Alimentar</title>
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;750;850&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            nunito: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            brandGreen: '#58CC02',
+            brandGreenDark: '#46A302',
+            brandBlue: '#1CB0F6',
+            brandBlueDark: '#1899D6',
+            brandYellow: '#FFC800',
+            brandOrange: '#FF9600',
+            brandRed: '#EA2B2B',
+            forestGreen: '#10B981',
+            forestDark: '#047857',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+    }
+    
+    /* Efeitos de botões 3D */
+    .btn-3d-forest {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #047857;
+    }
+    .btn-3d-forest:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #047857;
+    }
+
+    .btn-3d-green {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #46A302;
+    }
+    .btn-3d-green:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #46A302;
+    }
+
+    .btn-3d-orange {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #D97706;
+    }
+    .btn-3d-orange:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #D97706;
+    }
+
+    /* Animação pulsante */
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .pulse-animation {
+      animation: pulse-slow 2s infinite ease-in-out;
+    }
+
+    /* Animação de tremor de erro */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    /* Flutuação leve para os cards na bandeja */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .card-float {
+      animation: float 4s infinite ease-in-out;
+    }
+
+    /* Animação de pop de encaixe */
+    @keyframes pop-in {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop-in {
+      animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+  </style>
+</head>
+<body id="game-body" class="bg-gradient-to-br from-emerald-50 via-teal-50 to-green-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden transition-all duration-750">
+
+  <!-- Cabeçalho do Jogo -->
+  <header class="w-full max-w-5xl mx-auto px-4 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3 z-10">
+    <div class="flex items-center gap-2">
+      <div class="bg-forestGreen text-white p-2 rounded-2xl shadow-md">
+        <i data-lucide="leaf" class="w-6 h-6"></i>
+      </div>
+      <span class="text-xl font-extrabold tracking-wide text-forestDark">Conexão Natureza</span>
+    </div>
+    
+    <!-- Botão de Navegação entre Jogos -->
+    <a href="./mestre_fracoes.html" class="bg-brandOrange hover:bg-brandOrange/90 text-white border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 px-4 py-2 rounded-2xl text-xs md:text-sm font-black flex items-center gap-1.5 transition-all shadow-md">
+      <i data-lucide="pizza" class="w-4 h-4"></i>
+      Missão Pizzaria das Frações 🍕
+    </a>
+    
+    <!-- Pontos, Nível e Som -->
+    <div class="flex items-center gap-3">
+      <div class="bg-white px-4 py-2 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center gap-2">
+        <i data-lucide="sparkles" class="text-brandYellow w-5 h-5 fill-brandYellow"></i>
+        <span id="score-text" class="font-extrabold text-slate-700">0 Pontos</span>
+      </div>
+      <button id="sound-btn" onclick="toggleSound()" class="bg-white p-2.5 rounded-2xl border-2 border-slate-200 hover:bg-slate-100 transition-colors shadow-sm text-slate-500">
+        <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="flex-grow flex items-center justify-center p-4 w-full max-w-5xl mx-auto">
+    
+    <!-- TELA INICIAL -->
+    <section id="screen-start" class="w-full max-w-2xl bg-white rounded-3xl border-4 border-slate-200 p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] text-center flex flex-col items-center gap-6 animate-pop-in">
+      
+      <!-- Ilustração Floresta Fofa -->
+      <div class="w-48 h-48 flex items-center justify-center relative">
+        <!-- Árvore e Sol em SVG -->
+        <svg viewBox="0 0 100 100" class="w-full h-full">
+          <!-- Sol de fundo -->
+          <circle cx="75" cy="25" r="12" fill="#FFC800" opacity="0.8" />
+          
+          <!-- Montanhas de fundo -->
+          <polygon points="10,80 40,40 70,80" fill="#E2F1E8" />
+          <polygon points="35,80 65,45 95,80" fill="#D2E8DC" />
+          
+          <!-- Tronco de Árvore -->
+          <rect x="46" y="55" width="8" height="25" rx="3" fill="#8B5A2B" />
+          
+          <!-- Folhagem Fofa (3 círculos sobrepostos) -->
+          <circle cx="50" cy="48" r="18" fill="#10B981" />
+          <circle cx="38" cy="54" r="14" fill="#059669" />
+          <circle cx="62" cy="54" r="14" fill="#34D399" />
+          
+          <!-- Carinha fofa na árvore -->
+          <circle cx="46" cy="46" r="1.5" fill="#FFFFFF" />
+          <circle cx="54" cy="46" r="1.5" fill="#FFFFFF" />
+          <path d="M 48 50 Q 50 52 52 50" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
+          
+          <!-- Passarinho voando -->
+          <path d="M 20 30 Q 25 25 30 30 Q 35 25 40 30" fill="none" stroke="#1CB0F6" stroke-width="2.5" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <div>
+        <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">Conexão Natureza</h1>
+        <p class="text-forestDark font-extrabold text-lg md:text-xl uppercase tracking-wider mt-1">Cadeia Alimentar 🌳</p>
+      </div>
+
+      <p class="text-slate-500 font-semibold max-w-md text-base md:text-lg">
+        Os seres vivos dependem uns dos outros para obter energia! Ordene as peças para equilibrar o fluxo de energia dos ecossistemas.
+      </p>
+
+      <button onclick="startGame()" class="btn-3d-forest bg-forestGreen hover:bg-forestDark text-white text-xl font-extrabold px-10 py-4 rounded-2xl w-full max-w-xs transition-all pulse-animation">
+        Equilibrar Ecossistema 🌍
+      </button>
+    </section>
+
+    <!-- TELA DE GAMEPLAY -->
+    <section id="screen-game" class="w-full bg-white rounded-3xl border-4 border-slate-200 p-5 md:p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] flex flex-col gap-6 hidden animate-pop-in">
+      
+      <!-- Cabeçalho do Gameplay (Fase e Progresso) -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b-2 border-slate-100">
+        <div>
+          <h2 id="ecosystem-title" class="text-2xl font-black text-slate-800">Ecossistema: Jardim Florestal</h2>
+          <p id="ecosystem-desc" class="text-slate-500 font-bold text-sm">Organize a cadeia alimentar do menor nível de energia para o maior.</p>
+        </div>
+        <div class="flex items-center gap-2 font-extrabold text-forestDark whitespace-nowrap text-lg">
+          <i data-lucide="compass" class="w-5 h-5 animate-spin-slow"></i>
+          <span id="phase-indicator">Ecossistema 1 de 3</span>
+        </div>
+      </div>
+
+      <!-- Barra de Progresso do Ecossistema -->
+      <div class="bg-slate-100 h-3 rounded-full border border-slate-200 overflow-hidden">
+        <div id="phase-progress-bar" class="bg-brandGreen h-full w-0 transition-all duration-500 ease-out"></div>
+      </div>
+
+      <!-- INSTRUÇÃO RÁPIDA E AJUDA ECOLÓGICA -->
+      <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-3 flex gap-2.5 items-center">
+        <span class="bg-forestGreen text-white text-xs font-extrabold px-2 py-1 rounded-lg">💡 Como Jogar</span>
+        <p class="text-slate-600 font-bold text-xs md:text-sm">
+          Arraste o card até o slot correto OU clique no card e depois no slot correspondente!
+        </p>
+      </div>
+
+      <!-- SLOTS DE DESTINO (ONDE ENCAIXAR OS CARDS) -->
+      <div>
+        <h3 class="font-extrabold text-slate-500 text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <i data-lucide="milestone" class="w-4 h-4"></i>
+          Fluxo de Energia (Ordem Crescente)
+        </h3>
+        
+        <!-- Grid de Slots -->
+        <div id="slots-container" class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 w-full">
+          <!-- Gerado dinamicamente: 5 Slots (Produtor -> Consumidores -> Decompositor) -->
+        </div>
+      </div>
+
+      <!-- BANDEJA DE CARDS EMBARALHADOS (DECK) -->
+      <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-5 mt-2">
+        <h3 class="font-extrabold text-slate-500 text-xs uppercase tracking-wider mb-4 flex items-center gap-1.5">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          Seres Vivos a Organizar
+        </h3>
+        
+        <!-- Deck de Peças -->
+        <div id="deck-container" class="flex flex-wrap gap-4 items-center justify-center min-h-[160px] p-2">
+          <!-- Gerado dinamicamente no JS -->
+        </div>
+      </div>
+
+      <!-- DICA PEDAGÓGICA (ON ERROR) -->
+      <div id="hint-box" class="bg-blue-50 border-2 border-brandBlue/30 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300">
+        <div class="bg-brandBlue text-white p-2 rounded-xl">
+          <i data-lucide="help-circle" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h4 class="font-extrabold text-brandBlueDark text-base">Dica da Professora Clara:</h4>
+          <p id="hint-text" class="text-slate-600 font-semibold text-sm mt-0.5"></p>
+        </div>
+      </div>
+
+      <!-- Botão para Próxima Fase (inicialmente invisível) -->
+      <div id="next-phase-container" class="flex justify-center hidden">
+        <button onclick="advancePhase()" class="btn-3d-green bg-brandGreen hover:bg-brandGreenDark text-white font-extrabold text-lg px-10 py-4 rounded-2xl flex items-center gap-2 animate-bounce">
+          Avançar para Próximo Ecossistema
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- TELA DE VITÓRIA GERAL -->
+    <section id="screen-victory" class="w-full max-w-2xl bg-white rounded-3xl border-4 border-slate-200 p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] text-center flex flex-col items-center gap-6 hidden animate-pop-in">
+      
+      <!-- Troféu e Estrelas de ouro -->
+      <div class="relative flex flex-col items-center gap-2">
+        <div class="flex gap-2 justify-center mb-1">
+          <i id="star-1" data-lucide="star" class="w-10 h-10 text-slate-300"></i>
+          <i id="star-2" data-lucide="star" class="w-12 h-12 text-slate-300 -translate-y-2"></i>
+          <i id="star-3" data-lucide="star" class="w-10 h-10 text-slate-300"></i>
+        </div>
+        <div class="w-32 h-32 bg-emerald-100 rounded-full flex items-center justify-center border-4 border-emerald-300 relative shadow-inner">
+          <i data-lucide="globe" class="w-20 h-20 text-emerald-600 fill-emerald-100"></i>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-3xl font-black text-slate-800 tracking-tight">Protetor da Natureza!</h2>
+        <p class="text-forestGreen font-extrabold text-lg uppercase tracking-wider mt-1">Ecossistemas em Equilíbrio 🌲</p>
+      </div>
+
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 w-full max-w-sm flex justify-around">
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Erros</div>
+          <div id="victory-errors" class="text-2xl font-black text-brandRed">0</div>
+        </div>
+        <div class="w-px bg-slate-200"></div>
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
+          <div id="victory-score" class="text-2xl font-black text-brandOrange">0</div>
+        </div>
+        <div class="w-px bg-slate-200"></div>
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Desempenho</div>
+          <div id="victory-perf" class="text-2xl font-black text-brandBlue">Excelente</div>
+        </div>
+      </div>
+
+      <button onclick="resetGame()" class="btn-3d-orange bg-brandOrange hover:bg-brandOrange/90 text-white text-lg font-extrabold px-10 py-4 rounded-2xl w-full max-w-xs transition-all">
+        Jogar Novamente
+      </button>
+    </section>
+
+  </main>
+
+  <!-- Rodapé Educacional -->
+  <footer class="w-full text-center py-4 text-xs font-bold text-slate-400 border-t border-slate-200/50 mt-4 bg-white/50">
+    Desenvolvido em Conformidade com a BNCC (4º ano EF - Biologia)
+  </footer>
+
+  <!-- Container de Confete -->
+  <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
+
+  <!-- SCRIPT DO JOGO -->
+  <script>
+    // --- BANCO DE DADOS DOS ECOSSISTEMAS (3 FASES) ---
+    const ECOSYSTEMS = [
+      {
+        title: "Ecossistema: Jardim Florestal 🌳",
+        desc: "Organize a cadeia alimentar do menor nível (Produtor) até o Decompositor.",
+        bgColor: "from-emerald-50 via-teal-50 to-green-100",
+        items: [
+          { roleId: 0, name: "Flor", role: "Produtor", emoji: "🌱", color: "bg-green-100 text-green-700 border-green-300", hint: "Os Produtores (plantas) captam energia solar e dão início a toda cadeia!" },
+          { roleId: 1, name: "Lagarta", role: "Consumidor 1º", emoji: "🐛", color: "bg-amber-100 text-amber-700 border-amber-300", hint: "O Consumidor Primário se alimenta diretamente da planta (herbívoros)." },
+          { roleId: 2, name: "Passarinho", role: "Consumidor 2º", emoji: "🐦", color: "bg-blue-100 text-blue-700 border-blue-300", hint: "O Consumidor Secundário é um carnívoro pequeno que come insetos como lagartas." },
+          { roleId: 3, name: "Gavião", role: "Consumidor 3º", emoji: "🦅", color: "bg-red-100 text-red-700 border-red-300", hint: "O Consumidor Terciário é um predador topo de linha como as grandes aves." },
+          { roleId: 4, name: "Cogumelo", role: "Decompositor", emoji: "🍄", color: "bg-purple-100 text-purple-700 border-purple-300", hint: "Os Decompositores reciclam a matéria morta do ecossistema, fechando a cadeia!" }
+        ]
+      },
+      {
+        title: "Ecossistema: Oceano Atlântico 🌊",
+        desc: "Os oceanos têm cadeias marinhas impressionantes. Ajude a organizá-las!",
+        bgColor: "from-blue-50 via-indigo-50 to-cyan-100",
+        items: [
+          { roleId: 0, name: "Algas", role: "Produtor", emoji: "🌿", color: "bg-green-100 text-green-700 border-green-300", hint: "Algas marinhas usam a fotossíntese para produzir energia, iniciando o ciclo!" },
+          { roleId: 1, name: "Camarão", role: "Consumidor 1º", emoji: "🦐", color: "bg-amber-100 text-amber-700 border-amber-300", hint: "Pequenos crustáceos como camarão comem as algas microscópicas." },
+          { roleId: 2, name: "Peixe Médio", role: "Consumidor 2º", emoji: "🐟", color: "bg-blue-100 text-blue-700 border-blue-300", hint: "Os peixes médios caçam camarões e outros pequenos animais marinhos." },
+          { roleId: 3, name: "Tubarão", role: "Consumidor 3º", emoji: "🦈", color: "bg-red-100 text-red-700 border-red-300", hint: "O tubarão é um predador grande, o consumidor de nível mais alto aqui." },
+          { roleId: 4, name: "Bactérias", role: "Decompositor", emoji: "🦠", color: "bg-purple-100 text-purple-700 border-purple-300", hint: "Bactérias decompõem restos orgânicos no fundo do mar, reciclando nutrientes." }
+        ]
+      },
+      {
+        title: "Ecossistema: Savana Africana 🌾",
+        desc: "Nas planícies, herbívoros e grandes predadores dividem a energia natural.",
+        bgColor: "from-amber-50 via-yellow-50 to-orange-100",
+        items: [
+          { roleId: 0, name: "Capim", role: "Produtor", emoji: "🌾", color: "bg-green-100 text-green-700 border-green-300", hint: "O capim e os arbustos da savana são os produtores de energia!" },
+          { roleId: 1, name: "Zebra", role: "Consumidor 1º", emoji: "🦓", color: "bg-amber-100 text-amber-700 border-amber-300", hint: "A zebra consome o capim diretamente para obter sua energia inicial." },
+          { roleId: 2, name: "Leão", role: "Consumidor 2º", emoji: "🦁", color: "bg-blue-100 text-blue-700 border-blue-300", hint: "O leão é o consumidor secundário que caça herbívoros como a zebra." },
+          { roleId: 3, name: "Urubu", role: "Consumidor 3º", emoji: "🦅", color: "bg-red-100 text-red-700 border-red-300", hint: "O urubu age como consumidor terciário e carniceiro, limpando a savana." },
+          { roleId: 4, name: "Fungos", role: "Decompositor", emoji: "🍄", color: "bg-purple-100 text-purple-700 border-purple-300", hint: "Fungos e micróbios decompõem a matéria orgânica no solo fértil da savana." }
+        ]
+      }
+    ];
+
+    // --- ESTADO DO JOGO ---
+    let soundEnabled = true;
+    let score = 0;
+    let errorsCount = 0;
+    let currentPhase = 0; // 0, 1, 2
+    let selectedCard = null; // Guarda o card selecionado no clique
+    let filledSlots = Array(5).fill(null); // Quais cards estão em quais slots (index do slot = roleId)
+    
+    // --- SINTETIZADOR DE ÁUDIO WEB AUDIO API ---
+    let audioCtx = null;
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        
+        if (type === 'click') {
+          // Clique simples (pop)
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
+          
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } 
+        else if (type === 'success') {
+          // Nota alta e brilhante de acerto
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(783.99, now + 0.08); // G5
+          
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.005, now + 0.25);
+          
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } 
+        else if (type === 'error') {
+          // Buzina baixa de erro
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.linearRampToValueAtTime(100, now + 0.22);
+          
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } 
+        else if (type === 'complete') {
+          // Vitória da rodada
+          const notes = [523.25, 587.33, 659.25, 783.99, 1046.50]; // Arpejo pentatônico
+          notes.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            
+            gain.gain.setValueAtTime(0.08, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.002, now + i * 0.08 + 0.3);
+            
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.3);
+          });
+        }
+      } catch (e) {
+        console.error("Falha ao inicializar Web Audio: ", e);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const soundIcon = document.getElementById('sound-icon');
+      if (soundEnabled) {
+        soundIcon.setAttribute('data-lucide', 'volume-2');
+        soundIcon.classList.remove('text-brandRed');
+        playSound('click');
+      } else {
+        soundIcon.setAttribute('data-lucide', 'volume-x');
+        soundIcon.classList.add('text-brandRed');
+      }
+      lucide.createIcons();
+    }
+
+    // --- CONFETES ---
+    function spawnConfetti() {
+      const container = document.getElementById('confetti-container');
+      container.innerHTML = '';
+      const colors = ['#10B981', '#1CB0F6', '#FFC800', '#FF9600', '#EA2B2B', '#A855F7'];
+      
+      for (let i = 0; i < 70; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'absolute w-3 h-3 rounded-sm opacity-90 transition-all duration-1000 ease-out z-50';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = (Math.random() * 80 + 10) + '%';
+        confetti.style.top = '100%';
+        confetti.style.transform = `scale(${Math.random() * 0.8 + 0.5}) rotate(${Math.random() * 360}deg)`;
+        container.appendChild(confetti);
+        
+        const targetLeft = parseFloat(confetti.style.left) + (Math.random() * 30 - 15);
+        const targetTop = Math.random() * 35 + 15;
+        
+        setTimeout(() => {
+          confetti.style.left = targetLeft + '%';
+          confetti.style.top = targetTop + '%';
+          confetti.style.transform = `scale(${Math.random() * 0.8 + 0.5}) rotate(${Math.random() * 720}deg)`;
+        }, 30);
+
+        setTimeout(() => {
+          confetti.style.top = '110%';
+          confetti.style.opacity = '0';
+        }, 700);
+      }
+    }
+
+    // --- CONTROLE DOS ESTADOS E TELAS ---
+    function startGame() {
+      playSound('click');
+      document.getElementById('screen-start').classList.add('hidden');
+      document.getElementById('screen-game').classList.remove('hidden');
+      loadPhase();
+    }
+
+    function loadPhase() {
+      const data = ECOSYSTEMS[currentPhase];
+      
+      // Mudar fundo do corpo dependendo do ecossistema para dar experiência visual premium
+      const body = document.getElementById('game-body');
+      body.className = `bg-gradient-to-br ${data.bgColor} min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden transition-all duration-750`;
+
+      // Atualizar textos
+      document.getElementById('ecosystem-title').innerText = data.title;
+      document.getElementById('ecosystem-desc').innerText = data.desc;
+      document.getElementById('phase-indicator').innerText = `Ecossistema ${currentPhase + 1} de ${ECOSYSTEMS.length}`;
+      
+      // Progresso
+      const progressPercent = (currentPhase / ECOSYSTEMS.length) * 100;
+      document.getElementById('phase-progress-bar').style.width = `${progressPercent}%`;
+
+      // Resetar estados locais da fase
+      filledSlots = Array(5).fill(null);
+      selectedCard = null;
+      document.getElementById('hint-box').classList.add('hidden');
+      document.getElementById('next-phase-container').classList.add('hidden');
+
+      // Gerar Slots Vazios
+      renderSlots(data.items);
+
+      // Embaralhar e Gerar Cards
+      const shuffledItems = [...data.items].sort(() => Math.random() - 0.5);
+      renderDeck(shuffledItems);
+    }
+
+    // --- RENDERIZAR OS SLOTS DE DESTINO ---
+    function renderSlots(items) {
+      const container = document.getElementById('slots-container');
+      container.innerHTML = '';
+
+      items.forEach((item, index) => {
+        // Criar o slot principal
+        const slotDiv = document.createElement('div');
+        slotDiv.className = "flex flex-col items-center w-full";
+        
+        // Slot receptor do drag/drop
+        const receptor = document.createElement('div');
+        receptor.id = `slot-${item.roleId}`;
+        receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-white/70 border-3 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-white/90 transition-all duration-200";
+        receptor.dataset.expectedRole = item.roleId;
+
+        // Label interior descritiva
+        receptor.innerHTML = `
+          <div class="pointer-events-none flex flex-col items-center text-center">
+            <span class="text-xs font-black text-slate-400 uppercase tracking-wider">${index + 1}º Nível</span>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-200/50 px-2 py-0.5 rounded-md mt-1 uppercase">${item.role}</span>
+          </div>
+        `;
+
+        // --- LISTENERS DE TOQUE / DRAG & DROP PARA O RECEPTOR ---
+        receptor.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (!filledSlots[item.roleId]) {
+            receptor.classList.add('border-brandYellow', 'bg-yellow-50/50');
+          }
+        });
+
+        receptor.addEventListener('dragleave', () => {
+          receptor.classList.remove('border-brandYellow', 'bg-yellow-50/50');
+        });
+
+        receptor.addEventListener('drop', (e) => {
+          e.preventDefault();
+          receptor.classList.remove('border-brandYellow', 'bg-yellow-50/50');
+          
+          const cardId = e.dataTransfer.getData('text/plain');
+          const cardEl = document.getElementById(cardId);
+          if (cardEl) {
+            validatePlacement(cardEl, receptor);
+          }
+        });
+
+        // Clique no slot (para a mecânica híbrida toque)
+        receptor.addEventListener('click', () => {
+          if (selectedCard && !filledSlots[item.roleId]) {
+            validatePlacement(selectedCard, receptor);
+          }
+        });
+
+        slotDiv.appendChild(receptor);
+
+        // Se não for o último, podemos colocar um indicador visual de fluxo (seta) entre os slots no grid do Desktop
+        // No celular, as setas podem aparecer de outra forma. Para manter responsivo, as setas serão adicionadas via CSS ou posicionadas lateralmente.
+        container.appendChild(slotDiv);
+      });
+    }
+
+    // --- RENDERIZAR OS CARDS NA BANDEJA (DECK) ---
+    function renderDeck(items) {
+      const container = document.getElementById('deck-container');
+      container.innerHTML = '';
+
+      items.forEach((item) => {
+        const card = document.createElement('div');
+        card.id = `card-${item.roleId}`;
+        card.className = "w-28 h-36 bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-between p-3 cursor-grab select-none card-float shadow-[0_6px_0_0_rgba(226,232,240,1)] hover:shadow-[0_8px_0_0_rgba(226,232,240,1)] hover:-translate-y-1 transition-all duration-150 active:cursor-grabbing";
+        card.setAttribute('draggable', 'true');
+        card.dataset.roleId = item.roleId;
+
+        // Conteúdo visual do card (Estilo Duolingo)
+        card.innerHTML = `
+          <span class="text-3xl filter drop-shadow-md select-none pointer-events-none">${item.emoji}</span>
+          <div class="text-center pointer-events-none select-none">
+            <h4 class="font-extrabold text-sm text-slate-800 leading-tight">${item.name}</h4>
+            <span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full mt-1 inline-block uppercase">${item.role}</span>
+          </div>
+        `;
+
+        // --- LISTENERS DE INTERAÇÃO PARA O CARD ---
+        
+        // Drag Nativo
+        card.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', card.id);
+          card.classList.add('opacity-50');
+          playSound('click');
+        });
+
+        card.addEventListener('dragend', () => {
+          card.classList.remove('opacity-50');
+        });
+
+        // Clique para seleção assistida
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          playSound('click');
+          
+          // Se o card já está em algum slot, ele não pode ser selecionado novamente
+          if (card.classList.contains('placed')) return;
+
+          // Se clicar no mesmo card, desmarca
+          if (selectedCard === card) {
+            card.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+            selectedCard = null;
+            return;
+          }
+
+          // Desmarcar anterior
+          if (selectedCard) {
+            selectedCard.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+          }
+
+          // Marcar atual
+          selectedCard = card;
+          card.classList.add('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+        });
+
+        container.appendChild(card);
+      });
+
+      // Clique fora dos cards desmarca
+      document.addEventListener('click', () => {
+        if (selectedCard) {
+          selectedCard.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+          selectedCard = null;
+        }
+      });
+    }
+
+    // --- VALIDAÇÃO DA TENTATIVA DE ENCAIXE ---
+    function validatePlacement(cardEl, slotEl) {
+      const expectedRoleId = parseInt(slotEl.dataset.expectedRole);
+      const cardRoleId = parseInt(cardEl.dataset.roleId);
+      
+      const gameBox = document.getElementById('screen-game');
+      const data = ECOSYSTEMS[currentPhase];
+      const itemData = data.items.find(i => i.roleId === cardRoleId);
+
+      if (expectedRoleId === cardRoleId) {
+        // ENCAIXE CORRETO!
+        playSound('success');
+        
+        // Marcar slot como preenchido
+        filledSlots[expectedRoleId] = cardEl;
+
+        // Remover da seleção
+        cardEl.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30', 'card-float');
+        cardEl.classList.add('placed');
+        cardEl.setAttribute('draggable', 'false');
+        
+        // Efeito visual no slot (Brilho verde e borda cheia)
+        slotEl.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-green-50 border-3 border-brandGreen rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md animate-pop-in text-center";
+        
+        // Desenhar card dentro do slot
+        slotEl.innerHTML = `
+          <div class="absolute top-1.5 right-1.5 bg-brandGreen text-white rounded-full p-0.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+          </div>
+          <span class="text-3xl filter drop-shadow-md select-none mt-1">${itemData.emoji}</span>
+          <div class="text-center select-none mt-1">
+            <h4 class="font-extrabold text-xs text-slate-800 leading-tight">${itemData.name}</h4>
+            <span class="text-[9px] font-black text-brandGreenDark bg-green-200/50 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">${itemData.role}</span>
+          </div>
+        `;
+
+        // Sumir com o card original da bandeja
+        cardEl.classList.add('hidden');
+        
+        // Adicionar pontuação
+        score += 50;
+        document.getElementById('score-text').innerText = `${score} Pontos`;
+
+        // Ocultar dica anterior de erro
+        document.getElementById('hint-box').classList.add('hidden');
+
+        // Resetar seleção assistida
+        selectedCard = null;
+
+        // Verificar se todos os slots foram completados
+        checkPhaseCompletion();
+
+      } else {
+        // ENCAIXE INCORRETO!
+        playSound('error');
+        errorsCount++;
+
+        // Tremor (shake) visual no slot
+        slotEl.classList.add('animate-shake', 'border-brandRed', 'bg-red-50/50');
+        setTimeout(() => {
+          slotEl.classList.remove('animate-shake', 'border-brandRed', 'bg-red-50/50');
+        }, 400);
+
+        // Tremor no card selecionado
+        cardEl.classList.add('animate-shake');
+        setTimeout(() => {
+          cardEl.classList.remove('animate-shake');
+        }, 400);
+
+        // Desmarcar seleção do card
+        cardEl.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+        selectedCard = null;
+
+        // Mostrar Dica Biológica sobre o card arrastado
+        const hintBox = document.getElementById('hint-box');
+        const hintText = document.getElementById('hint-text');
+        
+        hintText.innerHTML = `Você tentou colocar <strong>${itemData.name} (${itemData.role})</strong> no lugar errado. <br><span class="text-brandBlueDark">${itemData.hint}</span>`;
+        hintBox.classList.remove('hidden');
+      }
+    }
+
+    // --- VERIFICAR FASE COMPLETA ---
+    function checkPhaseCompletion() {
+      // Se todos os 5 slots estiverem preenchidos (diferente de null)
+      const finished = filledSlots.every(slot => slot !== null);
+
+      if (finished) {
+        playSound('complete');
+        spawnConfetti();
+
+        // Expandir barra de progresso da fase para 100%
+        const progressPercent = ((currentPhase + 1) / ECOSYSTEMS.length) * 100;
+        document.getElementById('phase-progress-bar').style.width = `${progressPercent}%`;
+
+        // Mostrar botão de avançar
+        document.getElementById('next-phase-container').classList.remove('hidden');
+      }
+    }
+
+    // --- AVANÇAR DE ECOSSISTEMA ---
+    function advancePhase() {
+      playSound('click');
+      currentPhase++;
+
+      if (currentPhase < ECOSYSTEMS.length) {
+        loadPhase();
+      } else {
+        // Vitória geral!
+        showVictoryScreen();
+      }
+    }
+
+    // --- TELA DE VITÓRIA GERAL ---
+    function showVictoryScreen() {
+      document.getElementById('screen-game').classList.add('hidden');
+      document.getElementById('screen-victory').classList.remove('hidden');
+      playSound('complete');
+      
+      // Placar
+      document.getElementById('victory-errors').innerText = errorsCount;
+      document.getElementById('victory-score').innerText = score;
+      
+      let performanceText = "Excepcional! 🏆";
+      let starColors = ["text-brandYellow", "text-brandYellow", "text-brandYellow"];
+      
+      if (errorsCount >= 6) {
+        performanceText = "Protetor Iniciante 🌱";
+        starColors = ["text-brandYellow", "text-slate-300", "text-slate-300"];
+      } else if (errorsCount >= 3) {
+        performanceText = "Guardião da Biosfera 🦌";
+        starColors = ["text-brandYellow", "text-brandYellow", "text-slate-300"];
+      }
+      
+      document.getElementById('victory-perf').innerText = performanceText;
+
+      // Pintar estrelas de ouro
+      document.getElementById('star-1').className = `w-10 h-10 ${starColors[0]} fill-current animate-pop-in`;
+      document.getElementById('star-2').className = `w-12 h-12 ${starColors[1]} fill-current -translate-y-2 animate-pop-in`;
+      document.getElementById('star-3').className = `w-10 h-10 ${starColors[2]} fill-current animate-pop-in`;
+    }
+
+    // --- REINICIAR O JOGO ---
+    function resetGame() {
+      playSound('click');
+      score = 0;
+      errorsCount = 0;
+      currentPhase = 0;
+      
+      document.getElementById('score-text').innerText = `0 Pontos`;
+      document.getElementById('screen-victory').classList.add('hidden');
+      document.getElementById('screen-start').classList.remove('hidden');
+    }
+
+    // Inicializar Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

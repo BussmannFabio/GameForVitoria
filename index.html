@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Jogos Educativos - 4º Ano EF</title>
+  <!-- Tailwind CSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;750;850&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            nunito: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            brandGreen: '#58CC02',
+            brandGreenDark: '#46A302',
+            brandBlue: '#1CB0F6',
+            brandBlueDark: '#1899D6',
+            brandYellow: '#FFC800',
+            brandOrange: '#FF9600',
+            brandOrangeDark: '#D97706',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+    }
+    
+    /* Botões 3D Bouncy */
+    .btn-3d-orange {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #D97706;
+    }
+    .btn-3d-orange:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #D97706;
+    }
+
+    .btn-3d-green {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #46A302;
+    }
+    .btn-3d-green:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #46A302;
+    }
+
+    /* Animações Flutuantes Suaves */
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+    }
+    .animate-float-slow {
+      animation: float-slow 4s infinite ease-in-out;
+    }
+
+    @keyframes float-reverse {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(-1deg); }
+    }
+    .animate-float-reverse {
+      animation: float-reverse 4.5s infinite ease-in-out;
+    }
+
+    /* Cards premium que afundam levemente com sombra física */
+    .card-premium {
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 10px 0 0 #E2E8F0;
+    }
+    .card-premium:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 0 0 #CBD5E1;
+    }
+    .card-premium:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 0 #CBD5E1;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-blue-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Header da Central -->
+  <header class="w-full max-w-5xl mx-auto px-6 pt-6 flex justify-between items-center z-10">
+    <div class="flex items-center gap-2.5">
+      <div class="bg-indigo-600 text-white p-2.5 rounded-2xl shadow-lg">
+        <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <span class="text-xl font-black tracking-wide text-indigo-700 block leading-tight">Portal EdTech</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Escolas Premium</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <button id="sound-btn" onclick="toggleSound()" class="bg-white p-2.5 rounded-2xl border-2 border-slate-200 hover:bg-slate-100 transition-colors shadow-sm text-slate-500">
+        <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-grow flex flex-col items-center justify-center p-6 w-full max-w-5xl mx-auto gap-8">
+    
+    <!-- Título Principal -->
+    <div class="text-center max-w-xl animate-pop-in">
+      <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight leading-tight">
+        Missões Educativas <br>
+        <span class="text-indigo-600 font-extrabold text-2xl md:text-3xl uppercase tracking-wider block mt-2">Ensino Fundamental (4º Ano)</span>
+      </h1>
+      <p class="text-slate-500 font-semibold text-base md:text-lg mt-3">
+        Escolha uma das aventuras interativas abaixo criadas em conformidade com as diretrizes e habilidades da BNCC.
+      </p>
+    </div>
+
+    <!-- Grid de Jogos (Cards) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl px-2">
+      
+      <!-- CARD JOGO 1: PIZZA GOURMET -->
+      <div class="card-premium bg-white rounded-3xl border-4 border-slate-200 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden animate-float-slow"
+           onclick="launchGame('fracoes')" onmouseenter="playHoverSound()">
+        
+        <!-- Fundo decorativo sutil -->
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-orange-100 rounded-full opacity-30 pointer-events-none"></div>
+        
+        <div>
+          <!-- Cabeçalho do Card -->
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-5xl filter drop-shadow-md select-none">🍕</span>
+            <span class="bg-orange-100 text-brandOrange font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Matemática</span>
+          </div>
+
+          <h2 class="text-2xl font-black text-slate-800 leading-tight">Mestre das Frações</h2>
+          <p class="text-brandOrange font-extrabold text-xs uppercase tracking-widest mt-0.5">Pizza Gourmet</p>
+
+          <p class="text-slate-500 font-semibold text-sm mt-3 leading-relaxed">
+            Ajude o Chef a fatiar, pintar e entregar as pizzas ideais para os bichinhos. Domine numeradores e denominadores na prática de forma visual e deliciosa!
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Habilidades BNCC Tag -->
+          <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-start gap-2">
+            <i data-lucide="tag" class="text-brandOrange w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-500 leading-snug">
+              <strong>BNCC EF04MA09</strong>: Representar e associar frações maiores e menores que a unidade.
+            </span>
+          </div>
+
+          <!-- Botão 3D -->
+          <button class="btn-3d-orange bg-brandOrange hover:bg-brandOrange/95 text-white font-black py-3 rounded-2xl w-full text-base transition-colors flex items-center justify-center gap-2">
+            Iniciar Missão
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD JOGO 2: CADEIA ALIMENTAR -->
+      <div class="card-premium bg-white rounded-3xl border-4 border-slate-200 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden animate-float-reverse"
+           onclick="launchGame('natureza')" onmouseenter="playHoverSound()">
+        
+        <!-- Fundo decorativo sutil -->
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-100 rounded-full opacity-30 pointer-events-none"></div>
+
+        <div>
+          <!-- Cabeçalho do Card -->
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-5xl filter drop-shadow-md select-none">🌳</span>
+            <span class="bg-emerald-100 text-brandGreenDark font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Ciências</span>
+          </div>
+
+          <h2 class="text-2xl font-black text-slate-800 leading-tight">Conexão Natureza</h2>
+          <p class="text-brandGreenDark font-extrabold text-xs uppercase tracking-widest mt-0.5">Cadeia Alimentar</p>
+
+          <p class="text-slate-500 font-semibold text-sm mt-3 leading-relaxed">
+            Organize o fluxo de energia dos produtores aos decompositores em 3 ecossistemas incríveis: Jardim, Oceano e Savana. Equilibre a biodiversidade!
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Habilidades BNCC Tag -->
+          <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-start gap-2">
+            <i data-lucide="tag" class="text-brandGreenDark w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-500 leading-snug">
+              <strong>BNCC EF04CI04</strong>: Analisar e construir cadeias alimentares, reconhecendo produtores, consumidores e decompositores.
+            </span>
+          </div>
+
+          <!-- Botão 3D -->
+          <button class="btn-3d-green bg-brandGreen hover:bg-brandGreenDark text-white font-black py-3 rounded-2xl w-full text-base transition-colors flex items-center justify-center gap-2">
+            Iniciar Missão
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Rodapé Educacional -->
+  <footer class="w-full text-center py-5 text-xs font-bold text-slate-400 border-t border-slate-200/50 mt-6 bg-white/50">
+    Diretrizes da BNCC (4º ano) • Escola de Alto Padrão
+  </footer>
+
+  <!-- SCRIPT DE ÁUDIO E CONTROLES -->
+  <script>
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        
+        if (type === 'hover') {
+          // Clique bem sutil e suave no hover
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(450, now);
+          osc.frequency.exponentialRampToValueAtTime(350, now + 0.05);
+          
+          gain.gain.setValueAtTime(0.03, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }
+        else if (type === 'launch') {
+          // Arpejo feliz e rápido de início
+          const notes = [261.63, 329.63, 392.00, 523.25];
+          notes.forEach((freq, index) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq * 1.5, now + index * 0.05);
+            
+            gain.gain.setValueAtTime(0.08, now + index * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.005, now + index * 0.05 + 0.2);
+            
+            osc.start(now + index * 0.05);
+            osc.stop(now + index * 0.05 + 0.2);
+          });
+        }
+        else if (type === 'click') {
+          // Pop de click simples
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
+          
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          
+          osc.start(now);
+          osc.stop(now + 0.08);
+        }
+      } catch (e) {
+        console.error("Falha ao inicializar Web Audio: ", e);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const soundIcon = document.getElementById('sound-icon');
+      if (soundEnabled) {
+        soundIcon.setAttribute('data-lucide', 'volume-2');
+        soundIcon.classList.remove('text-red-500');
+        playSound('click');
+      } else {
+        soundIcon.setAttribute('data-lucide', 'volume-x');
+        soundIcon.classList.add('text-red-500');
+      }
+      lucide.createIcons();
+    }
+
+    function playHoverSound() {
+      playSound('hover');
+    }
+
+    function launchGame(game) {
+      playSound('launch');
+      setTimeout(() => {
+        if (game === 'fracoes') {
+          window.location.href = './mestre_fracoes.html';
+        } else if (game === 'natureza') {
+          window.location.href = './cadeia_alimentar.html';
+        }
+      }, 250);
+    }
+
+    // Inicializar Ícones
+    lucide.createIcons();
+  </script>
+</body>
+</html>

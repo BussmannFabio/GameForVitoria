@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eco-Tactics: A Batalha pelo Ecossistema</title>
+  <!-- Tailwind CSS v4 CDN oficial de browser -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts - Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;750;850;950&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            nunito: ['Nunito', 'sans-serif'],
+          },
+          colors: {
+            brandGreen: '#58CC02',
+            brandGreenDark: '#46A302',
+            brandBlue: '#1CB0F6',
+            brandBlueDark: '#1899D6',
+            brandYellow: '#FFC800',
+            brandOrange: '#FF9600',
+            brandRed: '#EA2B2B',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #0B0F19;
+    }
+    
+    /* Neon Glows estilo Apple Arcade */
+    .glow-forest {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2), inset 0 0 10px rgba(16, 185, 129, 0.1);
+    }
+    .glow-savannah {
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.2), inset 0 0 10px rgba(245, 158, 11, 0.1);
+    }
+    .glow-water {
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.2), inset 0 0 10px rgba(14, 165, 233, 0.1);
+    }
+
+    /* Botão 3D Gamer */
+    .btn-3d {
+      position: relative;
+      transition: all 0.1s ease;
+    }
+    .btn-3d:active {
+      transform: translateY(3px);
+      border-bottom-width: 1px;
+    }
+    
+    /* Animações Flutuantes e de Efeitos */
+    @keyframes float-text {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      20% { transform: translateY(-10px) scale(1); opacity: 1; }
+      80% { transform: translateY(-25px) scale(1); opacity: 0.8; }
+      100% { transform: translateY(-35px) scale(0.9); opacity: 0; }
+    }
+    .animate-float-text {
+      animation: float-text 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes pulse-neon {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .animate-pulse-neon {
+      animation: pulse-neon 2.5s infinite ease-in-out;
+    }
+
+    /* Estilo de slots do grid */
+    .grid-cell {
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    .grid-cell.active-select {
+      background-color: rgba(251, 191, 36, 0.15) !important;
+      border-color: #FBBF24 !important;
+    }
+
+    /* Animação de tremor (shake) */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-4px); }
+      40%, 80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: shake 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-200 flex flex-col justify-between overflow-x-hidden relative">
+
+  <!-- Container de Confetes -->
+  <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
+
+  <!-- CABEÇALHO DO JOGO -->
+  <header class="w-full max-w-6xl mx-auto px-4 pt-4 flex flex-col lg:flex-row justify-between items-center gap-3 z-10">
+    <div class="flex flex-wrap items-center gap-2.5">
+      <!-- Logo de Navegação de volta ao Hub -->
+      <a href="./index.html" class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-2xl shadow-lg transition-transform hover:scale-105 flex items-center justify-center" title="Central de Jogos">
+        <i data-lucide="home" class="w-5 h-5"></i>
+      </a>
+      <div class="flex items-center gap-2 mr-2">
+        <div class="bg-[#10B981] text-white p-2 rounded-xl">
+          <i data-lucide="activity" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-lg font-black tracking-wide text-[#10B981] block leading-tight">Eco-Tactics</span>
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Cadeia Alimentar Ativa</span>
+        </div>
+      </div>
+
+      <!-- Navegação de Missões -->
+      <nav class="flex items-center gap-1.5 bg-slate-900/60 p-1 rounded-2xl border border-slate-800">
+        <a href="./mestre_fracoes.html" class="bg-brandOrange hover:bg-brandOrange/90 text-white px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 transition-all" title="Mestre das Frações">
+          <span>Frações</span> 🍕
+        </a>
+        <a href="./cadeia_alimentar.html" class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 transition-all" title="Conexão Natureza">
+          <span>Cadeia</span> 🌳
+        </a>
+      </nav>
+    </div>
+    
+    <!-- CONTROLES PEDAGÓGICOS DA PROFESSORA -->
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Pausar Aula -->
+      <button id="pause-btn" onclick="togglePauseClassroom()" class="btn-3d bg-indigo-600 hover:bg-indigo-700 text-white font-black px-4 py-2 border-b-4 border-indigo-900 rounded-2xl text-xs md:text-sm flex items-center gap-1.5 transition-all shadow-md">
+        <i id="pause-icon" data-lucide="pause-circle" class="w-4 h-4"></i>
+        <span id="pause-text">Pausar Aula ⏱️</span>
+      </button>
+
+      <!-- Placar de Sobrevivência e Energia Solar -->
+      <div class="bg-slate-900/90 border border-slate-700 px-4 py-1.5 rounded-2xl text-sm font-bold flex items-center gap-3 shadow-md">
+        <div class="flex items-center gap-1">
+          <i data-lucide="sun" class="text-brandYellow w-4 h-4 fill-brandYellow animate-spin-slow"></i>
+          <span id="solar-text" class="text-brandYellow font-extrabold">100</span>
+        </div>
+        <div class="w-px h-4 bg-slate-700"></div>
+        <div class="flex items-center gap-1">
+          <i data-lucide="shield-alert" class="text-brandRed w-4 h-4"></i>
+          <span id="base-life-text" class="text-brandRed font-extrabold">Vida: 100%</span>
+        </div>
+      </div>
+
+      <!-- Controle de Som -->
+      <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/90 p-2.5 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors shadow-md text-slate-400">
+        <i id="sound-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTAINER DE JOGO E TABULEIRO -->
+  <main class="flex-grow flex items-center justify-center p-4 w-full max-w-6xl mx-auto z-10">
+    <div class="w-full flex flex-col gap-4 relative">
+      
+      <!-- PAINEL DE AVISO DE PAUSA PEDAGÓGICA (TELA DA PROFESSORA) -->
+      <div id="classroom-panel" class="absolute inset-0 bg-[#0B0F19]/95 border-4 border-indigo-500 rounded-3xl z-40 p-6 flex flex-col md:flex-row gap-6 hidden animate-pop-in">
+        <!-- Lado Esquerdo: Lousa de Discussão -->
+        <div class="flex-grow bg-slate-900 border-2 border-slate-800 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-indigo-400 font-extrabold uppercase text-xs tracking-wider mb-2">
+              <i data-lucide="presentation" class="w-4 h-4"></i>
+              Lousa Pedagógica (Modo Aula)
+            </div>
+            <h3 class="text-xl font-black text-slate-100">Análise do Ecossistema</h3>
+            
+            <!-- Descrição e Dinâmicas em Tempo Real -->
+            <div id="classroom-analysis" class="mt-4 text-slate-300 space-y-3 font-semibold text-sm leading-relaxed">
+              <!-- JS preencherá dinamicamente dependendo do tabuleiro -->
+            </div>
+          </div>
+
+          <div class="border-t border-slate-800/80 pt-4 mt-4 flex items-start gap-3 bg-indigo-950/20 p-3 rounded-xl border border-indigo-900/30">
+            <i data-lucide="help-circle" class="text-indigo-400 w-5 h-5 flex-shrink-0 mt-0.5 animate-pulse"></i>
+            <p class="text-xs text-slate-400 leading-normal font-bold">
+              Professora: Use este espaço para pausar o jogo e fazer perguntas de raciocínio lógico biológico para os alunos ("Se eu tirar as plantas da linha, o que acontece com os coelhos?").
+            </p>
+          </div>
+        </div>
+
+        <!-- Lado Direito: Eventos Ambientais da Professora -->
+        <div class="w-full md:w-80 flex-shrink-0 bg-slate-900 border-2 border-slate-800 rounded-2xl p-5 flex flex-col gap-4">
+          <div class="flex items-center gap-2 text-brandOrange font-extrabold uppercase text-xs tracking-wider">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            Disparar Eventos Climáticos
+          </div>
+          <p class="text-xs text-slate-400 font-semibold leading-normal">Simule incidentes ecológicos reais para os alunos tentarem resolver no tabuleiro:</p>
+
+          <!-- Botões de Ações Climáticas -->
+          <div class="flex flex-col gap-2.5">
+            <button onclick="triggerWeatherEvent('sun')" class="btn-3d bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2.5 border-b-4 border-amber-700 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+              <i data-lucide="sun" class="w-4 h-4"></i>
+              Super Sol (Fotossíntese +100%)
+            </button>
+            <button onclick="triggerWeatherEvent('acid_rain')" class="btn-3d bg-red-500 hover:bg-red-600 text-white font-black py-2.5 border-b-4 border-red-800 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+              <i data-lucide="cloud-lightning" class="w-4 h-4"></i>
+              Chuva Ácida (Dano em Plantas)
+            </button>
+            <button onclick="triggerWeatherEvent('toxic')" class="btn-3d bg-purple-600 hover:bg-purple-700 text-white font-black py-2.5 border-b-4 border-purple-900 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+              <i data-lucide="skull" class="w-4 h-4"></i>
+              Poluição Química (Invasão Praga)
+            </button>
+          </div>
+
+          <button onclick="togglePauseClassroom()" class="btn-3d bg-brandGreen hover:bg-brandGreenDark text-white font-black py-3 border-b-4 border-green-800 rounded-xl text-sm flex items-center justify-center gap-2 transition-all mt-auto shadow-md">
+            Retomar Simulação 🚀
+          </button>
+        </div>
+      </div>
+
+      <!-- TELA INICIAL (BOAS VINDAS / TUTORIAL) -->
+      <section id="screen-start" class="w-full bg-[#111827] border-4 border-slate-800 rounded-3xl p-8 shadow-2xl text-center flex flex-col items-center gap-6 animate-pop-in">
+        <div class="w-32 h-32 flex items-center justify-center bg-indigo-950/50 rounded-full border-2 border-indigo-500/30 animate-pulse">
+          <i data-lucide="swords" class="w-16 h-16 text-[#10B981]"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight">Eco-Tactics</h1>
+          <p class="text-[#10B981] font-black uppercase tracking-widest text-sm md:text-base mt-1">A Batalha pelo Ecossistema 🛡️</p>
+        </div>
+        <p class="text-slate-400 font-semibold max-w-lg text-sm md:text-base leading-relaxed">
+          Neste auto-battler ecológico, você deve defender o ecossistema invocando seres vivos. Mas lembre-se: **a vida depende da cadeia alimentar!** Nenhum herbívoro vive sem plantas, e nenhum carnívoro caça sem presas.
+        </p>
+
+        <!-- Instruções Rápidas de Cadeia -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl w-full text-left mt-2">
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-emerald-500/20 text-center">
+            <span class="text-3xl block">🌿</span>
+            <span class="font-extrabold text-[11px] uppercase tracking-wider text-emerald-400">Produtor</span>
+            <p class="text-[10px] text-slate-500 font-bold mt-1">Gera energia vital solar.</p>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-amber-500/20 text-center">
+            <span class="text-3xl block">🐰</span>
+            <span class="font-extrabold text-[11px] uppercase tracking-wider text-amber-400">Consumidor 1º</span>
+            <p class="text-[10px] text-slate-500 font-bold mt-1">Ataca pragas corpo a corpo.</p>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-sky-500/20 text-center">
+            <span class="text-3xl block">🐍</span>
+            <span class="font-extrabold text-[11px] uppercase tracking-wider text-sky-400">Consumidor 2º</span>
+            <p class="text-[10px] text-slate-500 font-bold mt-1">Atira projéteis purificadores.</p>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-purple-500/20 text-center">
+            <span class="text-3xl block">🍄</span>
+            <span class="font-extrabold text-[11px] uppercase tracking-wider text-purple-400">Decompositor</span>
+            <p class="text-[10px] text-slate-500 font-bold mt-1">Recicla mortes em energia.</p>
+          </div>
+        </div>
+
+        <button onclick="startGame()" class="btn-3d bg-brandGreen hover:bg-brandGreenDark text-slate-950 font-black text-xl px-12 py-4 border-b-4 border-green-800 rounded-2xl transition-all shadow-lg">
+          Iniciar Simulação ⚔️
+        </button>
+      </section>
+
+      <!-- TELA DE SIMULAÇÃO ATIVA (TABULEIRO DE JOGO) -->
+      <section id="screen-game" class="w-full flex flex-col gap-4 hidden">
+        
+        <!-- O Tabuleiro do Ecossistema -->
+        <div id="game-board-container" class="relative w-full bg-slate-950/80 rounded-3xl border-4 border-slate-800 overflow-hidden min-h-[380px] p-2 flex flex-col justify-around gap-2 select-none shadow-inner">
+          
+          <!-- Linhas do Bioma (Raias) -->
+          <!-- Raias e slots gerados via JavaScript -->
+          
+          <!-- Container de Elementos Absolutos (Poluição, Projéteis e Efeitos Flutuantes) -->
+          <div id="entities-container" class="absolute inset-0 pointer-events-none overflow-hidden z-20"></div>
+        </div>
+
+        <!-- PAINEL INFORMATIVO DO CARD SELECIONADO -->
+        <div id="info-panel" class="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl flex gap-3 items-center min-h-[70px]">
+          <div class="bg-indigo-950 text-indigo-400 p-2 rounded-xl">
+            <i data-lucide="info" class="w-5 h-5 animate-pulse"></i>
+          </div>
+          <div>
+            <h4 id="info-title" class="font-extrabold text-sm text-indigo-400">Pronto para Invocar</h4>
+            <p id="info-desc" class="text-xs text-slate-400 font-semibold leading-relaxed">Selecione um ser vivo no deck inferior para ver seu papel na cadeia e seu custo de energia vital solar.</p>
+          </div>
+        </div>
+
+        <!-- DECK DE INVOCAÇÃO INFERIOR -->
+        <div class="bg-slate-900/90 border-2 border-slate-800 rounded-3xl p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-center text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+            <span>Deck de Invocadores (Escolha um elemento)</span>
+            <span id="deck-solars-needed" class="text-brandYellow">Selecione para ver o custo</span>
+          </div>
+
+          <!-- Grid dos Cards do Deck -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
+            
+            <!-- CARD 1: PLANTA (PRODUTOR) -->
+            <button id="card-produtor" onclick="selectCardToPlace('produtor')" class="btn-3d bg-slate-950 border-3 border-slate-800 hover:border-emerald-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+              <div class="flex items-center gap-2">
+                <span class="text-3.5xl">🌿</span>
+                <div class="text-left leading-tight">
+                  <span class="font-extrabold text-xs block text-slate-300">Planta</span>
+                  <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Produtor</span>
+                </div>
+              </div>
+              <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-xs px-2.5 py-1 rounded-xl border border-brandYellow/20">50 ☀️</span>
+            </button>
+
+            <!-- CARD 2: COELHO (CONSUMIDOR 1º) -->
+            <button id="card-primario" onclick="selectCardToPlace('primario')" class="btn-3d bg-slate-950 border-3 border-slate-800 hover:border-amber-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+              <div class="flex items-center gap-2">
+                <span class="text-3.5xl">🐰</span>
+                <div class="text-left leading-tight">
+                  <span class="font-extrabold text-xs block text-slate-300">Coelho</span>
+                  <span class="text-[9px] font-bold text-amber-400 uppercase tracking-wider">Consumidor 1º</span>
+                </div>
+              </div>
+              <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-xs px-2.5 py-1 rounded-xl border border-brandYellow/20">75 ☀️</span>
+            </button>
+
+            <!-- CARD 3: SERPENTE (CONSUMIDOR 2º) -->
+            <button id="card-secundario" onclick="selectCardToPlace('secundario')" class="btn-3d bg-slate-950 border-3 border-slate-800 hover:border-sky-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+              <div class="flex items-center gap-2">
+                <span class="text-3.5xl">🐍</span>
+                <div class="text-left leading-tight">
+                  <span class="font-extrabold text-xs block text-slate-300">Serpente</span>
+                  <span class="text-[9px] font-bold text-sky-400 uppercase tracking-wider">Consumidor 2º</span>
+                </div>
+              </div>
+              <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-xs px-2.5 py-1 rounded-xl border border-brandYellow/20">120 ☀️</span>
+            </button>
+
+            <!-- CARD 4: COGUMELO (DECOMPOSITOR) -->
+            <button id="card-decompositor" onclick="selectCardToPlace('decompositor')" class="btn-3d bg-slate-950 border-3 border-slate-800 hover:border-purple-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+              <div class="flex items-center gap-2">
+                <span class="text-3.5xl">🍄</span>
+                <div class="text-left leading-tight">
+                  <span class="font-extrabold text-xs block text-slate-300">Cogumelo</span>
+                  <span class="text-[9px] font-bold text-purple-400 uppercase tracking-wider">Decompositor</span>
+                </div>
+              </div>
+              <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-xs px-2.5 py-1 rounded-xl border border-brandYellow/20">40 ☀️</span>
+            </button>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TELA DE GAME OVER (FALHA / NATUREZA DESTRUÍDA) -->
+      <section id="screen-gameover" class="w-full bg-[#111827] border-4 border-brandRed/30 rounded-3xl p-8 shadow-2xl text-center flex flex-col items-center gap-6 hidden animate-pop-in">
+        <div class="w-24 h-24 flex items-center justify-center bg-red-950/50 rounded-full border-2 border-brandRed/30 text-brandRed animate-bounce">
+          <i data-lucide="heart-off" class="w-12 h-12"></i>
+        </div>
+        <div>
+          <h2 class="text-3xl font-black text-white">Ecossistema Colapsou!</h2>
+          <p class="text-brandRed font-black uppercase tracking-widest text-sm mt-1">A Poluição venceu a Natureza 👾</p>
+        </div>
+        <p class="text-slate-400 font-semibold max-w-sm text-sm leading-relaxed">
+          Você não conseguiu equilibrar o fluxo biológico a tempo. Lembre-se: **invocar produtores é a chave para ter energia extra** e manter o tabuleiro ativo!
+        </p>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 w-full max-w-xs flex justify-around">
+          <div class="text-center">
+            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Pontuação</div>
+            <div id="go-score" class="text-xl font-black text-brandOrange">0</div>
+          </div>
+          <div class="w-px bg-slate-800"></div>
+          <div class="text-center">
+            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Pragas Purificadas</div>
+            <div id="go-kills" class="text-xl font-black text-brandGreen font-extrabold">0</div>
+          </div>
+        </div>
+
+        <button onclick="resetGame()" class="btn-3d bg-brandOrange hover:bg-brandOrange/90 text-white font-black text-lg px-10 py-3.5 border-b-4 border-amber-700 rounded-xl transition-all shadow-md">
+          Tentar Novamente 🔄
+        </button>
+      </section>
+
+      <!-- TELA DE VITÓRIA (EQUILÍBRIO RESTAURADO) -->
+      <section id="screen-victory" class="w-full bg-[#111827] border-4 border-[#10B981]/30 rounded-3xl p-8 shadow-2xl text-center flex flex-col items-center gap-6 hidden animate-pop-in">
+        <div class="w-24 h-24 flex items-center justify-center bg-emerald-950/50 rounded-full border-2 border-[#10B981]/30 text-[#10B981] animate-bounce">
+          <i data-lucide="crown" class="w-12 h-12"></i>
+        </div>
+        <div>
+          <h2 class="text-3xl font-black text-white">Ecossistema Restaurado!</h2>
+          <p class="text-[#10B981] font-black uppercase tracking-widest text-sm mt-1">Equilíbrio da Cadeia Alimentar Perfeito 🎉</p>
+        </div>
+        <p class="text-slate-400 font-semibold max-w-sm text-sm leading-relaxed">
+          Incrível! Você neutralizou a poluição com estratégia tática de fotossíntese, predação e decomposição de matéria orgânica.
+        </p>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 w-full max-w-xs flex justify-around">
+          <div class="text-center">
+            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Pontuação</div>
+            <div id="vic-score" class="text-xl font-black text-brandOrange">0</div>
+          </div>
+          <div class="w-px bg-slate-800"></div>
+          <div class="text-center">
+            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Sobreviventes</div>
+            <div id="vic-saves" class="text-xl font-black text-brandGreen font-extrabold">0</div>
+          </div>
+        </div>
+
+        <button onclick="resetGame()" class="btn-3d bg-brandGreen hover:bg-brandGreenDark text-slate-950 font-black text-lg px-10 py-3.5 border-b-4 border-green-800 rounded-xl transition-all shadow-md">
+          Jogar Novamente 🔄
+        </button>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Rodapé Educacional -->
+  <footer class="w-full text-center py-4 text-xs font-bold text-slate-600 border-t border-slate-800/20 mt-4 bg-slate-950/40">
+    Eco-Tactics • Gamificação Premium BNCC EF04CI04
+  </footer>
+
+  <script>
+    // --- ESTADO GLOBAL DO JOGO ---
+    let soundEnabled = true;
+    let isPaused = false;
+    let isClassroomPaused = false;
+    let solarEnergy = 100;
+    let baseLife = 100;
+    let score = 0;
+    let totalKills = 0;
+    let currentWave = 1;
+    let gameActive = false;
+    let frameId = null;
+
+    // Configurações do Grid de Raias
+    const ROWS = 3;
+    const COLS = 6;
+    
+    // Dados dos Biomas por Raia
+    const BIOMES = [
+      { id: 0, name: "Floresta 🟩", bgStyle: "bg-gradient-to-r from-emerald-950/80 to-[#10B981]/10", borderClass: "border-emerald-500/20", glowClass: "glow-forest" },
+      { id: 1, name: "Terra Seca 🟫", bgStyle: "bg-gradient-to-r from-amber-950/80 to-[#F59E0B]/10", borderClass: "border-amber-500/20", glowClass: "glow-savannah" },
+      { id: 2, name: "Rio/Água 🟦", bgStyle: "bg-gradient-to-r from-blue-950/80 to-[#0EA5E9]/10", borderClass: "border-sky-500/20", glowClass: "glow-water" }
+    ];
+
+    // Detalhes dos Defensores
+    const CARDS = {
+      produtor: { type: 'produtor', name: 'Planta', emoji: '🌿', cost: 50, desc: 'Produtor: Gera +10 energia solar a cada 5s. Não precisa de nada para ser invocada.', role: 'Produtor' },
+      primario: { type: 'primario', name: 'Coelho', emoji: '🐰', cost: 75, desc: 'Consumidor Primário (Herbívoro): Ataca inimigos à sua frente. Só pode ser colocado se houver uma Planta na raia!', role: 'Consumidor 1º' },
+      secundario: { type: 'secundario', name: 'Serpente', emoji: '🐍', cost: 120, desc: 'Consumidor Secundário (Carnívoro): Dispara bolas de energia para purificação à distância. Só pode ser colocado se houver um Coelho na raia!', role: 'Consumidor 2º' },
+      decompositor: { type: 'decompositor', name: 'Cogumelo', emoji: '🍄', cost: 40, desc: 'Decompositor: Quando um aliado morre na sua raia, ele a limpa e recupera o dobro de energia (+80 ☀️)!', role: 'Decompositor' }
+    };
+
+    let selectedType = null; // Card selecionado atualmente
+    
+    // Vetores de Entidades
+    let grid = []; // Matriz de ROWS x COLS representando defensores: grid[r][c] = { type, emoji, life, maxLife, row, col, lastAction, hungerTime, starvation }
+    let enemies = []; // Array de { id, type, emoji, x, y, row, life, maxLife, speed }
+    let projectiles = []; // Array de { x, y, row, speed, damage }
+    let floatTexts = []; // Array de { text, x, y, timer }
+    
+    // Eventos Climáticos ativos
+    let weatherEffects = {
+      superSun: 0, // timer em frames
+      acidRain: 0
+    };
+
+    // --- SINTETIZADOR DE ÁUDIO WEB AUDIO API ---
+    let audioCtx = null;
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+
+        if (type === 'click') {
+          // Clique padrão
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+          gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(); osc.stop(now + 0.08);
+        }
+        else if (type === 'invoke') {
+          // Arpejo agudo de invocação
+          const notes = [440, 554.37, 659.25, 880];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+            gain.gain.setValueAtTime(0.05, now + idx * 0.05); gain.gain.exponentialRampToValueAtTime(0.002, now + idx * 0.05 + 0.15);
+            osc.start(now + idx * 0.05); osc.stop(now + idx * 0.05 + 0.15);
+          });
+        }
+        else if (type === 'shoot') {
+          // Som de laser fofo
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+          gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.start(); osc.stop(now + 0.1);
+        }
+        else if (type === 'hit') {
+          // Estalo de impacto
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(220, now);
+          gain.gain.setValueAtTime(0.07, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.start(); osc.stop(now + 0.05);
+        }
+        else if (type === 'coin') {
+          // Moeda solar rápida
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(523, now);
+          osc.frequency.setValueAtTime(783, now + 0.08);
+          gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.002, now + 0.2);
+          osc.start(); osc.stop(now + 0.2);
+        }
+        else if (type === 'danger') {
+          // Alerta grave de fome
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, now);
+          osc.frequency.setValueAtTime(120, now + 0.15);
+          gain.gain.setValueAtTime(0.12, now); gain.gain.exponentialRampToValueAtTime(0.002, now + 0.3);
+          osc.start(); osc.stop(now + 0.3);
+        }
+        else if (type === 'decompose') {
+          // Ruído de decomposição
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'triangle'; osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(60, now + 0.4);
+          gain.gain.setValueAtTime(0.12, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(); osc.stop(now + 0.4);
+        }
+        else if (type === 'weather') {
+          // Alarme de vento / evento ecológico
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'sine'; osc.frequency.setValueAtTime(300, now);
+          osc.frequency.linearRampToValueAtTime(600, now + 0.6);
+          gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(); osc.stop(now + 0.6);
+        }
+        else if (type === 'complete') {
+          // Vitória da rodada/jogo
+          const notes = [523.25, 587.33, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            gain.gain.setValueAtTime(0.08, now + idx * 0.08); gain.gain.exponentialRampToValueAtTime(0.002, now + idx * 0.08 + 0.3);
+            osc.start(now + idx * 0.08); osc.stop(now + idx * 0.08 + 0.3);
+          });
+        }
+      } catch(e) {
+        console.error("Falha no sintetizador: ", e);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const soundIcon = document.getElementById('sound-icon');
+      if (soundEnabled) {
+        soundIcon.setAttribute('data-lucide', 'volume-2');
+        soundIcon.classList.remove('text-red-500');
+        playSound('click');
+      } else {
+        soundIcon.setAttribute('data-lucide', 'volume-x');
+        soundIcon.classList.add('text-red-500');
+      }
+      lucide.createIcons();
+    }
+
+    // --- CONTROLES DE FLUXO DO JOGO ---
+    function startGame() {
+      playSound('click');
+      document.getElementById('screen-start').classList.add('hidden');
+      document.getElementById('screen-game').classList.remove('hidden');
+      
+      initGameBoard();
+      gameActive = true;
+      lastTime = performance.now();
+      
+      // Spawna inimigo inicial rápido para engajar
+      spawnEnemy();
+      
+      // Loop Principal
+      frameId = requestAnimationFrame(gameLoop);
+    }
+
+    function initGameBoard() {
+      const container = document.getElementById('game-board-container');
+      container.innerHTML = ''; // Limpar antigos
+
+      // Criar as 3 raias bioma
+      for (let r = 0; r < ROWS; r++) {
+        const biome = BIOMES[r];
+        
+        // Raias horizontais
+        const raia = document.createElement('div');
+        raia.id = `raia-${r}`;
+        raia.className = `flex items-center w-full h-[110px] relative border-y border-slate-800 ${biome.bgStyle} ${biome.glowClass} px-2 py-1 gap-2.5`;
+        
+        // Grid de slots de defesa (Colunas 0 a 4). Coluna 5 é a Base de Natureza
+        const gridDiv = document.createElement('div');
+        gridDiv.className = "flex-grow h-full grid grid-cols-5 gap-2 relative z-10";
+        
+        for (let c = 0; c < 5; c++) {
+          const slot = document.createElement('div');
+          slot.id = `slot-${r}-${c}`;
+          slot.className = "grid-cell bg-slate-950/40 border-2 border-dashed border-slate-700/60 rounded-xl flex items-center justify-center cursor-pointer hover:border-brandYellow hover:bg-slate-900/30 transition-all";
+          slot.dataset.row = r;
+          slot.dataset.col = c;
+          
+          slot.addEventListener('click', () => handleSlotClick(r, c));
+          gridDiv.appendChild(slot);
+        }
+        
+        raia.appendChild(gridDiv);
+
+        // A Base da Natureza na Coluna 5 (Coração do Bioma)
+        const baseDiv = document.createElement('div');
+        baseDiv.id = `base-${r}`;
+        baseDiv.className = "w-24 h-full bg-slate-900/80 border-2 border-emerald-500/30 rounded-2xl flex flex-col items-center justify-center p-2 text-center relative shadow-lg";
+        baseDiv.innerHTML = `
+          <span class="text-3xl filter drop-shadow-md animate-pulse">🌸</span>
+          <span class="text-[9px] font-black text-emerald-400 mt-1 uppercase tracking-wider">Coração</span>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5 border border-slate-700">
+            <div id="base-life-bar-${r}" class="bg-brandGreen h-full w-full transition-all"></div>
+          </div>
+        `;
+        
+        raia.appendChild(baseDiv);
+        container.appendChild(raia);
+      }
+
+      // Inicializa Matriz do Grid Vazia
+      grid = [];
+      for (let r = 0; r < ROWS; r++) {
+        grid.push(Array(COLS).fill(null));
+      }
+    }
+
+    // --- CONTROLE DE SELEÇÃO DOS CARDS DO DECK ---
+    function selectCardToPlace(type) {
+      playSound('click');
+      
+      // Desmarcar anterior
+      if (selectedType) {
+        document.getElementById(`card-${selectedType}`).classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+      }
+
+      if (selectedType === type) {
+        selectedType = null;
+        updateInfoPanel(null);
+        return;
+      }
+
+      selectedType = type;
+      const card = CARDS[type];
+      document.getElementById(`card-${type}`).classList.add('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+      
+      // Atualiza painel informativo
+      updateInfoPanel(card);
+    }
+
+    function updateInfoPanel(card) {
+      const title = document.getElementById('info-title');
+      const desc = document.getElementById('info-desc');
+      const sub = document.getElementById('deck-solars-needed');
+      
+      if (card) {
+        title.innerText = `Pronto para Invocar: ${card.name} ${card.emoji}`;
+        desc.innerText = card.desc;
+        sub.innerHTML = `Energia Necessária: <span class="font-extrabold text-brandYellow text-sm">${card.cost} ☀️</span>`;
+        
+        // Destaque visual temporário nos slots vazios e válidos
+        highlightValidSlots(card.type);
+      } else {
+        title.innerText = "Pronto para Invocar";
+        desc.innerText = "Selecione um ser vivo no deck inferior para ver seu papel na cadeia e seu custo de energia vital solar.";
+        sub.innerText = "Selecione para ver o custo";
+        clearHighlights();
+      }
+    }
+
+    // Destacar células onde é válido invocar
+    function highlightValidSlots(type) {
+      clearHighlights();
+      
+      for (let r = 0; r < ROWS; r++) {
+        const hasProducer = lineHasEntity(r, 'produtor');
+        const hasConsumer1 = lineHasEntity(r, 'primario');
+
+        let isValidLine = true;
+        if (type === 'primario' && !hasProducer) isValidLine = false;
+        if (type === 'secundario' && !hasConsumer1) isValidLine = false;
+
+        for (let c = 0; c < 5; c++) {
+          const slot = document.getElementById(`slot-${r}-${c}`);
+          if (slot && !grid[r][c]) {
+            if (isValidLine) {
+              slot.classList.add('border-emerald-500/50', 'bg-emerald-500/5');
+            } else {
+              slot.classList.add('border-brandRed/30', 'bg-brandRed/5');
+            }
+          }
+        }
+      }
+    }
+
+    function clearHighlights() {
+      const cells = document.querySelectorAll('.grid-cell');
+      cells.forEach(cell => {
+        cell.classList.remove('border-emerald-500/50', 'bg-emerald-500/5', 'border-brandRed/30', 'bg-brandRed/5');
+      });
+    }
+
+    function lineHasEntity(row, type) {
+      for (let c = 0; c < 5; c++) {
+        if (grid[row][c] && grid[row][c].type === type) return true;
+      }
+      return false;
+    }
+
+    // --- CLIQUE NOS SLOTS DO GRID (INVOCAR SER VIVO) ---
+    function handleSlotClick(row, col) {
+      if (!selectedType || isPaused || isClassroomPaused) return;
+
+      const card = CARDS[selectedType];
+      
+      // 1. Verificar se slot está livre
+      if (grid[row][col]) {
+        showFloatText("Slot Ocupado! ❌", row, col, '#EF4444');
+        playSound('danger');
+        return;
+      }
+
+      // 2. Verificar se tem energia solar suficiente
+      if (solarEnergy < card.cost) {
+        showFloatText("Sem Energia! ☀️", row, col, '#FFC800');
+        playSound('danger');
+        return;
+      }
+
+      // 3. Validar Cadeia Alimentar (Regras do Ecossistema)
+      const hasProducer = lineHasEntity(row, 'produtor');
+      const hasConsumer1 = lineHasEntity(row, 'primario');
+
+      if (card.type === 'primario' && !hasProducer) {
+        showFloatText("Falta Planta na Linha! 🌿", row, col, '#EA2B2B');
+        playSound('danger');
+        displayWarningMessage("Invocação inválida! Coelhos (Consumidores Primários) precisam de Plantas (Produtores) na mesma linha para comer e obter energia!");
+        return;
+      }
+      if (card.type === 'secundario' && !hasConsumer1) {
+        showFloatText("Falta Coelho na Linha! 🐰", row, col, '#EA2B2B');
+        playSound('danger');
+        displayWarningMessage("Invocação inválida! Serpentes (Consumidores Secundários) precisam de Coelhos na mesma linha para caçar!");
+        return;
+      }
+
+      // 4. Executar a Invocação
+      solarEnergy -= card.cost;
+      document.getElementById('solar-text').innerText = solarEnergy;
+      playSound('invoke');
+      
+      // Instanciar entidade no grid
+      grid[row][col] = {
+        type: card.type,
+        emoji: card.emoji,
+        name: card.name,
+        role: card.role,
+        life: 100,
+        maxLife: 100,
+        row: row,
+        col: col,
+        lastAction: performance.now(),
+        hungerTime: 0, // Se ficar com fome, começa a contar
+        starvation: false
+      };
+
+      // Atualizar visual do slot
+      updateSlotVisual(row, col);
+      
+      showFloatText("Invocado! ✨", row, col, '#58CC02');
+      score += 10;
+      
+      // Limpar seleção
+      selectCardToPlace(selectedType);
+    }
+
+    function displayWarningMessage(msg) {
+      // Exibe dica na lousa inferior
+      const infoDesc = document.getElementById('info-desc');
+      const infoTitle = document.getElementById('info-title');
+      
+      infoTitle.innerText = "Alerta Ecológico! ⚠️";
+      infoDesc.innerHTML = `<span class="text-brandRed font-bold">${msg}</span>`;
+      
+      // Limpa após 4 segundos se o aluno não interagir
+      setTimeout(() => {
+        if (!selectedType) {
+          infoTitle.innerText = "Pronto para Invocar";
+          infoDesc.innerText = "Selecione um ser vivo no deck inferior...";
+        }
+      }, 5000);
+    }
+
+    function updateSlotVisual(row, col) {
+      const slot = document.getElementById(`slot-${row}-${col}`);
+      const item = grid[row][col];
+      
+      if (item) {
+        slot.className = "grid-cell bg-slate-900/90 border-2 border-slate-700 rounded-xl flex flex-col items-center justify-between p-2 relative shadow-md animate-pop-in";
+        slot.innerHTML = `
+          <!-- Indicador de Fome -->
+          <div id="hunger-${row}-${col}" class="absolute -top-2 -left-2 bg-brandRed text-white text-[10px] px-1.5 py-0.5 rounded-full font-black animate-bounce hidden">FOME 😩</div>
+          
+          <!-- Emoji do elemento -->
+          <span class="text-3.5xl filter drop-shadow-md select-none mt-0.5">${item.emoji}</span>
+          
+          <div class="w-full text-center leading-none mt-1">
+            <span class="font-extrabold text-[10px] text-slate-300 block">${item.name}</span>
+            <!-- Barra de Vida -->
+            <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1 border border-slate-700">
+              <div id="life-${row}-${col}" class="bg-brandGreen h-full" style="width: 100%"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Esvaziar
+        slot.className = "grid-cell bg-slate-950/40 border-2 border-dashed border-slate-700/60 rounded-xl flex items-center justify-center cursor-pointer hover:border-brandYellow hover:bg-slate-900/30 transition-all";
+        slot.innerHTML = `
+          <div class="pointer-events-none flex flex-col items-center text-center">
+            <span class="text-xs font-black text-slate-400 uppercase tracking-wider">${col + 1}º Nível</span>
+          </div>
+        `;
+      }
+    }
+
+    // --- MOTOR DE FÍSICA E LOOP DE GAMEPLAY ---
+    let lastTime = 0;
+    let spawnTimer = 0;
+    const spawnInterval = 360; // frames entre monstros de poluição (~6 segundos)
+
+    function gameLoop(time) {
+      if (!gameActive) return;
+      
+      if (isPaused || isClassroomPaused) {
+        // Apenas continua o frame loop sem avançar física
+        frameId = requestAnimationFrame(gameLoop);
+        return;
+      }
+
+      // Geração Solar Passiva (taxa lenta)
+      if (Math.random() < 0.005) {
+        // Geração lenta de sol
+        solarEnergy += (weatherEffects.superSun > 0) ? 4 : 2;
+        document.getElementById('solar-text').innerText = solarEnergy;
+      }
+
+      // Gerenciar Spawns de Poluição
+      spawnTimer++;
+      if (spawnTimer >= spawnInterval) {
+        spawnEnemy();
+        spawnTimer = 0;
+      }
+
+      // Atualizar Efeitos Climáticos
+      if (weatherEffects.superSun > 0) weatherEffects.superSun--;
+      if (weatherEffects.acidRain > 0) {
+        weatherEffects.acidRain--;
+        // Chuva ácida dá dano lento nas plantas a cada segundo
+        if (Math.random() < 0.01) {
+          damageAllPlants();
+        }
+      }
+
+      // Atualizar Defensores no Grid (Comportamento e Fome)
+      updateDefenders();
+
+      // Mover e Colidir Inimigos
+      updateEnemies();
+
+      // Mover e Colidir Projéteis
+      updateProjectiles();
+
+      // Desenhar/Atualizar elementos visuais absolutos
+      drawEntities();
+
+      // Próximo frame
+      frameId = requestAnimationFrame(gameLoop);
+    }
+
+    // --- GERENCIAR DEFENSORAS (AÇÕES & FOME ECOLÓGICA) ---
+    function updateDefenders() {
+      const now = performance.now();
+
+      for (let r = 0; r < ROWS; r++) {
+        const hasProducer = lineHasEntity(r, 'produtor');
+        const hasConsumer1 = lineHasEntity(r, 'primario');
+
+        for (let c = 0; c < 5; c++) {
+          const item = grid[r][c];
+          if (!item) continue;
+
+          // --- 1. MECÂNICA DE FOME E MORTE ---
+          // Coelho fica com fome sem planta
+          if (item.type === 'primario') {
+            if (!hasProducer) {
+              triggerHunger(item, r, c);
+            } else {
+              clearHunger(item, r, c);
+            }
+          }
+          // Serpente fica com fome sem coelho
+          if (item.type === 'secundario') {
+            if (!hasConsumer1) {
+              triggerHunger(item, r, c);
+            } else {
+              clearHunger(item, r, c);
+            }
+          }
+
+          // Dano de Fome contínuo
+          if (item.starvation) {
+            item.life -= 0.15; // Perde vida lentamente a cada frame
+            updateLifeBar(r, c, item);
+            if (item.life <= 0) {
+              killDefender(r, c, "FOME! 😩");
+              continue;
+            }
+          }
+
+          // --- 2. MECÂNICA DE AÇÃO DA PLANTA (GERAR ENERGIA) ---
+          if (item.type === 'produtor') {
+            const timeLimit = (weatherEffects.superSun > 0) ? 2500 : 5000; // Super sol acelera fotossíntese
+            if (now - item.lastAction >= timeLimit) {
+              const energyGenerated = (weatherEffects.superSun > 0) ? 20 : 10;
+              solarEnergy += energyGenerated;
+              document.getElementById('solar-text').innerText = solarEnergy;
+              playSound('coin');
+              showFloatText(`+${energyGenerated} ☀️`, r, c, '#FFC800');
+              item.lastAction = now;
+            }
+          }
+
+          // --- 3. MECÂNICA DE DISPARO DA SERPENTE ---
+          if (item.type === 'secundario') {
+            if (now - item.lastAction >= 2500) {
+              // Só dispara se houver inimigos na mesma raia
+              const enemiesInLine = enemies.some(e => e.row === r);
+              if (enemiesInLine) {
+                shootProjectile(r, c);
+                item.lastAction = now;
+              }
+            }
+          }
+
+          // --- 4. MECÂNICA DE ATAQUE DO COELHO (CORPO A CORPO) ---
+          if (item.type === 'primario') {
+            // Se houver inimigo perto na mesma raia, ele ataca
+            enemies.forEach(e => {
+              if (e.row === r) {
+                // slot do coelho
+                const coelhoX = c * 100 + 50;
+                // Se inimigo estiver próximo (dentro de 110 pixels)
+                if (Math.abs(e.x - coelhoX) < 110 && now - item.lastAction >= 1500) {
+                  e.life -= 25;
+                  playSound('hit');
+                  showFloatText("DANO! 🐰", r, c, '#FBBF24');
+                  
+                  // feedback de dano flutuante no inimigo
+                  createFloatTextAtPx("-25 👾", e.x, r * 110 + 40, '#FF4B4B');
+                  item.lastAction = now;
+                }
+              }
+            });
+          }
+        }
+      }
+    }
+
+    function triggerHunger(item, r, c) {
+      if (!item.starvation) {
+        item.starvation = true;
+        playSound('danger');
+        showFloatText("FOME! 😩", r, c, '#EA2B2B');
+        
+        // Exibe etiqueta de fome
+        const hungerBadge = document.getElementById(`hunger-${r}-${c}`);
+        if (hungerBadge) hungerBadge.classList.remove('hidden');
+      }
+    }
+
+    function clearHunger(item, r, c) {
+      if (item.starvation) {
+        item.starvation = false;
+        item.life = Math.min(item.life + 30, 100); // Recupera um pouco de vida quando volta a comer
+        showFloatText("NUTRIDO! 🌿", r, c, '#58CC02');
+        updateLifeBar(r, c, item);
+        
+        const hungerBadge = document.getElementById(`hunger-${r}-${c}`);
+        if (hungerBadge) hungerBadge.classList.add('hidden');
+      }
+    }
+
+    function updateLifeBar(r, col, item) {
+      const bar = document.getElementById(`life-${r}-${col}`);
+      if (bar) {
+        const percent = Math.max(0, item.life);
+        bar.style.width = `${percent}%`;
+        
+        // Mudar cor da barra baseado na vida
+        if (percent < 35) {
+          bar.className = "bg-brandRed h-full";
+        } else if (percent < 65) {
+          bar.className = "bg-brandOrange h-full";
+        } else {
+          bar.className = "bg-brandGreen h-full";
+        }
+      }
+    }
+
+    function killDefender(row, col, reason) {
+      const item = grid[row][col];
+      if (!item) return;
+
+      playSound('danger');
+      showFloatText(reason, row, col, '#EA2B2B');
+      
+      // Efeito de decomposição se houver Cogumelo na raia!
+      const hasDecomposer = lineHasEntity(row, 'decompositor');
+      if (hasDecomposer) {
+        // Encontra o cogumelo e recompensa o aluno
+        for (let c = 0; c < 5; c++) {
+          if (grid[row][c] && grid[row][c].type === 'decompositor') {
+            solarEnergy += 80;
+            document.getElementById('solar-text').innerText = solarEnergy;
+            playSound('decompose');
+            showFloatText("+80 Decomp 🍄", row, c, '#A855F7');
+            break;
+          }
+        }
+      }
+
+      // Esvaziar grid
+      grid[row][col] = null;
+      updateSlotVisual(row, col);
+    }
+
+    // Dano de chuva ácida
+    function damageAllPlants() {
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < 5; c++) {
+          if (grid[r][c] && grid[r][c].type === 'produtor') {
+            grid[r][c].life -= 15;
+            updateLifeBar(r, c, grid[r][c]);
+            showFloatText("-15 🌧️", r, c, '#EF4444');
+            if (grid[r][c].life <= 0) {
+              killDefender(r, c, "DESTRUÍDA! 🌧️");
+            }
+          }
+        }
+      }
+    }
+
+    // --- ENVIAR PROJÉTIL DA SERPENTE ---
+    function shootProjectile(row, col) {
+      playSound('shoot');
+      const startX = col * 100 + 70; // Spawn à frente da serpente
+      
+      projectiles.push({
+        x: startX,
+        y: row * 110 + 55, // centralizado verticalmente na raia
+        row: row,
+        speed: 4.5,
+        damage: 34
+      });
+    }
+
+    // --- SPAWNAR INIMIGO DE POLUIÇÃO ---
+    let enemyId = 0;
+    function spawnEnemy() {
+      const row = Math.floor(Math.random() * ROWS);
+      enemies.push({
+        id: enemyId++,
+        type: 'pollution',
+        emoji: '👾',
+        x: -20, // Surge fora da tela na esquerda
+        y: row * 110 + 35,
+        row: row,
+        life: 100,
+        maxLife: 100,
+        speed: 0.5 + Math.random() * 0.4 // Velocidade lenta do Auto-Battler
+      });
+    }
+
+    // --- MOVER E ATUALIZAR INIMIGOS (POLUIÇÃO) ---
+    function updateEnemies() {
+      const now = performance.now();
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const enemy = enemies[i];
+        
+        // Determinar em qual slot horizontal ele está (célula 0 a 4)
+        const cell = Math.floor(enemy.x / 100);
+        
+        // Verifica se colidiu com algum defensor naquela célula
+        let blockEntity = null;
+        if (cell >= 0 && cell < 5) {
+          blockEntity = grid[enemy.row][cell];
+        }
+
+        if (blockEntity) {
+          // O inimigo para e ataca o defensor
+          if (now - (enemy.lastAttack || 0) >= 1200) {
+            blockEntity.life -= 15; // Dano ao defensor
+            playSound('hit');
+            updateLifeBar(enemy.row, cell, blockEntity);
+            enemy.lastAttack = now;
+            
+            showFloatText("-15 👾", enemy.row, cell, '#EF4444');
+
+            if (blockEntity.life <= 0) {
+              killDefender(enemy.row, cell, "DESTRUÍDO! 👾");
+            }
+          }
+          
+          // Animação de ataque (recua e vai para frente levemente)
+          enemy.xOffset = (Math.sin(now / 50) * 3);
+        } else {
+          // Sem defensores, ele continua andando da esquerda para a direita
+          enemy.x += enemy.speed;
+          enemy.xOffset = 0;
+        }
+
+        // Checar se a poluição chegou no Coração da Natureza (Base na direita, X > 500)
+        if (enemy.x >= 500) {
+          // Causa dano na Base e some
+          baseLife = Math.max(0, baseLife - 20);
+          document.getElementById('base-life-text').innerText = `Vida: ${baseLife}%`;
+          playSound('danger');
+          
+          // Animação vermelha rápida na base
+          triggerBaseDamageVisual(enemy.row);
+
+          // Remover inimigo
+          enemies.splice(i, 1);
+          
+          if (baseLife <= 0) {
+            endGame(false);
+          }
+          continue;
+        }
+
+        // Checar se o inimigo morreu
+        if (enemy.life <= 0) {
+          playSound('decompose');
+          totalKills++;
+          score += 50;
+          createFloatTextAtPx("+50 Pontos", enemy.x, enemy.row * 110 + 40, '#58CC02');
+          
+          // Remover inimigo
+          enemies.splice(i, 1);
+          
+          // Vitória temporária de ondas (5 abates por onda avança o ecossistema)
+          if (totalKills % 6 === 0) {
+            score += 150;
+            solarEnergy += 100;
+            document.getElementById('solar-text').innerText = solarEnergy;
+            playSound('coin');
+            
+            if (totalKills >= 18) {
+              endGame(true); // Vitória total!
+            } else {
+              showFloatText("Onda Purificada! 🎉", enemy.row, 2, '#FFC800');
+            }
+          }
+        }
+      }
+    }
+
+    function triggerBaseDamageVisual(row) {
+      const base = document.getElementById(`base-${row}`);
+      if (base) {
+        base.classList.add('bg-red-900/40', 'border-brandRed', 'animate-shake');
+        
+        // Barra de vida correspondente
+        const bar = document.getElementById(`base-life-bar-${row}`);
+        if (bar) {
+          const rowLife = Math.max(0, parseInt(bar.style.width) - 20);
+          bar.style.width = `${rowLife}%`;
+          if (rowLife < 40) {
+            bar.className = "bg-brandRed h-full";
+          }
+        }
+
+        setTimeout(() => {
+          base.classList.remove('bg-red-900/40', 'border-brandRed', 'animate-shake');
+        }, 500);
+      }
+    }
+
+    // --- MOVER E ATUALIZAR PROJÉTEIS ---
+    function updateProjectiles() {
+      for (let i = projectiles.length - 1; i >= 0; i--) {
+        const proj = projectiles[i];
+        
+        // Projéteis voam da direita para a esquerda (ao encontro das pragas)
+        proj.x -= proj.speed;
+
+        // Checar colisão com inimigos na mesma raia
+        let hit = false;
+        for (let j = 0; j < enemies.length; j++) {
+          const enemy = enemies[j];
+          if (enemy.row === proj.row) {
+            // Distância no X
+            if (Math.abs(enemy.x - proj.x) < 25) {
+              enemy.life -= proj.damage;
+              playSound('hit');
+              hit = true;
+              break;
+            }
+          }
+        }
+
+        // Se colidiu ou saiu da tela na esquerda, remove
+        if (hit || proj.x < 0) {
+          projectiles.splice(i, 1);
+        }
+      }
+    }
+
+    // --- SISTEMA DE TEXTOS E FEEDBACK FLUTUANTES ---
+    function showFloatText(text, row, col, color) {
+      const startX = col * 100 + 40;
+      const startY = row * 110 + 40;
+      
+      createFloatTextAtPx(text, startX, startY, color);
+    }
+
+    function createFloatTextAtPx(text, x, y, color) {
+      floatTexts.push({
+        text: text,
+        x: x,
+        y: y,
+        color: color || '#FFFFFF',
+        id: Math.random()
+      });
+      
+      // Renderizar imediatamente no DOM absoluto
+      const container = document.getElementById('entities-container');
+      const textDiv = document.createElement('div');
+      textDiv.id = `text-${floatTexts[floatTexts.length - 1].id}`;
+      textDiv.className = "absolute font-black text-xs md:text-sm tracking-wider pointer-events-none select-none animate-float-text z-30 drop-shadow-md";
+      textDiv.style.left = `${x}px`;
+      textDiv.style.top = `${y}px`;
+      textDiv.style.color = color;
+      textDiv.innerText = text;
+      
+      container.appendChild(textDiv);
+      
+      // Limpa do DOM após animação
+      setTimeout(() => {
+        textDiv.remove();
+        // Remove do array
+        floatTexts = floatTexts.filter(t => t.id !== textDiv.id);
+      }, 1200);
+    }
+
+    // --- DESENHAR E MOVER INIMIGOS E PROJÉTEIS NO DOM ---
+    function drawEntities() {
+      const container = document.getElementById('entities-container');
+      
+      // 1. Renderizar Inimigos (Poluição)
+      enemies.forEach(enemy => {
+        let el = document.getElementById(`enemy-${enemy.id}`);
+        if (!el) {
+          el = document.createElement('div');
+          el.id = `enemy-${enemy.id}`;
+          el.className = "absolute w-12 h-12 flex flex-col items-center justify-center pointer-events-none select-none z-20 transition-all duration-75";
+          el.innerHTML = `
+            <span class="text-3.5xl filter drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] animate-pulse-neon">${enemy.emoji}</span>
+            <div class="w-8 bg-slate-900 border border-slate-700 h-1 rounded-full overflow-hidden mt-0.5">
+              <div id="enemy-life-bar-${enemy.id}" class="bg-brandRed h-full w-full"></div>
+            </div>
+          `;
+          container.appendChild(el);
+        }
+
+        // Posicionamento X real com offset de ataque
+        const realX = enemy.x + (enemy.xOffset || 0);
+        el.style.left = `${realX}px`;
+        el.style.top = `${enemy.y}px`;
+        
+        // Atualiza barra de vida do inimigo
+        const lifeBar = document.getElementById(`enemy-life-bar-${enemy.id}`);
+        if (lifeBar) {
+          const percent = Math.max(0, (enemy.life / enemy.maxLife) * 100);
+          lifeBar.style.width = `${percent}%`;
+        }
+      });
+
+      // Limpar inimigos mortos do DOM
+      const domEnemies = container.querySelectorAll('[id^="enemy-"]');
+      domEnemies.forEach(domEl => {
+        const id = parseInt(domEl.id.split('-')[1]);
+        const exists = enemies.some(e => e.id === id);
+        if (!exists) domEl.remove();
+      });
+
+      // 2. Renderizar Projéteis de Serpente (Esferas)
+      projectiles.forEach((proj, idx) => {
+        let el = document.getElementById(`proj-${idx}`);
+        if (!el) {
+          el = document.createElement('div');
+          el.id = `proj-${idx}`;
+          el.className = "absolute w-4.5 h-4.5 bg-gradient-to-br from-cyan-300 to-blue-500 rounded-full border border-white shadow-[0_0_10px_#22d3ee] flex items-center justify-center pointer-events-none select-none z-10 animate-pulse";
+          container.appendChild(el);
+        }
+        el.style.left = `${proj.x}px`;
+        el.style.top = `${proj.y}px`;
+      });
+
+      // Limpar projéteis antigos do DOM
+      const domProjs = container.querySelectorAll('[id^="proj-"]');
+      domProjs.forEach(domEl => {
+        const idx = parseInt(domEl.id.split('-')[1]);
+        if (idx >= projectiles.length) domEl.remove();
+      });
+    }
+
+    // --- FINALIZAR PARTIDA (FALHA / VITÓRIA) ---
+    function endGame(victory) {
+      gameActive = false;
+      cancelAnimationFrame(frameId);
+      
+      // Limpar elementos absolutos do DOM
+      const container = document.getElementById('entities-container');
+      container.innerHTML = '';
+
+      document.getElementById('screen-game').classList.add('hidden');
+      
+      if (victory) {
+        playSound('complete');
+        spawnConfetti();
+        document.getElementById('screen-victory').classList.remove('hidden');
+        document.getElementById('vic-score').innerText = score;
+        
+        // Contar quantos defensores sobreviveram no grid
+        let survivors = 0;
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < 5; c++) {
+            if (grid[r][c]) survivors++;
+          }
+        }
+        document.getElementById('vic-saves').innerText = survivors;
+      } else {
+        playSound('danger');
+        document.getElementById('screen-gameover').classList.remove('hidden');
+        document.getElementById('go-score').innerText = score;
+        document.getElementById('go-kills').innerText = totalKills;
+      }
+    }
+
+    // --- REINICIAR GAME ---
+    function resetGame() {
+      playSound('click');
+      solarEnergy = 100;
+      baseLife = 100;
+      score = 0;
+      totalKills = 0;
+      spawnTimer = 0;
+      enemies = [];
+      projectiles = [];
+      selectedType = null;
+      isPaused = false;
+      isClassroomPaused = false;
+
+      document.getElementById('solar-text').innerText = solarEnergy;
+      document.getElementById('base-life-text').innerText = `Vida: 100%`;
+      document.getElementById('screen-victory').classList.add('hidden');
+      document.getElementById('screen-gameover').classList.add('hidden');
+      document.getElementById('classroom-panel').classList.add('hidden');
+      document.getElementById('pause-icon').setAttribute('data-lucide', 'pause-circle');
+      document.getElementById('pause-text').innerText = "Pausar Aula ⏱️";
+      lucide.createIcons();
+
+      startGame();
+    }
+
+    // --- CONTROLES DE PAUSA E EVENTOS DA PROFESSORA ---
+    function togglePauseClassroom() {
+      playSound('click');
+      isClassroomPaused = !isClassroomPaused;
+      
+      const panel = document.getElementById('classroom-panel');
+      const pauseIcon = document.getElementById('pause-icon');
+      const pauseText = document.getElementById('pause-text');
+
+      if (isClassroomPaused) {
+        panel.classList.remove('hidden');
+        pauseIcon.setAttribute('data-lucide', 'play-circle');
+        pauseText.innerText = "Retomar Aula 🎮";
+        
+        // Gerar análise de tabuleiro pedagógica em tempo real
+        buildClassroomAnalysis();
+      } else {
+        panel.classList.add('hidden');
+        pauseIcon.setAttribute('data-lucide', 'pause-circle');
+        pauseText.innerText = "Pausar Aula ⏱️";
+      }
+      lucide.createIcons();
+    }
+
+    // Montar texto explicativo dinâmico do tabuleiro
+    function buildClassroomAnalysis() {
+      const container = document.getElementById('classroom-analysis');
+      container.innerHTML = ''; // Limpar anterior
+
+      let plantsCount = 0;
+      let coelhosCount = 0;
+      let serpentesCount = 0;
+      let cogumelosCount = 0;
+      let starvings = 0;
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < 5; c++) {
+          const item = grid[r][c];
+          if (!item) continue;
+          if (item.type === 'produtor') plantsCount++;
+          if (item.type === 'primario') coelhosCount++;
+          if (item.type === 'secundario') serpentesCount++;
+          if (item.type === 'decompositor') cogumelosCount++;
+          if (item.starvation) starvings++;
+        }
+      }
+
+      // 1. Resumo quantitativo
+      let html = `<p class="border-b border-slate-800 pb-2 flex gap-2 items-center text-slate-100">
+        <i class="w-4 h-4 text-emerald-400" data-lucide="bar-chart-2"></i>
+        <span>População Atual no Campo: <strong>${plantsCount}🌿</strong> Produtores | <strong>${coelhosCount}🐰</strong> Consumidores 1º | <strong>${serpentesCount}🐍</strong> Consumidores 2º | <strong>${cogumelosCount}🍄</strong> Decompositores</span>
+      </p>`;
+
+      // 2. Análise didática das dependências
+      html += `<div class="space-y-2.5">`;
+
+      if (plantsCount > 0) {
+        html += `<p class="flex items-start gap-2 text-emerald-300">
+          <i class="w-4 h-4 mt-0.5 text-emerald-400" data-lucide="check-circle"></i>
+          <span>As plantas estão realizando **fotossíntese** no tabuleiro. Elas são **Autótrofas** (produzem seu próprio alimento) e geram a energia que abastece o restante dos animais.</span>
+        </p>`;
+      } else {
+        html += `<p class="flex items-start gap-2 text-brandRed font-black">
+          <i class="w-4 h-4 mt-0.5" data-lucide="alert-triangle"></i>
+          <span>Atenção: Não há nenhuma Planta no ecossistema! Sem produtores, a entrada de energia cessará e todos os animais entrarão em colapso!</span>
+        </p>`;
+      }
+
+      if (starvings > 0) {
+        html += `<p class="flex items-start gap-2 text-brandRed font-bold">
+          <i class="w-4 h-4 mt-0.5" data-lucide="shield-alert"></i>
+          <span>Temos **${starvings} animal(is) morrendo de fome**. Isso ocorre porque o nível inferior que serve de alimento para ele foi destruído. A cadeia alimentar foi quebrada!</span>
+        </p>`;
+      } else if (coelhosCount > 0 || serpentesCount > 0) {
+        html += `<p class="flex items-start gap-2 text-amber-300">
+          <i class="w-4 h-4 mt-0.5 text-amber-400" data-lucide="heart"></i>
+          <span>Os consumidores estão se alimentando perfeitamente. O fluxo de matéria orgânica está correndo livre de forma **heterótrofa** (obtenção de energia consumindo outro ser vivo).</span>
+        </p>`;
+      }
+
+      if (cogumelosCount > 0) {
+        html += `<p class="flex items-start gap-2 text-purple-400">
+          <i class="w-4 h-4 mt-0.5 text-purple-400" data-lucide="refresh-cw"></i>
+          <span>Os Decompositores (cogumelos) estão apostos. Eles reciclam as substâncias de seres mortos e as devolvem para o solo, gerando energia vital solar para novas plantas nascerem.</span>
+        </p>`;
+      }
+
+      html += `</div>`;
+
+      // 3. Perguntas sugeridas para a professora debater
+      html += `<div class="mt-4 pt-3 border-t border-slate-800">
+        <span class="text-xs text-indigo-400 font-extrabold uppercase tracking-widest block mb-1.5">Questões para Debate:</span>
+        <ul class="list-disc list-inside space-y-1 text-slate-400 text-xs font-semibold">
+          <li>Por que a Serpente não pode ser colocada diretamente se não houver um Coelho?</li>
+          <li>Qual é o papel do Cogumelo quando uma planta ou coelho é devorado pelas pragas?</li>
+          <li>Como a energia solar gerada pelo sol se transforma na energia que a cobra usa para disparar?</li>
+        </ul>
+      </div>`;
+
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // Disparar Eventos Climáticos/Ecológicos pela professora
+    function triggerWeatherEvent(event) {
+      if (!gameActive) return;
+      playSound('weather');
+
+      if (event === 'sun') {
+        weatherEffects.superSun = 900; // ~15 segundos em 60fps
+        createFloatTextAtPx("SUPER SOL ATIVADO! ☀️☀️", 180, 150, '#FFC800');
+        // Mensagem flutuante para todas as plantas
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < 5; c++) {
+            if (grid[r][c] && grid[r][c].type === 'produtor') {
+              showFloatText("Super Fotossíntese! 🌿", r, c, '#FFC800');
+            }
+          }
+        }
+      }
+      else if (event === 'acid_rain') {
+        weatherEffects.acidRain = 900;
+        createFloatTextAtPx("CHUVA ÁCIDA CAINDO! 🌧️⛈️", 180, 150, '#EA2B2B');
+      }
+      else if (event === 'toxic') {
+        // Spawna instantaneamente 4 monstros de poluição na esquerda
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            spawnEnemy();
+          }, i * 200);
+        }
+        createFloatTextAtPx("DESCARTE QUÍMICO ILEGAL! 👾☣️", 180, 150, '#A855F7');
+      }
+
+      // Retoma automaticamente o jogo após disparar o evento
+      togglePauseClassroom();
+    }
+
+    // --- SISTEMA DE CONFETES NATIVOS ---
+    function spawnConfetti() {
+      const container = document.getElementById('confetti-container');
+      container.innerHTML = '';
+      const colors = ['#58CC02', '#1CB0F6', '#FFC800', '#FF9600', '#EA2B2B', '#A855F7'];
+      
+      for (let i = 0; i < 80; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'absolute w-3.5 h-3.5 rounded-sm opacity-90 transition-all duration-1000 ease-out z-50';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = (Math.random() * 80 + 10) + '%';
+        confetti.style.top = '100%';
+        confetti.style.transform = `scale(${Math.random() * 0.8 + 0.5}) rotate(${Math.random() * 360}deg)`;
+        container.appendChild(confetti);
+        
+        const targetLeft = parseFloat(confetti.style.left) + (Math.random() * 30 - 15);
+        const targetTop = Math.random() * 35 + 15;
+        
+        setTimeout(() => {
+          confetti.style.left = targetLeft + '%';
+          confetti.style.top = targetTop + '%';
+          confetti.style.transform = `scale(${Math.random() * 0.8 + 0.5}) rotate(${Math.random() * 720}deg)`;
+        }, 30);
+
+        setTimeout(() => {
+          confetti.style.top = '110%';
+          confetti.style.opacity = '0';
+        }, 700);
+      }
+    }
+
+    // Inicializar ícones
+    lucide.createIcons();
+  </script>
+</body>
+</html>

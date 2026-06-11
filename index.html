@@ -60,6 +60,16 @@
       box-shadow: 0 2px 0 0 #46A302;
     }
 
+    .btn-3d-indigo {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #312E81;
+    }
+    .btn-3d-indigo:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #312E81;
+    }
+
     /* Animações Flutuantes Suaves */
     @keyframes float-slow {
       0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -128,7 +138,7 @@
     </div>
 
     <!-- Grid de Jogos (Cards) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl px-2">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-2">
       
       <!-- CARD JOGO 1: PIZZA GOURMET -->
       <div class="card-premium bg-white rounded-3xl border-4 border-slate-200 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden animate-float-slow"
@@ -203,6 +213,45 @@
           <!-- Botão 3D -->
           <button class="btn-3d-green bg-brandGreen hover:bg-brandGreenDark text-white font-black py-3 rounded-2xl w-full text-base transition-colors flex items-center justify-center gap-2">
             Iniciar Missão
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD JOGO 3: ECO-TACTICS -->
+      <div class="card-premium bg-slate-900 border-4 border-indigo-950 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-slow"
+           onclick="launchGame('ecotactics')" onmouseenter="playHoverSound()">
+        
+        <!-- Fundo decorativo sutil -->
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-indigo-950 rounded-full opacity-30 pointer-events-none"></div>
+
+        <div>
+          <!-- Cabeçalho do Card -->
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-5xl filter drop-shadow-md select-none">⚔️</span>
+            <span class="bg-indigo-950/80 text-indigo-400 border border-indigo-900/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Estratégia</span>
+          </div>
+
+          <h2 class="text-2xl font-black text-white leading-tight">Eco-Tactics</h2>
+          <p class="text-indigo-400 font-extrabold text-xs uppercase tracking-widest mt-0.5">Batalha pelo Ecossistema</p>
+
+          <p class="text-slate-400 font-semibold text-sm mt-3 leading-relaxed">
+            Defenda a natureza invocando cadeias biológicas ativas contra a poluição! Gerencie a fome dos animais e controle o clima em tempo real.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Habilidades BNCC Tag -->
+          <div class="bg-indigo-950/40 border border-indigo-900/40 rounded-xl p-2.5 flex items-start gap-2">
+            <i data-lucide="tag" class="text-indigo-400 w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-400 leading-snug">
+              <strong>BNCC EF04CI04</strong>: Analisar relações ecológicas e impactos no equilíbrio do ecossistema.
+            </span>
+          </div>
+
+          <!-- Botão 3D -->
+          <button class="btn-3d-indigo bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-2xl w-full text-base transition-colors flex items-center justify-center gap-2">
+            Iniciar Batalha
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </button>
         </div>
@@ -318,6 +367,8 @@
           window.location.href = './mestre_fracoes.html';
         } else if (game === 'natureza') {
           window.location.href = './cadeia_alimentar.html';
+        } else if (game === 'ecotactics') {
+          window.location.href = './eco_tactics.html';
         }
       }, 250);
     }

@@ -266,7 +266,7 @@
       <section id="screen-game" class="w-full flex flex-col gap-4 hidden">
         
         <!-- O Tabuleiro do Ecossistema -->
-        <div id="game-board-container" class="relative w-full bg-slate-950/80 rounded-3xl border-4 border-slate-800 overflow-hidden min-h-[380px] p-2 flex flex-col justify-around gap-2 select-none shadow-inner">
+        <div id="game-board-container" class="relative w-full bg-slate-950/80 rounded-3xl border-4 border-slate-800 overflow-hidden h-[330px] select-none shadow-inner">
           
           <!-- Linhas do Bioma (Raias) -->
           <!-- Raias e slots gerados via JavaScript -->
@@ -422,11 +422,10 @@
     let soundEnabled = true;
     let isPaused = false;
     let isClassroomPaused = false;
-    let solarEnergy = 100;
+    let solarEnergy = 200; // Começa com mais energia para melhor jogabilidade
     let baseLife = 100;
     let score = 0;
     let totalKills = 0;
-    let currentWave = 1;
     let gameActive = false;
     let frameId = null;
 
@@ -617,11 +616,11 @@
         // Raias horizontais
         const raia = document.createElement('div');
         raia.id = `raia-${r}`;
-        raia.className = `flex items-center w-full h-[110px] relative border-y border-slate-800 ${biome.bgStyle} ${biome.glowClass} px-2 py-1 gap-2.5`;
+        raia.className = `flex items-center w-full h-[110px] relative border-y border-slate-800/80 ${biome.bgStyle} ${biome.glowClass}`;
         
-        // Grid de slots de defesa (Colunas 0 a 4). Coluna 5 é a Base de Natureza
+        // Grid de slots de defesa (Colunas 0 a 4) - exatamente 80% do espaço
         const gridDiv = document.createElement('div');
-        gridDiv.className = "flex-grow h-full grid grid-cols-5 gap-2 relative z-10";
+        gridDiv.className = "w-[80%] h-full grid grid-cols-5 p-1.5 gap-2 relative z-10";
         
         for (let c = 0; c < 5; c++) {
           const slot = document.createElement('div');
@@ -636,15 +635,15 @@
         
         raia.appendChild(gridDiv);
 
-        // A Base da Natureza na Coluna 5 (Coração do Bioma)
+        // A Base da Natureza na Coluna 5 (Coração do Bioma) - exatamente 20% do espaço
         const baseDiv = document.createElement('div');
         baseDiv.id = `base-${r}`;
-        baseDiv.className = "w-24 h-full bg-slate-900/80 border-2 border-emerald-500/30 rounded-2xl flex flex-col items-center justify-center p-2 text-center relative shadow-lg";
+        baseDiv.className = "w-[20%] h-full bg-slate-900/85 border-l border-slate-800/80 flex flex-col items-center justify-center p-1.5 text-center relative shadow-lg";
         baseDiv.innerHTML = `
           <span class="text-3xl filter drop-shadow-md animate-pulse">🌸</span>
           <span class="text-[9px] font-black text-emerald-400 mt-1 uppercase tracking-wider">Coração</span>
           <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5 border border-slate-700">
-            <div id="base-life-bar-${r}" class="bg-brandGreen h-full w-full transition-all"></div>
+            <div id="base-life-bar-${r}" class="bg-brandGreen h-full" style="width: 100%"></div>
           </div>
         `;
         
@@ -982,9 +981,9 @@
             enemies.forEach(e => {
               if (e.row === r) {
                 // slot do coelho
-                const coelhoX = c * 100 + 50;
-                // Se inimigo estiver próximo (dentro de 110 pixels)
-                if (Math.abs(e.x - coelhoX) < 110 && now - item.lastAction >= 1500) {
+                const coelhoX = c * 128 + 64;
+                // Se inimigo estiver próximo (dentro de 80 pixels virtuais)
+                if (Math.abs(e.x - coelhoX) < 80 && now - item.lastAction >= 1500) {
                   e.life -= 25;
                   playSound('hit');
                   showFloatText("DANO! 🐰", r, c, '#FBBF24');
@@ -1084,10 +1083,18 @@
       }
     }
 
+    // Helper para converter X virtual (0-800) em coluna do grid (0-4)
+    function getColFromX(x) {
+      if (x >= 0 && x < 640) {
+        return Math.floor(x / 128);
+      }
+      return -1;
+    }
+
     // --- ENVIAR PROJÉTIL DA SERPENTE ---
     function shootProjectile(row, col) {
       playSound('shoot');
-      const startX = col * 100 + 70; // Spawn à frente da serpente
+      const startX = col * 128 + 35; // Spawn à esquerda da serpente
       
       projectiles.push({
         x: startX,
@@ -1106,12 +1113,12 @@
         id: enemyId++,
         type: 'pollution',
         emoji: '👾',
-        x: -20, // Surge fora da tela na esquerda
-        y: row * 110 + 35,
+        x: -30, // Surge fora da tela na esquerda
+        y: row * 110 + 31,
         row: row,
         life: 100,
         maxLife: 100,
-        speed: 0.5 + Math.random() * 0.4 // Velocidade lenta do Auto-Battler
+        speed: 0.3 + Math.random() * 0.3 // Velocidade ajustada para melhor gameplay
       });
     }
 
@@ -1123,12 +1130,16 @@
         const enemy = enemies[i];
         
         // Determinar em qual slot horizontal ele está (célula 0 a 4)
-        const cell = Math.floor(enemy.x / 100);
+        const cell = getColFromX(enemy.x);
         
         // Verifica se colidiu com algum defensor naquela célula
         let blockEntity = null;
         if (cell >= 0 && cell < 5) {
-          blockEntity = grid[enemy.row][cell];
+          // Só bloqueia se o inimigo já estiver próximo do centro da célula (aproximadamente colisão física)
+          const slotCenter = cell * 128 + 64;
+          if (enemy.x >= slotCenter - 45) {
+            blockEntity = grid[enemy.row][cell];
+          }
         }
 
         if (blockEntity) {
@@ -1154,8 +1165,8 @@
           enemy.xOffset = 0;
         }
 
-        // Checar se a poluição chegou no Coração da Natureza (Base na direita, X > 500)
-        if (enemy.x >= 500) {
+        // Checar se a poluição chegou no Coração da Natureza (Base na direita, X > 640)
+        if (enemy.x >= 640) {
           // Causa dano na Base e some
           baseLife = Math.max(0, baseLife - 20);
           document.getElementById('base-life-text').innerText = `Vida: ${baseLife}%`;
@@ -1208,7 +1219,8 @@
         // Barra de vida correspondente
         const bar = document.getElementById(`base-life-bar-${row}`);
         if (bar) {
-          const rowLife = Math.max(0, parseInt(bar.style.width) - 20);
+          const currentWidth = bar.style.width ? parseInt(bar.style.width) : 100;
+          const rowLife = Math.max(0, currentWidth - 20);
           bar.style.width = `${rowLife}%`;
           if (rowLife < 40) {
             bar.className = "bg-brandRed h-full";
@@ -1253,7 +1265,7 @@
 
     // --- SISTEMA DE TEXTOS E FEEDBACK FLUTUANTES ---
     function showFloatText(text, row, col, color) {
-      const startX = col * 100 + 40;
+      const startX = col * 128 + 64;
       const startY = row * 110 + 40;
       
       createFloatTextAtPx(text, startX, startY, color);
@@ -1273,7 +1285,7 @@
       const textDiv = document.createElement('div');
       textDiv.id = `text-${floatTexts[floatTexts.length - 1].id}`;
       textDiv.className = "absolute font-black text-xs md:text-sm tracking-wider pointer-events-none select-none animate-float-text z-30 drop-shadow-md";
-      textDiv.style.left = `${x}px`;
+      textDiv.style.left = `${(x / 800) * 100}%`;
       textDiv.style.top = `${y}px`;
       textDiv.style.color = color;
       textDiv.innerText = text;
@@ -1310,7 +1322,7 @@
 
         // Posicionamento X real com offset de ataque
         const realX = enemy.x + (enemy.xOffset || 0);
-        el.style.left = `${realX}px`;
+        el.style.left = `${(realX / 800) * 100}%`;
         el.style.top = `${enemy.y}px`;
         
         // Atualiza barra de vida do inimigo
@@ -1338,7 +1350,7 @@
           el.className = "absolute w-4.5 h-4.5 bg-gradient-to-br from-cyan-300 to-blue-500 rounded-full border border-white shadow-[0_0_10px_#22d3ee] flex items-center justify-center pointer-events-none select-none z-10 animate-pulse";
           container.appendChild(el);
         }
-        el.style.left = `${proj.x}px`;
+        el.style.left = `${(proj.x / 800) * 100}%`;
         el.style.top = `${proj.y}px`;
       });
 
@@ -1386,7 +1398,7 @@
     // --- REINICIAR GAME ---
     function resetGame() {
       playSound('click');
-      solarEnergy = 100;
+      solarEnergy = 200; // Reset com 200
       baseLife = 100;
       score = 0;
       totalKills = 0;
@@ -1519,7 +1531,7 @@
 
       if (event === 'sun') {
         weatherEffects.superSun = 900; // ~15 segundos em 60fps
-        createFloatTextAtPx("SUPER SOL ATIVADO! ☀️☀️", 180, 150, '#FFC800');
+        createFloatTextAtPx("SUPER SOL ATIVADO! ☀️☀️", 300, 150, '#FFC800');
         // Mensagem flutuante para todas as plantas
         for (let r = 0; r < ROWS; r++) {
           for (let c = 0; c < 5; c++) {
@@ -1531,7 +1543,7 @@
       }
       else if (event === 'acid_rain') {
         weatherEffects.acidRain = 900;
-        createFloatTextAtPx("CHUVA ÁCIDA CAINDO! 🌧️⛈️", 180, 150, '#EA2B2B');
+        createFloatTextAtPx("CHUVA ÁCIDA CAINDO! 🌧️⛈️", 300, 150, '#EA2B2B');
       }
       else if (event === 'toxic') {
         // Spawna instantaneamente 4 monstros de poluição na esquerda
@@ -1540,7 +1552,7 @@
             spawnEnemy();
           }, i * 200);
         }
-        createFloatTextAtPx("DESCARTE QUÍMICO ILEGAL! 👾☣️", 180, 150, '#A855F7');
+        createFloatTextAtPx("DESCARTE QUÍMICO ILEGAL! 👾☣️", 300, 150, '#A855F7');
       }
 
       // Retoma automaticamente o jogo após disparar o evento

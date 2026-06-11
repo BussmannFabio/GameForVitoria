@@ -1,6 +1,7 @@
 # Ignorar tudo por padrão
 *
 
-# Permitir apenas arquivos HTML dos jogos e o próprio .gitignore
+# Permitir apenas arquivos HTML dos jogos, imagens PNG e o próprio .gitignore
 !*.html
+!*.png
 !.gitignore

@@ -127,10 +127,64 @@
     }
   </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col justify-between select-none bg-slate-950 text-slate-100">
+<body class="h-screen overflow-hidden select-none bg-slate-950 text-slate-100">
 
   <!-- Container de Confetes -->
   <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
+
+  <!-- MODAL DE VITÓRIA -->
+  <div id="screen-victory" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-5 text-center">
+      <div class="w-20 h-20 bg-emerald-950/40 rounded-full flex items-center justify-center border border-emerald-500/50 shadow-inner">
+        <i data-lucide="trophy" class="w-12 h-12 text-emerald-400 fill-emerald-400"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-100 tracking-tight">Vitória do Ecossistema!</h2>
+        <p class="text-emerald-400 font-extrabold text-sm uppercase tracking-wider mt-1">Equilíbrio Restabelecido 🎉</p>
+      </div>
+      <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 w-full flex justify-around">
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
+          <div id="vic-score" class="text-2xl font-black text-brandOrange">0</div>
+        </div>
+        <div class="w-px bg-slate-800"></div>
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Criaturas Salvas</div>
+          <div id="vic-saves" class="text-2xl font-black text-indigo-400">0</div>
+        </div>
+      </div>
+      <button onclick="resetGame()" class="btn-3d bg-brandGreen hover:bg-brandGreenDark text-slate-950 font-black text-base py-3 px-8 rounded-2xl border-b-4 border-green-800 w-full transition-all shadow-md">
+        Jogar Novamente 🔄
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DE DERROTA (GAME OVER) -->
+  <div id="screen-gameover" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-red-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-5 text-center">
+      <div class="w-20 h-20 bg-red-950/40 rounded-full flex items-center justify-center border border-red-500/50 shadow-inner">
+        <i data-lucide="skull" class="w-12 h-12 text-red-400"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-100 tracking-tight">Ecossistema Colapsou!</h2>
+        <p class="text-red-400 font-extrabold text-sm uppercase tracking-wider mt-1">A Poluição Venceu 😩</p>
+      </div>
+      <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 w-full flex justify-around">
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
+          <div id="go-score" class="text-2xl font-black text-brandOrange">0</div>
+        </div>
+        <div class="w-px bg-slate-800"></div>
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Eliminações</div>
+          <div id="go-kills" class="text-2xl font-black text-indigo-400">0</div>
+        </div>
+      </div>
+      <button onclick="resetGame()" class="btn-3d bg-brandOrange hover:bg-brandOrange/95 text-white font-black text-base py-3 px-8 rounded-2xl border-b-4 border-amber-700 w-full transition-all shadow-md">
+        Tentar Novamente 🔄
+      </button>
+    </div>
+  </div>
 
   <!-- MODAL TUTORIAL / MANUAL ECOLOGICO INTERATIVO -->
   <div id="manual-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -152,34 +206,34 @@
         </div>
 
         <div class="bg-slate-950/60 p-2.5 rounded-2xl border border-slate-800/80 flex items-start gap-3">
-          <span class="text-2xl mt-0.5">🌿</span>
+          <span class="text-2xl mt-0.5" id="man-produtor-emoji">🌿</span>
           <div>
-            <strong class="text-white">2. Planta (Produtor):</strong>
-            <p class="text-xs text-slate-400 mt-0.5">Custo 30☀️. Invoque clicando no bioma. Produz Sol e alimenta o Coelho.</p>
+            <strong class="text-white" id="man-produtor-title">2. Planta (Produtor):</strong>
+            <p class="text-xs text-slate-400 mt-0.5" id="man-produtor-desc">Custo 30☀️. Invoque clicando no bioma. Produz Sol e alimenta o Coelho.</p>
           </div>
         </div>
 
         <div class="bg-slate-950/60 p-2.5 rounded-2xl border border-slate-800/80 flex items-start gap-3">
-          <span class="text-2xl mt-0.5">🐰</span>
+          <span class="text-2xl mt-0.5" id="man-primario-emoji">🐰</span>
           <div>
-            <strong class="text-white">3. Coelho (Herbívoro):</strong>
-            <p class="text-xs text-slate-400 mt-0.5">Custo 50☀️. Spawna na esquerda e avança. Precisa comer plantas para não morrer de fome e ganhar escudo.</p>
+            <strong class="text-white" id="man-primario-title">3. Coelho (Herbívoro):</strong>
+            <p class="text-xs text-slate-400 mt-0.5" id="man-primario-desc">Custo 50☀️. Spawna na esquerda e avança. Precisa comer plantas para não morrer de fome e ganhar escudo.</p>
           </div>
         </div>
 
         <div class="bg-slate-950/60 p-2.5 rounded-2xl border border-slate-800/80 flex items-start gap-3">
-          <span class="text-2xl mt-0.5">🐍</span>
+          <span class="text-2xl mt-0.5" id="man-secundario-emoji">🐍</span>
           <div>
-            <strong class="text-white">4. Serpente (Carnívoro):</strong>
-            <p class="text-xs text-slate-400 mt-0.5">Custo 70☀️. Dispara esferas purificadoras. Caça os coelhos para carregar Super Tiros!</p>
+            <strong class="text-white" id="man-secundario-title">4. Serpente (Carnívoro):</strong>
+            <p class="text-xs text-slate-400 mt-0.5" id="man-secundario-desc">Custo 70☀️. Dispara esferas purificadoras. Caça os coelhos para carregar Super Tiros!</p>
           </div>
         </div>
 
         <div class="bg-slate-950/60 p-2.5 rounded-2xl border border-slate-800/80 flex items-start gap-3">
-          <span class="text-2xl mt-0.5">🍄</span>
+          <span class="text-2xl mt-0.5" id="man-decompositor-emoji">🍄</span>
           <div>
-            <strong class="text-white">5. Cogumelo (Decompositor):</strong>
-            <p class="text-xs text-slate-400 mt-0.5">Custo 25☀️. Recicla corpos de criaturas mortas próximas (raio 150px) e devolve +40☀️.</p>
+            <strong class="text-white" id="man-decompositor-title">5. Cogumelo (Decompositor):</strong>
+            <p class="text-xs text-slate-400 mt-0.5" id="man-decompositor-desc">Custo 25☀️. Recicla corpos de criaturas mortas próximas (raio 150px) e devolve +60☀️.</p>
           </div>
         </div>
 
@@ -195,56 +249,66 @@
     </div>
   </div>
 
-  <!-- CABEÇALHO DO JOGO -->
-  <header class="w-full max-w-6xl mx-auto px-3 pt-2.5 pb-1 flex justify-between items-center z-10 flex-shrink-0">
-    <div class="flex items-center gap-2">
-      <!-- Retornar ao Hub -->
-      <a href="./index.html" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Central de Jogos">
-        <i data-lucide="home" class="w-4.5 h-4.5"></i>
-      </a>
-      <!-- Ajuda / Abrir Manual -->
-      <button onclick="openManual()" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Como Jogar">
-        <i data-lucide="help-circle" class="w-4.5 h-4.5"></i>
-      </button>
+  <!-- TELA DO JOGO (CONTEÚDO PRINCIPAL) -->
+  <div id="screen-game" class="h-full flex flex-col justify-between">
+
+    <!-- CABEÇALHO DO JOGO -->
+    <header class="w-full max-w-6xl mx-auto px-3 pt-2.5 pb-1 flex justify-between items-center z-10 flex-shrink-0">
+      <div class="flex items-center gap-2">
+        <!-- Retornar ao Hub -->
+        <a href="./index.html" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Central de Jogos">
+          <i data-lucide="home" class="w-4.5 h-4.5"></i>
+        </a>
+        <!-- Ajuda / Abrir Manual -->
+        <button onclick="openManual()" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Como Jogar">
+          <i data-lucide="help-circle" class="w-4.5 h-4.5"></i>
+        </button>
+
+        <!-- Seletor de Ecossistema -->
+        <select id="eco-select" onchange="changeEcosystemTheme(this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs font-black rounded-2xl px-2.5 py-2 focus:outline-none cursor-pointer hover:bg-slate-800 transition-colors shadow-md">
+          <option value="forest">🌳 Floresta</option>
+          <option value="ocean">🌊 Oceano</option>
+          <option value="savanna">🌾 Savana</option>
+        </select>
+        
+        <!-- Título de Navegação -->
+        <div class="hidden sm:flex items-center gap-2 ml-1">
+          <div class="bg-indigo-650 text-white p-2 rounded-xl border border-indigo-500/20">
+            <i data-lucide="heart" class="w-4 h-4 text-red-400 fill-red-400"></i>
+          </div>
+          <div>
+            <span class="text-sm font-black tracking-wide text-white block leading-tight font-nunito">GamesForVitória 💖</span>
+            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Eco-Tactics</span>
+          </div>
+        </div>
+      </div>
       
-      <!-- Título de Navegação -->
-      <div class="hidden sm:flex items-center gap-2 ml-1">
-        <div class="bg-indigo-650 text-white p-2 rounded-xl border border-indigo-500/20">
-          <i data-lucide="heart" class="w-4 h-4 text-red-400 fill-red-400"></i>
-        </div>
-        <div>
-          <span class="text-sm font-black tracking-wide text-white block leading-tight font-nunito">GamesForVitória 💖</span>
-          <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Eco-Tactics</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- CONTROLES PEDAGÓGICOS E ESTADO -->
-    <div class="flex items-center gap-2.5">
-      <button id="pause-btn" onclick="togglePauseClassroom()" class="btn-3d bg-indigo-600 hover:bg-indigo-700 text-white font-black px-3.5 py-1.5 border-b-4 border-indigo-900 rounded-2xl text-[11px] md:text-xs flex items-center gap-1 transition-all shadow-md">
-        <i id="pause-icon" data-lucide="pause-circle" class="w-3.5 h-3.5"></i>
-        <span id="pause-text">Pausar Aula ⏱️</span>
-      </button>
+      <!-- CONTROLES PEDAGÓGICOS E ESTADO -->
+      <div class="flex items-center gap-2.5">
+        <button id="pause-btn" onclick="togglePauseClassroom()" class="btn-3d bg-indigo-600 hover:bg-indigo-700 text-white font-black px-3.5 py-1.5 border-b-4 border-indigo-900 rounded-2xl text-[11px] md:text-xs flex items-center gap-1 transition-all shadow-md">
+          <i id="pause-icon" data-lucide="pause-circle" class="w-3.5 h-3.5"></i>
+          <span id="pause-text">Pausar Aula ⏱️</span>
+        </button>
 
-      <!-- Energia e Vida com Coração Pulsante -->
-      <div class="bg-slate-900/90 border border-slate-700 px-3.5 py-1.5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3.5 shadow-md transition-all" id="base-life-card">
-        <div class="flex items-center gap-1">
-          <i data-lucide="sun" class="text-brandYellow w-4 h-4 fill-brandYellow animate-spin-slow"></i>
-          <span id="solar-text" class="text-brandYellow font-black">200</span>
+        <!-- Energia e Vida com Coração Pulsante -->
+        <div class="bg-slate-900/90 border border-slate-700 px-3.5 py-1.5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3.5 shadow-md transition-all" id="base-life-card">
+          <div class="flex items-center gap-1">
+            <i data-lucide="sun" class="text-brandYellow w-4 h-4 fill-brandYellow animate-spin-slow"></i>
+            <span id="solar-text" class="text-brandYellow font-black">200</span>
+          </div>
+          <div class="w-px h-3.5 bg-slate-700"></div>
+          <div class="flex items-center gap-1.5">
+            <span id="heart-icon" class="animate-heartbeat inline-block">❤️</span>
+            <span id="base-life-text" class="text-brandRed font-black">Vida: 100%</span>
+          </div>
         </div>
-        <div class="w-px h-3.5 bg-slate-700"></div>
-        <div class="flex items-center gap-1.5">
-          <span id="heart-icon" class="animate-heartbeat inline-block">❤️</span>
-          <span id="base-life-text" class="text-brandRed font-black">Vida: 100%</span>
-        </div>
-      </div>
 
-      <!-- Mudo/Som -->
-      <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/90 p-2 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors shadow-md text-slate-400">
-        <i id="sound-icon" data-lucide="volume-2" class="w-4 h-4"></i>
-      </button>
-    </div>
-  </header>
+        <!-- Mudo/Som -->
+        <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/90 p-2 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors shadow-md text-slate-400">
+          <i id="sound-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
 
   <!-- PAINEL DE AVISO DE PAUSA PEDAGÓGICA (TELA DA PROFESSORA) -->
   <div id="classroom-panel" class="absolute inset-0 bg-slate-950/95 border-4 border-indigo-500 rounded-3xl z-40 p-5 flex flex-col md:flex-row gap-5 hidden animate-pop-in">
@@ -325,8 +389,8 @@
         <!-- CARD 1: PLANTA -->
         <button id="card-produtor" class="btn-3d bg-slate-950 border border-emerald-500/20 rounded-xl p-2 flex flex-col md:flex-row items-center justify-between gap-1 transition-all group min-h-[50px]">
           <div class="flex flex-col md:flex-row items-center gap-1.5">
-            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform">🌿</span>
-            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline">Planta</span>
+            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform" id="card-produtor-emoji">🌿</span>
+            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline" id="card-produtor-name">Planta</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-[10px] px-2 py-0.5 rounded-lg border border-brandYellow/10">30☀️</span>
@@ -337,8 +401,8 @@
         <!-- CARD 2: COELHO -->
         <button id="card-primario" class="btn-3d bg-slate-950 border border-amber-500/20 rounded-xl p-2 flex flex-col md:flex-row items-center justify-between gap-1 transition-all group min-h-[50px]">
           <div class="flex flex-col md:flex-row items-center gap-1.5">
-            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform">🐰</span>
-            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline">Coelho</span>
+            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform" id="card-primario-emoji">🐰</span>
+            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline" id="card-primario-name">Coelho</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-[10px] px-2 py-0.5 rounded-lg border border-brandYellow/10">50☀️</span>
@@ -349,8 +413,8 @@
         <!-- CARD 3: SERPENTE -->
         <button id="card-secundario" class="btn-3d bg-slate-950 border border-rose-500/20 rounded-xl p-2 flex flex-col md:flex-row items-center justify-between gap-1 transition-all group min-h-[50px]">
           <div class="flex flex-col md:flex-row items-center gap-1.5">
-            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform">🐍</span>
-            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline">Serpente</span>
+            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform" id="card-secundario-emoji">🐍</span>
+            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline" id="card-secundario-name">Serpente</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-[10px] px-2 py-0.5 rounded-lg border border-brandYellow/10">70☀️</span>
@@ -361,8 +425,8 @@
         <!-- CARD 4: COGUMELO -->
         <button id="card-decompositor" class="btn-3d bg-slate-950 border border-purple-500/20 rounded-xl p-2 flex flex-col md:flex-row items-center justify-between gap-1 transition-all group min-h-[50px]">
           <div class="flex flex-col md:flex-row items-center gap-1.5">
-            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform">🍄</span>
-            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline">Cogumelo</span>
+            <span class="text-2xl md:text-3xl select-none group-hover:scale-105 transition-transform" id="card-decompositor-emoji">🍄</span>
+            <span class="font-extrabold text-[10px] text-slate-300 hidden sm:inline" id="card-decompositor-name">Cogumelo</span>
           </div>
           <div class="flex items-center gap-1">
             <span class="bg-brandYellow/15 text-brandYellow font-extrabold text-[10px] px-2 py-0.5 rounded-lg border border-brandYellow/10">25☀️</span>
@@ -373,19 +437,46 @@
       </div>
     </div>
   </footer>
+  </div>
 
   <script>
     // --- ESTADO GLOBAL DO JOGO ---
     let soundEnabled = true;
     let isPaused = false;
     let isClassroomPaused = false;
-    let solarEnergy = 200; // Inicia com 200 para bom início de gameplay
+    let solarEnergy = 400; // Inicia com 400 para melhor início de gameplay com maior facilidade
     let baseLife = 100;
     let score = 0;
     let totalKills = 0;
     let gameActive = false;
     let frameId = null;
     let lastTime = 0;
+
+    // --- TEMAS DE ECOSSISTEMA SELECIONÁVEIS ---
+    let currentEcosystem = 'forest';
+    const ECO_THEMES = {
+      forest: {
+        name: 'Floresta 🌳',
+        produtor: { emoji: '🌿', name: 'Planta' },
+        primario: { emoji: '🐰', name: 'Coelho' },
+        secundario: { emoji: '🐍', name: 'Serpente' },
+        decompositor: { emoji: '🍄', name: 'Cogumelo' }
+      },
+      ocean: {
+        name: 'Oceano 🌊',
+        produtor: { emoji: '🌿', name: 'Algas' },
+        primario: { emoji: '🦐', name: 'Camarão' },
+        secundario: { emoji: '🐟', name: 'Peixe' },
+        decompositor: { emoji: '🦠', name: 'Bactéria' }
+      },
+      savanna: {
+        name: 'Savana 🌾',
+        produtor: { emoji: '🌾', name: 'Capim' },
+        primario: { emoji: '🦓', name: 'Zebra' },
+        secundario: { emoji: '🦁', name: 'Leão' },
+        decompositor: { emoji: '🍄', name: 'Fungo' }
+      }
+    };
 
     // Configurações do Grid Virtual
     const ROWS = 3;
@@ -398,12 +489,12 @@
       { id: 2, name: "Rio/Água 🟦", bgStyle: "bg-gradient-to-r from-blue-950 to-blue-900/60", glowClass: "glow-water" }
     ];
 
-    // Custo e Descrições dos Cards
+    // Custo e Descrições dos Cards (iniciados com o tema padrão Floresta)
     const CARDS = {
       produtor: { type: 'produtor', name: 'Planta', emoji: '🌿', cost: 30, desc: 'Produtor: Gera +10 energia solar a cada 5s. Serve de alimento para o Coelho.' },
       primario: { type: 'primario', name: 'Coelho', emoji: '🐰', cost: 50, desc: 'Herbívoro: Defende corpo a corpo. Precisa comer plantas para não morrer de fome e ganhar escudo.' },
       secundario: { type: 'secundario', name: 'Serpente', emoji: '🐍', cost: 70, desc: 'Carnívoro: Dispara esferas purificadoras à distância. Caça coelhos para ativar Super Velocidade!' },
-      decompositor: { type: 'decompositor', name: 'Cogumelo', emoji: '🍄', cost: 25, desc: 'Decompositor: Decompõe qualquer criatura morta próxima (raio 150px) e devolve +40☀️.' }
+      decompositor: { type: 'decompositor', name: 'Cogumelo', emoji: '🍄', cost: 25, desc: 'Decompositor: Decompõe qualquer criatura morta próxima (raio 150px) e devolve +60☀️.' }
     };
 
     let selectedType = null; // Card selecionado
@@ -587,6 +678,78 @@
       showGhost(card.emoji);
     }
 
+    function changeEcosystemTheme(value) {
+      currentEcosystem = value;
+      const theme = ECO_THEMES[value];
+      
+      // Update Deck UI Card Emojis and Names
+      document.getElementById('card-produtor-emoji').innerText = theme.produtor.emoji;
+      document.getElementById('card-produtor-name').innerText = theme.produtor.name;
+      
+      document.getElementById('card-primario-emoji').innerText = theme.primario.emoji;
+      document.getElementById('card-primario-name').innerText = theme.primario.name;
+      
+      document.getElementById('card-secundario-emoji').innerText = theme.secundario.emoji;
+      document.getElementById('card-secundario-name').innerText = theme.secundario.name;
+      
+      document.getElementById('card-decompositor-emoji').innerText = theme.decompositor.emoji;
+      document.getElementById('card-decompositor-name').innerText = theme.decompositor.name;
+
+      // Update active organisms in simulation
+      coelhos.forEach(r => {
+        const emojiEl = r.el.querySelector('.entity-emoji');
+        if (emojiEl) emojiEl.innerText = theme.primario.emoji;
+      });
+      serpentes.forEach(s => {
+        const emojiEl = s.el.querySelector('.entity-emoji');
+        if (emojiEl) emojiEl.innerText = theme.secundario.emoji;
+      });
+      plantas.forEach(p => {
+        const emojiEl = p.el.querySelector('span');
+        if (emojiEl) emojiEl.innerText = theme.produtor.emoji;
+      });
+      cogumelos.forEach(m => {
+        const emojiEl = m.el.querySelector('span');
+        if (emojiEl) emojiEl.innerText = theme.decompositor.emoji;
+      });
+      
+      // Update CARDS mapping references
+      CARDS.produtor.name = theme.produtor.name;
+      CARDS.produtor.emoji = theme.produtor.emoji;
+      CARDS.produtor.desc = `Produtor: Gera +10 energia solar a cada 5s. Serve de alimento para o ${theme.primario.name}.`;
+
+      CARDS.primario.name = theme.primario.name;
+      CARDS.primario.emoji = theme.primario.emoji;
+      CARDS.primario.desc = `Herbívoro: Defende corpo a corpo. Precisa comer ${theme.produtor.name}s para não morrer de fome e ganhar escudo.`;
+
+      CARDS.secundario.name = theme.secundario.name;
+      CARDS.secundario.emoji = theme.secundario.emoji;
+      CARDS.secundario.desc = `Carnívoro: Dispara esferas purificadoras à distância. Caça ${theme.primario.name}s para ativar Super Velocidade!`;
+
+      CARDS.decompositor.name = theme.decompositor.name;
+      CARDS.decompositor.emoji = theme.decompositor.emoji;
+      CARDS.decompositor.desc = `Decompositor: Decompõe qualquer criatura morta próxima (raio 150px) e devolve +60☀️.`;
+
+      // Update manual modal items
+      document.getElementById('man-produtor-emoji').innerText = theme.produtor.emoji;
+      document.getElementById('man-produtor-title').innerText = `2. ${theme.produtor.name} (Produtor):`;
+      document.getElementById('man-produtor-desc').innerText = `Custo 30☀️. Invoque clicando no bioma. Produz Sol e alimenta o ${theme.primario.name}.`;
+
+      document.getElementById('man-primario-emoji').innerText = theme.primario.emoji;
+      document.getElementById('man-primario-title').innerText = `3. ${theme.primario.name} (Herbívoro):`;
+      document.getElementById('man-primario-desc').innerText = `Custo 50☀️. Spawna na esquerda e avança. Precisa comer ${theme.produtor.name}s para não morrer de fome e ganhar escudo.`;
+
+      document.getElementById('man-secundario-emoji').innerText = theme.secundario.emoji;
+      document.getElementById('man-secundario-title').innerText = `4. ${theme.secundario.name} (Carnívoro):`;
+      document.getElementById('man-secundario-desc').innerText = `Custo 70☀️. Dispara esferas purificadoras. Caça os ${theme.primario.name}s para carregar Super Tiros!`;
+
+      document.getElementById('man-decompositor-emoji').innerText = theme.decompositor.emoji;
+      document.getElementById('man-decompositor-title').innerText = `5. ${theme.decompositor.name} (Decompositor):`;
+      document.getElementById('man-decompositor-desc').innerText = `Custo 25☀️. Recicla corpos de criaturas mortas próximas (raio 150px) e devolve +60☀️.`;
+
+      updateDeckUI();
+    }
+
     function updateInfoPanel(card) {
       const desc = document.getElementById('info-desc');
       if (card) {
@@ -613,7 +776,8 @@
         e.preventDefault(); // Impede click duplo lag no iOS
         const rect = element.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clickX = ((clientX - rect.left) / rect.width) * BOARD_WIDTH;
+        // Mapear área ativa (80% da direita) para a faixa [160, 800]
+        const clickX = 160 + ((clientX - rect.left) / rect.width) * (BOARD_WIDTH - 160);
         executePlacement(row, clickX);
       };
       
@@ -648,6 +812,20 @@
         raia.className = `raia-biome flex items-center w-full relative border-b border-slate-800/80 ${biome.bgStyle} ${biome.glowClass}`;
         raia.style.height = "33.33%"; // preenchimento vertical perfeito
         
+        // A Base da Natureza na extrema esquerda (20%)
+        const baseDiv = document.createElement('div');
+        baseDiv.id = `base-${r}`;
+        baseDiv.className = "w-[20%] h-full bg-slate-950/70 border-r border-slate-800/80 flex flex-col items-center justify-center p-2 text-center relative shadow-lg z-10 transition-all";
+        baseDiv.innerHTML = `
+          <span class="text-2xl md:text-3xl filter drop-shadow-md animate-pulse">🌸</span>
+          <span class="text-[8px] md:text-[9px] font-black text-emerald-400 mt-0.5 uppercase tracking-wider">Coração</span>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1 border border-slate-700">
+            <div id="base-life-bar-${r}" class="bg-brandGreen h-full" style="width: 100%"></div>
+          </div>
+        `;
+        
+        raia.appendChild(baseDiv);
+
         // Área de toque ativo (80% largura)
         const activeArea = document.createElement('div');
         activeArea.className = "w-[80%] h-full relative z-10";
@@ -659,19 +837,6 @@
 
         raia.appendChild(activeArea);
 
-        // A Base da Natureza na extrema direita (20%)
-        const baseDiv = document.createElement('div');
-        baseDiv.id = `base-${r}`;
-        baseDiv.className = "w-[20%] h-full bg-slate-950/70 border-l border-slate-800/80 flex flex-col items-center justify-center p-2 text-center relative shadow-lg z-10 transition-all";
-        baseDiv.innerHTML = `
-          <span class="text-2xl md:text-3xl filter drop-shadow-md animate-pulse">🌸</span>
-          <span class="text-[8px] md:text-[9px] font-black text-emerald-400 mt-0.5 uppercase tracking-wider">Coração</span>
-          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1 border border-slate-700">
-            <div id="base-life-bar-${r}" class="bg-brandGreen h-full" style="width: 100%"></div>
-          </div>
-        `;
-        
-        raia.appendChild(baseDiv);
         container.insertBefore(raia, document.getElementById('entities-container'));
       }
 
@@ -690,7 +855,7 @@
       enemies = [];
       projectiles = [];
       
-      solarEnergy = 200;
+      solarEnergy = 400; // Começa com 400 para maior facilidade
       baseLife = 100;
       score = 0;
       totalKills = 0;
@@ -722,7 +887,7 @@
       if (card.type === 'produtor' || card.type === 'decompositor') {
         ghost.style.left = `${mouseX - 20}px`;
       } else {
-        ghost.style.left = `20px`;
+        ghost.style.left = `${rect.width * 0.20}px`;
       }
       ghost.classList.remove('hidden');
     }
@@ -781,10 +946,11 @@
 
     // --- SPAWNS SISTÊMICOS DE ENTIDADES ---
     function spawnPlant(row, x) {
+      const theme = ECO_THEMES[currentEcosystem];
       const el = document.createElement('div');
       el.className = "absolute w-12 h-12 flex flex-col items-center justify-between pointer-events-none select-none z-20 transition-all duration-75";
       el.innerHTML = `
-        <span class="text-3xl md:text-3.5xl filter drop-shadow-md">🌿</span>
+        <span class="text-3xl md:text-3.5xl filter drop-shadow-md">${theme.produtor.emoji}</span>
         <div class="w-8 bg-slate-950 border border-slate-700 h-1 rounded-full overflow-hidden mt-0.5">
           <div class="life-bar bg-brandGreen h-full" style="width: 100%"></div>
         </div>
@@ -802,10 +968,11 @@
     }
 
     function spawnMushroom(row, x) {
+      const theme = ECO_THEMES[currentEcosystem];
       const el = document.createElement('div');
       el.className = "absolute w-12 h-12 flex flex-col items-center justify-between pointer-events-none select-none z-20 transition-all duration-75";
       el.innerHTML = `
-        <span class="text-3xl md:text-3.5xl filter drop-shadow-md animate-pulse">🍄</span>
+        <span class="text-3xl md:text-3.5xl filter drop-shadow-md animate-pulse">${theme.decompositor.emoji}</span>
         <div class="w-8 bg-slate-950 border border-slate-700 h-1 rounded-full overflow-hidden mt-0.5">
           <div class="life-bar bg-brandGreen h-full" style="width: 100%"></div>
         </div>
@@ -822,11 +989,12 @@
     }
 
     function spawnRabbit(row) {
+      const theme = ECO_THEMES[currentEcosystem];
       const el = document.createElement('div');
       el.className = "absolute w-12 h-12 flex flex-col items-center justify-between p-1 border-2 border-transparent rounded-xl z-20 transition-all duration-75";
       el.innerHTML = `
         <div class="hunger-alert absolute -top-4 bg-brandRed text-white text-[8px] px-1 rounded-full font-black animate-bounce hidden">FOME 😩</div>
-        <span class="entity-emoji text-3xl md:text-3.5xl filter drop-shadow-md">🐰</span>
+        <span class="entity-emoji text-3xl md:text-3.5xl filter drop-shadow-md">${theme.primario.emoji}</span>
         <div class="w-8 bg-slate-950 border border-slate-700 h-1 rounded-full overflow-hidden mt-0.5">
           <div class="life-bar bg-brandGreen h-full" style="width: 100%"></div>
         </div>
@@ -834,7 +1002,7 @@
       document.getElementById('entities-container').appendChild(el);
 
       coelhos.push({
-        x: 20,
+        x: 160, // Spawna no limite da Base (20%)
         row: row,
         life: 100,
         maxLife: 100,
@@ -849,11 +1017,12 @@
     }
 
     function spawnSnake(row) {
+      const theme = ECO_THEMES[currentEcosystem];
       const el = document.createElement('div');
       el.className = "absolute w-12 h-12 flex flex-col items-center justify-between p-1 border-2 border-transparent rounded-xl z-20 transition-all duration-75";
       el.innerHTML = `
         <div class="hunger-alert absolute -top-4 bg-brandRed text-white text-[8px] px-1 rounded-full font-black animate-bounce hidden">FOME 😩</div>
-        <span class="entity-emoji text-3xl md:text-3.5xl filter drop-shadow-md">🐍</span>
+        <span class="entity-emoji text-3xl md:text-3.5xl filter drop-shadow-md">${theme.secundario.emoji}</span>
         <div class="w-8 bg-slate-950 border border-slate-700 h-1 rounded-full overflow-hidden mt-0.5">
           <div class="life-bar bg-brandGreen h-full" style="width: 100%"></div>
         </div>
@@ -861,7 +1030,7 @@
       document.getElementById('entities-container').appendChild(el);
 
       serpentes.push({
-        x: 20,
+        x: 160, // Spawna no limite da Base (20%)
         row: row,
         life: 100,
         maxLife: 100,
@@ -935,7 +1104,7 @@
       }
 
       // Sol Solar passivo
-      if (Math.random() < 0.008) {
+      if (Math.random() < 0.012) {
         const energyGen = (weatherEffects.superSun > 0) ? 10 : 5;
         solarEnergy += energyGen;
         document.getElementById('solar-text').innerText = solarEnergy;
@@ -946,7 +1115,7 @@
       plantas.forEach(p => {
         const timeLimit = (weatherEffects.superSun > 0) ? 2500 : 5000;
         if (now - p.lastSunGen >= timeLimit) {
-          const sunVal = (weatherEffects.superSun > 0) ? 20 : 10;
+          const sunVal = (weatherEffects.superSun > 0) ? 40 : 20;
           solarEnergy += sunVal;
           document.getElementById('solar-text').innerText = solarEnergy;
           playSound('coin');
@@ -959,6 +1128,7 @@
       // 2. ATUALIZAR COELHOS (HERBÍVOROS)
       for (let i = coelhos.length - 1; i >= 0; i--) {
         const rabbit = coelhos[i];
+        const theme = ECO_THEMES[currentEcosystem];
         
         if (rabbit.shieldTime > 0) {
           rabbit.shieldTime -= deltaTime;
@@ -991,7 +1161,7 @@
             
             playSound('coin');
             spawnFloatText("SUPER ESCUDO 🛡️", rabbit.row, rabbit.x, '#FFC800');
-            spawnFloatText("DEVORADO! 🌿", plant.row, plant.x, '#EA2B2B');
+            spawnFloatText(`DEVORADO! ${theme.produtor.emoji}`, plant.row, plant.x, '#EA2B2B');
             triggerDecomposition(plant.row, plant.x);
             
             atePlant = true;
@@ -1014,7 +1184,7 @@
               const damage = rabbit.shield ? 5 : 15;
               rabbit.life -= damage;
               playSound('hit');
-              spawnFloatText(`-${damage} 🐰`, rabbit.row, rabbit.x, '#FBBF24');
+              spawnFloatText(`-${damage} ${theme.primario.emoji}`, rabbit.row, rabbit.x, '#FBBF24');
               enemy.lastAction = now;
             }
           }
@@ -1025,13 +1195,14 @@
         }
 
         if (rabbit.life <= 0) {
-          killEntity(rabbit, i, coelhos, "DESTRUIDO! 🐰");
+          killEntity(rabbit, i, coelhos, `DESTRUIDO! ${theme.primario.emoji}`);
         }
       }
 
       // 3. ATUALIZAR SERPENTES (CARNÍVOROS)
       for (let i = serpentes.length - 1; i >= 0; i--) {
         const snake = serpentes[i];
+        const theme = ECO_THEMES[currentEcosystem];
 
         if (snake.superchargeTime > 0) {
           snake.superchargeTime -= deltaTime;
@@ -1064,7 +1235,7 @@
 
             playSound('hit');
             spawnFloatText("SUPER CARGA ⚡", snake.row, snake.x, '#0EA5E9');
-            spawnFloatText("PREDAÇÃO! 🐰", rabbit.row, rabbit.x, '#EA2B2B');
+            spawnFloatText(`PREDAÇÃO! ${theme.primario.emoji}`, rabbit.row, rabbit.x, '#EA2B2B');
             triggerDecomposition(rabbit.row, rabbit.x);
 
             ateRabbit = true;
@@ -1080,7 +1251,7 @@
             if (now - enemy.lastAction >= 1200) {
               snake.life -= 15;
               playSound('hit');
-              spawnFloatText("-15 🐍", snake.row, snake.x, '#EA2B2B');
+              spawnFloatText(`-15 ${theme.secundario.emoji}`, snake.row, snake.x, '#EA2B2B');
               enemy.lastAction = now;
             }
           }
@@ -1101,16 +1272,17 @@
         }
 
         if (snake.life <= 0) {
-          killEntity(snake, i, serpentes, "DESTRUIDA! 🐍");
+          killEntity(snake, i, serpentes, `DESTRUIDA! ${theme.secundario.emoji}`);
         }
       }
 
       // 4. ATUALIZAR INIMIGOS (PRAGAS)
       for (let i = enemies.length - 1; i >= 0; i--) {
         const enemy = enemies[i];
+        const theme = ECO_THEMES[currentEcosystem];
         
-        // Invasão da Base
-        if (enemy.x <= 20) {
+        // Invasão da Base (agora no limite de 20% da largura, x = 160)
+        if (enemy.x <= 160) {
           baseLife = Math.max(0, baseLife - 20);
           document.getElementById('base-life-text').innerText = `Vida: ${baseLife}%`;
           playSound('danger');
@@ -1131,7 +1303,7 @@
             if (now - enemy.lastAction >= 1200) {
               p.life -= 20;
               playSound('hit');
-              spawnFloatText("-20 🌿", p.row, p.x, '#EF4444');
+              spawnFloatText(`-20 ${theme.produtor.emoji}`, p.row, p.x, '#EF4444');
               enemy.lastAction = now;
               if (p.life <= 0) {
                 const index = plantas.indexOf(p);
@@ -1149,7 +1321,7 @@
             if (now - enemy.lastAction >= 1200) {
               c.life -= 20;
               playSound('hit');
-              spawnFloatText("-20 🍄", c.row, c.x, '#EF4444');
+              spawnFloatText(`-20 ${theme.decompositor.emoji}`, c.row, c.x, '#EF4444');
               enemy.lastAction = now;
               if (c.life <= 0) {
                 const index = cogumelos.indexOf(c);
@@ -1256,13 +1428,13 @@
     function triggerDecomposition(row, x) {
       const targetMushroom = cogumelos.find(c => c.row === row && Math.abs(c.x - x) <= 150);
       if (targetMushroom) {
-        solarEnergy += 40;
+        solarEnergy += 60;
         document.getElementById('solar-text').innerText = solarEnergy;
         updateDeckUI();
         playSound('decompose');
         
         spawnDecompParticle(x, targetMushroom.x, row);
-        spawnFloatText("+40 Decomp 🍄", row, targetMushroom.x, '#A855F7');
+        spawnFloatText(`+60 Decomp ${ECO_THEMES[currentEcosystem].decompositor.emoji}`, row, targetMushroom.x, '#A855F7');
       }
     }
 
@@ -1343,7 +1515,7 @@
           c.el.classList.add('animate-pulse-red');
         } else {
           alert.classList.add('hidden');
-          emoji.innerText = "🐰";
+          emoji.innerText = ECO_THEMES[currentEcosystem].primario.emoji;
           c.el.classList.remove('animate-pulse-red');
         }
 
@@ -1368,7 +1540,7 @@
           s.el.classList.add('animate-pulse-red');
         } else {
           alert.classList.add('hidden');
-          emoji.innerText = "🐍";
+          emoji.innerText = ECO_THEMES[currentEcosystem].secundario.emoji;
           s.el.classList.remove('animate-pulse-red');
         }
 
@@ -1420,12 +1592,14 @@
 
       setTimeout(() => {
         if (base) base.classList.remove('bg-red-950/80', 'border-brandRed', 'animate-shake');
-        if (heart) {
-          heart.innerText = '❤️';
-          heart.classList.remove('animate-shake');
-        }
-        if (lifeCard) {
-          lifeCard.classList.remove('animate-shake', 'border-brandRed');
+        if (gameActive) {
+          if (heart) {
+            heart.innerText = '❤️';
+            heart.classList.remove('animate-shake');
+          }
+          if (lifeCard) {
+            lifeCard.classList.remove('animate-shake', 'border-brandRed');
+          }
         }
       }, 600);
     }
@@ -1454,6 +1628,7 @@
 
     function buildClassroomAnalysis() {
       const container = document.getElementById('classroom-analysis');
+      const theme = ECO_THEMES[currentEcosystem];
       
       const pCount = plantas.length;
       const cCount = coelhos.length;
@@ -1463,7 +1638,7 @@
 
       let html = `<p class="border-b border-slate-800 pb-2 flex gap-2 items-center text-slate-100">
         <i class="w-4 h-4 text-indigo-400" data-lucide="bar-chart-2"></i>
-        <span>População Atual: <strong>${pCount}🌿</strong> Plantas | <strong>${cCount}🐰</strong> Coelhos | <strong>${sCount}🐍</strong> Serpentes | <strong>${mCount}🍄</strong> Cogumelos</span>
+        <span>População Atual: <strong>${pCount}${theme.produtor.emoji}</strong> ${theme.produtor.name}s | <strong>${cCount}${theme.primario.emoji}</strong> ${theme.primario.name}s | <strong>${sCount}${theme.secundario.emoji}</strong> ${theme.secundario.name}s | <strong>${mCount}${theme.decompositor.emoji}</strong> ${theme.decompositor.name}s</span>
       </p>`;
 
       html += `<div class="space-y-2.5 mt-2">`;
@@ -1471,12 +1646,12 @@
       if (pCount > 0) {
         html += `<p class="flex items-start gap-2 text-emerald-400">
           <i class="w-4 h-4 mt-0.5" data-lucide="check-circle"></i>
-          <span>As **Plantas (Autótrofas)** estão gerando energia solar para o ecossistema. Elas iniciam o fluxo energético.</span>
+          <span>As/Os **${theme.produtor.name}s (Autótrofas)** estão gerando energia solar para o ecossistema. Elas iniciam o fluxo energético.</span>
         </p>`;
       } else {
         html += `<p class="flex items-start gap-2 text-brandRed font-black">
           <i class="w-4 h-4 mt-0.5" data-lucide="alert-triangle"></i>
-          <span>Não há plantas ativas! Sem produtores, a cadeia alimentar entrará em colapso por fome.</span>
+          <span>Não há ${theme.produtor.name.toLowerCase()}s ativas/os! Sem produtores, a cadeia alimentar entrará em colapso por fome.</span>
         </p>`;
       }
 
@@ -1495,7 +1670,7 @@
       if (mCount > 0) {
         html += `<p class="flex items-start gap-2 text-purple-400">
           <i class="w-4 h-4 mt-0.5" data-lucide="refresh-cw"></i>
-          <span>Os **Cogumelos (Decompositores)** estão ativos! Eles reciclam matéria morta de volta ao ciclo de energia (+40☀️).</span>
+          <span>Os/As **${theme.decompositor.name}s (Decompositores)** estão ativos/as! Eles reciclam matéria morta de volta ao ciclo de energia (+60☀️).</span>
         </p>`;
       }
 
@@ -1504,8 +1679,8 @@
       html += `<div class="mt-3 pt-3 border-t border-slate-800">
         <span class="text-xs text-indigo-400 font-extrabold uppercase tracking-widest block mb-1">Questões Pedagógicas:</span>
         <ul class="list-disc list-inside space-y-1 text-slate-400 text-[11px] font-semibold">
-          <li>Por que a Serpente precisa que existam Coelhos na raia para sobreviver?</li>
-          <li>Como a ação dos Decompositores limpa o bioma e nos devolve energia solar?</li>
+          <li>Por que a/o ${theme.secundario.name} precisa que existam ${theme.primario.name}s na raia para sobreviver?</li>
+          <li>Como a ação dos Decompositores (${theme.decompositor.name}s) limpa o bioma e nos devolve energia solar?</li>
         </ul>
       </div>`;
 
@@ -1541,8 +1716,6 @@
     function endGame(victory) {
       gameActive = false;
       cancelAnimationFrame(frameId);
-      
-      document.getElementById('screen-game').classList.add('hidden');
       
       if (victory) {
         playSound('complete');
@@ -1611,6 +1784,9 @@
       document.getElementById('card-primario').addEventListener('click', () => selectCardToPlace('primario'));
       document.getElementById('card-secundario').addEventListener('click', () => selectCardToPlace('secundario'));
       document.getElementById('card-decompositor').addEventListener('click', () => selectCardToPlace('decompositor'));
+      
+      // Sincronizar deck de acordo com o ecossistema inicial (Floresta)
+      changeEcosystemTheme(currentEcosystem);
     });
 
     // Inicializar Lucide

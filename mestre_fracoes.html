@@ -63,11 +63,11 @@
     .btn-3d-gray {
       position: relative;
       transition: all 0.1s ease;
-      box-shadow: 0 6px 0 0 #CBD5E1;
+      box-shadow: 0 6px 0 0 #334155;
     }
     .btn-3d-gray:active {
       transform: translateY(4px);
-      box-shadow: 0 2px 0 0 #CBD5E1;
+      box-shadow: 0 2px 0 0 #334155;
     }
 
     .btn-3d-orange {
@@ -134,20 +134,23 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+<body class="bg-gradient-to-br from-slate-950 via-[#130E26] to-slate-950 min-h-screen text-slate-200 flex flex-col justify-between overflow-x-hidden">
 
   <!-- Cabeçalho Principal (Fixo no topo da área do jogo) -->
   <header class="w-full max-w-4xl mx-auto px-4 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3 z-10">
-    <div class="flex items-center gap-2">
-      <div class="bg-brandOrange text-white p-2 rounded-2xl shadow-md">
-        <i data-lucide="pizza" class="w-6 h-6"></i>
+    <div class="flex items-center gap-2.5">
+      <div class="bg-indigo-650 text-white p-2.5 rounded-2xl shadow-lg border border-indigo-500/25">
+        <i data-lucide="heart" class="w-6 h-6 text-red-400 fill-red-400"></i>
       </div>
-      <span class="text-xl font-extrabold tracking-wide text-brandOrange">Pizzaria das Frações</span>
+      <div>
+        <span class="text-lg font-black tracking-wide text-white block leading-tight">GamesForVitória 💖</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pizzaria das Frações</span>
+      </div>
     </div>
     
     <!-- Navegação de Missões -->
     <nav class="flex items-center gap-2">
-      <a href="./index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-2xl border-2 border-slate-200 shadow-sm transition-all flex items-center justify-center" title="Central de Jogos">
+      <a href="./index.html" class="bg-slate-900/80 hover:bg-slate-800 text-slate-350 p-2 rounded-2xl border border-slate-800/60 shadow-sm transition-all flex items-center justify-center" title="Central de Jogos">
         <i data-lucide="home" class="w-5 h-5"></i>
       </a>
       <a href="./cadeia_alimentar.html" class="bg-emerald-500 hover:bg-emerald-600 text-white border-b-4 border-emerald-700 active:border-b-0 active:translate-y-1 px-3 py-2 rounded-2xl text-xs font-black flex items-center gap-1 transition-all shadow-sm" title="Conexão Natureza">
@@ -160,11 +163,11 @@
     
     <!-- Controle de Som e Pontos -->
     <div class="flex items-center gap-3">
-      <div class="bg-white px-4 py-2 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center gap-2">
+      <div class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-slate-800/60 shadow-sm flex items-center gap-2">
         <i data-lucide="trophy" class="text-brandYellow w-5 h-5 fill-brandYellow"></i>
-        <span id="score-text" class="font-extrabold text-slate-700">0 Pontos</span>
+        <span id="score-text" class="font-extrabold text-slate-200">0 Pontos</span>
       </div>
-      <button id="sound-btn" onclick="toggleSound()" class="bg-white p-2.5 rounded-2xl border-2 border-slate-200 hover:bg-slate-100 transition-colors shadow-sm text-slate-500">
+      <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800/60 hover:bg-slate-800 transition-colors shadow-sm text-slate-400">
         <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
       </button>
     </div>
@@ -174,7 +177,7 @@
   <main class="flex-grow flex items-center justify-center p-4 w-full max-w-4xl mx-auto">
     
     <!-- TELA INICIAL (MENU) -->
-    <section id="screen-start" class="w-full bg-white rounded-3xl border-4 border-slate-200 p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] text-center flex flex-col items-center gap-6 animate-pop">
+    <section id="screen-start" class="w-full bg-slate-900/90 backdrop-blur-md rounded-3xl border border-slate-800/60 p-8 shadow-[0_12px_0_0_rgba(15,23,42,0.8)] text-center flex flex-col items-center gap-6 animate-pop">
       <!-- Mascot Chef Pizza -->
       <div class="w-44 h-44 flex items-center justify-center animate-float">
         <!-- SVG Gatinho Chef Fofo -->
@@ -215,11 +218,11 @@
       </div>
 
       <div>
-        <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">Mestre das Frações</h1>
+        <h1 class="text-3xl md:text-4xl font-black text-slate-100 tracking-tight">Mestre das Frações</h1>
         <p class="text-brandOrange font-extrabold text-lg md:text-xl uppercase tracking-wider mt-1">Pizza Gourmet 🍕</p>
       </div>
 
-      <p class="text-slate-500 font-semibold max-w-md text-base md:text-lg">
+      <p class="text-slate-400 font-semibold max-w-md text-base md:text-lg">
         Ajude o Chef a cortar e rechear as pizzas exatamente do tamanho que os clientes pedirem! Pronto para a missão?
       </p>
 
@@ -229,11 +232,11 @@
     </section>
 
     <!-- TELA DE GAMEPLAY -->
-    <section id="screen-game" class="w-full bg-white rounded-3xl border-4 border-slate-200 p-5 md:p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] flex flex-col gap-6 hidden animate-pop">
+    <section id="screen-game" class="w-full bg-slate-900/90 backdrop-blur-md rounded-3xl border border-slate-800/60 p-5 md:p-8 shadow-[0_12px_0_0_rgba(15,23,42,0.8)] flex flex-col gap-6 hidden animate-pop">
       
       <!-- Barra de Progresso superior -->
       <div class="flex items-center justify-between gap-4">
-        <div class="flex-grow bg-slate-100 h-6 rounded-full border-2 border-slate-200 overflow-hidden relative">
+        <div class="flex-grow bg-slate-950 h-6 rounded-full border border-slate-800/60 overflow-hidden relative">
           <div id="progress-bar" class="bg-gradient-to-r from-brandOrange to-brandYellow h-full w-0 transition-all duration-500 ease-out"></div>
         </div>
         <div class="flex items-center gap-1.5 font-extrabold text-brandOrange whitespace-nowrap text-lg">
@@ -246,13 +249,13 @@
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
         
         <!-- Bloco do Cliente (Esq) - 5/12 colunas -->
-        <div class="md:col-span-5 flex flex-col items-center gap-4 bg-orange-50/50 p-4 rounded-2xl border border-orange-100">
+        <div class="md:col-span-5 flex flex-col items-center gap-4 bg-slate-950/45 p-4 rounded-2xl border border-slate-850">
           <div id="client-avatar-container" class="w-28 h-28 flex items-center justify-center animate-float">
             <!-- Gerado dinamicamente no JS -->
           </div>
-          <div class="relative bg-white border-2 border-orange-200 p-4 rounded-2xl shadow-sm text-center w-full">
+          <div class="relative bg-slate-950 border border-slate-800 p-4 rounded-2xl shadow-sm text-center w-full">
             <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brandOrange text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Cliente</span>
-            <p id="client-speech-bubble" class="text-slate-700 font-extrabold text-base md:text-lg leading-snug pt-1">
+            <p id="client-speech-bubble" class="text-slate-200 font-extrabold text-base md:text-lg leading-snug pt-1">
               "Quero 3/4 da pizza de calabresa!"
             </p>
           </div>
@@ -261,11 +264,11 @@
         <!-- Bloco da Pizza e Seleção (Dir) - 7/12 colunas -->
         <div class="md:col-span-7 flex flex-col items-center justify-center">
           <!-- Pizza Board (Tábua de Madeira) -->
-          <div class="relative w-64 h-64 md:w-80 md:h-80 bg-amber-900/10 rounded-full flex items-center justify-center p-4 border border-amber-900/5 shadow-inner">
+          <div class="relative w-64 h-64 md:w-80 md:h-80 bg-amber-950/20 rounded-full flex items-center justify-center p-4 border border-amber-900/10 shadow-inner">
             <!-- Prato de Madeira Rústico -->
-            <div class="absolute inset-2 bg-gradient-to-br from-amber-700 to-amber-800 rounded-full border-4 border-amber-900 shadow-[0_6px_12px_rgba(0,0,0,0.15)] flex items-center justify-center">
+            <div class="absolute inset-2 bg-gradient-to-br from-amber-800 to-amber-950 rounded-full border-4 border-amber-900 shadow-[0_6px_12px_rgba(0,0,0,0.4)] flex items-center justify-center">
               <!-- Círculo guia interior -->
-              <div class="w-[94%] h-[94%] rounded-full border-2 border-dashed border-amber-600/30"></div>
+              <div class="w-[94%] h-[94%] rounded-full border-2 border-dashed border-amber-800/40"></div>
             </div>
             
             <!-- SVG da Pizza Dinâmica -->
@@ -276,10 +279,10 @@
           
           <!-- Estatística de seleção atual da fração (Oculto para forçar contagem visual, revelado no erro) -->
           <div id="fraction-container" class="mt-4 flex flex-col items-center gap-1 hidden">
-            <div class="text-slate-500 font-semibold text-sm">Fração Selecionada:</div>
-            <div id="fraction-visual" class="flex flex-col items-center font-black text-2xl text-slate-800 relative leading-none bg-slate-100/80 px-4 py-1.5 rounded-xl border border-slate-200">
+            <div class="text-slate-400 font-semibold text-sm">Fração Selecionada:</div>
+            <div id="fraction-visual" class="flex flex-col items-center font-black text-2xl text-slate-200 relative leading-none bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-800">
               <span id="fraction-numerator">0</span>
-              <div class="w-6 h-0.5 bg-slate-800 my-0.5"></div>
+              <div class="w-6 h-0.5 bg-slate-200 my-0.5"></div>
               <span id="fraction-denominator">4</span>
             </div>
           </div>
@@ -288,19 +291,19 @@
       </div>
 
       <!-- Barra de Dica Pedagógica (Escondida por padrão, aparece no erro) -->
-      <div id="hint-box" class="bg-blue-50 border-2 border-brandBlue/30 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300">
+      <div id="hint-box" class="bg-blue-950/30 border border-blue-800/40 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300">
         <div class="bg-brandBlue text-white p-2 rounded-xl">
           <i data-lucide="lightbulb" class="w-5 h-5"></i>
         </div>
         <div>
-          <h4 class="font-extrabold text-brandBlueDark text-base">Dica do Chefinho:</h4>
-          <p id="hint-text" class="text-slate-600 font-semibold text-sm mt-0.5"></p>
+          <h4 class="font-extrabold text-blue-400 text-base">Dica do Chefinho:</h4>
+          <p id="hint-text" class="text-slate-350 font-semibold text-sm mt-0.5"></p>
         </div>
       </div>
 
       <!-- Botões de Ação Inferiores -->
       <div class="flex flex-col sm:flex-row gap-3 w-full justify-between items-center mt-2">
-        <button onclick="clearSlices()" class="btn-3d-gray bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold px-6 py-3 rounded-2xl w-full sm:w-auto text-base">
+        <button onclick="clearSlices()" class="btn-3d-gray bg-slate-800 hover:bg-slate-750 text-slate-300 font-extrabold px-6 py-3 rounded-2xl w-full sm:w-auto text-base">
           Limpar Pizza
         </button>
         <button onclick="submitOrder()" class="btn-3d-green bg-brandGreen hover:bg-brandGreenDark text-white font-extrabold px-10 py-3 rounded-2xl w-full sm:w-auto text-lg flex items-center justify-center gap-2">
@@ -312,42 +315,42 @@
     </section>
 
     <!-- TELA FINAL (VITÓRIA / PLACAR) -->
-    <section id="screen-victory" class="w-full bg-white rounded-3xl border-4 border-slate-200 p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] text-center flex flex-col items-center gap-6 hidden animate-pop">
+    <section id="screen-victory" class="w-full bg-slate-900/90 backdrop-blur-md rounded-3xl border border-slate-800/60 p-8 shadow-[0_12px_0_0_rgba(15,23,42,0.8)] text-center flex flex-col items-center gap-6 hidden animate-pop">
       
       <!-- Troféu e Estrelas de ouro -->
       <div class="relative flex flex-col items-center gap-2">
         <!-- 3 Estrelas Animadas -->
         <div class="flex gap-2 justify-center mb-1">
-          <i id="star-1" data-lucide="star" class="w-10 h-10 text-slate-300"></i>
-          <i id="star-2" data-lucide="star" class="w-12 h-12 text-slate-300 -translate-y-2"></i>
-          <i id="star-3" data-lucide="star" class="w-10 h-10 text-slate-300"></i>
+          <i id="star-1" data-lucide="star" class="w-10 h-10 text-slate-700"></i>
+          <i id="star-2" data-lucide="star" class="w-12 h-12 text-slate-700 -translate-y-2"></i>
+          <i id="star-3" data-lucide="star" class="w-10 h-10 text-slate-700"></i>
         </div>
         
         <!-- Ícone do Troféu -->
-        <div class="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center border-4 border-amber-300 relative shadow-inner">
+        <div class="w-32 h-32 bg-amber-950/40 rounded-full flex items-center justify-center border border-amber-900/50 relative shadow-inner">
           <i data-lucide="award" class="w-20 h-20 text-brandYellow fill-brandYellow"></i>
         </div>
       </div>
 
       <div>
-        <h2 class="text-3xl font-black text-slate-800 tracking-tight">Super Chef das Frações!</h2>
+        <h2 class="text-3xl font-black text-slate-100 tracking-tight">Super Chef das Frações!</h2>
         <p class="text-brandGreen font-extrabold text-lg uppercase tracking-wider mt-1">Missão Concluída! 🎉</p>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 w-full max-w-sm flex justify-around">
+      <div class="bg-slate-950/50 border border-slate-800/60 rounded-2xl p-4 w-full max-w-sm flex justify-around">
         <div class="text-center">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Erros</div>
-          <div id="victory-errors" class="text-2xl font-black text-brandRed">0</div>
+          <div id="victory-errors" class="text-2xl font-black text-red-400">0</div>
         </div>
-        <div class="w-px bg-slate-200"></div>
+        <div class="w-px bg-slate-800"></div>
         <div class="text-center">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
           <div id="victory-score" class="text-2xl font-black text-brandOrange">0</div>
         </div>
-        <div class="w-px bg-slate-200"></div>
+        <div class="w-px bg-slate-800"></div>
         <div class="text-center">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Chef Rank</div>
-          <div id="victory-rank" class="text-2xl font-black text-brandBlue">Chef Ouro</div>
+          <div id="victory-rank" class="text-2xl font-black text-indigo-400">Chef Ouro</div>
         </div>
       </div>
 
@@ -359,8 +362,8 @@
   </main>
 
   <!-- Rodapé Educacional -->
-  <footer class="w-full text-center py-4 text-xs font-bold text-slate-400 border-t border-slate-200/50 mt-4 bg-white/50">
-    Desenvolvido de acordo com as Diretrizes da BNCC (4º ano) para Escolas Premium
+  <footer class="w-full text-center py-4 text-xs font-bold text-slate-500 border-t border-slate-800/40 mt-4 bg-slate-950/40">
+    GamesForVitória 💖 • Desenvolvido de acordo com as Diretrizes da BNCC (4º ano)
   </footer>
 
   <!-- Container de Confete de vitória -->

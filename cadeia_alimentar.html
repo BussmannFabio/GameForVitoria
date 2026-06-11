@@ -108,22 +108,23 @@
     .animate-pop-in {
       animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
-  </style>
-</head>
-<body id="game-body" class="bg-gradient-to-br from-emerald-50 via-teal-50 to-green-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden transition-all duration-750">
+  </style><body id="game-body" class="bg-gradient-to-br from-slate-950 via-[#0E1B17] to-slate-950 min-h-screen text-slate-200 flex flex-col justify-between overflow-x-hidden transition-all duration-750">
 
   <!-- Cabeçalho do Jogo -->
   <header class="w-full max-w-5xl mx-auto px-4 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3 z-10">
-    <div class="flex items-center gap-2">
-      <div class="bg-forestGreen text-white p-2 rounded-2xl shadow-md">
-        <i data-lucide="leaf" class="w-6 h-6"></i>
+    <div class="flex items-center gap-2.5">
+      <div class="bg-indigo-650 text-white p-2.5 rounded-2xl shadow-lg border border-indigo-500/25">
+        <i data-lucide="heart" class="w-6 h-6 text-red-400 fill-red-400"></i>
       </div>
-      <span class="text-xl font-extrabold tracking-wide text-forestDark">Conexão Natureza</span>
+      <div>
+        <span class="text-lg font-black tracking-wide text-white block leading-tight">GamesForVitória 💖</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Conexão Natureza</span>
+      </div>
     </div>
     
     <!-- Navegação de Missões -->
     <nav class="flex items-center gap-2">
-      <a href="./index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-2xl border-2 border-slate-200 shadow-sm transition-all flex items-center justify-center" title="Central de Jogos">
+      <a href="./index.html" class="bg-slate-900/80 hover:bg-slate-800 text-slate-350 p-2 rounded-2xl border border-slate-800/60 shadow-sm transition-all flex items-center justify-center" title="Central de Jogos">
         <i data-lucide="home" class="w-5 h-5"></i>
       </a>
       <a href="./mestre_fracoes.html" class="bg-brandOrange hover:bg-brandOrange/90 text-white border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 px-3 py-2 rounded-2xl text-xs font-black flex items-center gap-1 transition-all shadow-sm" title="Mestre das Frações">
@@ -136,11 +137,11 @@
     
     <!-- Pontos, Nível e Som -->
     <div class="flex items-center gap-3">
-      <div class="bg-white px-4 py-2 rounded-2xl border-2 border-slate-200 shadow-sm flex items-center gap-2">
+      <div class="bg-slate-900/80 px-4 py-2 rounded-2xl border border-slate-800/60 shadow-sm flex items-center gap-2">
         <i data-lucide="sparkles" class="text-brandYellow w-5 h-5 fill-brandYellow"></i>
-        <span id="score-text" class="font-extrabold text-slate-700">0 Pontos</span>
+        <span id="score-text" class="font-extrabold text-slate-200">0 Pontos</span>
       </div>
-      <button id="sound-btn" onclick="toggleSound()" class="bg-white p-2.5 rounded-2xl border-2 border-slate-200 hover:bg-slate-100 transition-colors shadow-sm text-slate-500">
+      <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800/60 hover:bg-slate-800 transition-colors shadow-sm text-slate-400">
         <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
       </button>
     </div>
@@ -150,7 +151,7 @@
   <main class="flex-grow flex items-center justify-center p-4 w-full max-w-5xl mx-auto">
     
     <!-- TELA INICIAL -->
-    <section id="screen-start" class="w-full max-w-2xl bg-white rounded-3xl border-4 border-slate-200 p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] text-center flex flex-col items-center gap-6 animate-pop-in">
+    <section id="screen-start" class="w-full max-w-2xl bg-slate-900/90 backdrop-blur-md rounded-3xl border border-slate-800/60 p-8 shadow-[0_12px_0_0_rgba(15,23,42,0.8)] text-center flex flex-col items-center gap-6 animate-pop-in">
       
       <!-- Ilustração Floresta Fofa -->
       <div class="w-48 h-48 flex items-center justify-center relative">
@@ -160,8 +161,8 @@
           <circle cx="75" cy="25" r="12" fill="#FFC800" opacity="0.8" />
           
           <!-- Montanhas de fundo -->
-          <polygon points="10,80 40,40 70,80" fill="#E2F1E8" />
-          <polygon points="35,80 65,45 95,80" fill="#D2E8DC" />
+          <polygon points="10,80 40,40 70,80" fill="#14211D" />
+          <polygon points="35,80 65,45 95,80" fill="#0F1B18" />
           
           <!-- Tronco de Árvore -->
           <rect x="46" y="55" width="8" height="25" rx="3" fill="#8B5A2B" />
@@ -182,50 +183,50 @@
       </div>
 
       <div>
-        <h1 class="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">Conexão Natureza</h1>
-        <p class="text-forestDark font-extrabold text-lg md:text-xl uppercase tracking-wider mt-1">Cadeia Alimentar 🌳</p>
+        <h1 class="text-3xl md:text-4xl font-black text-slate-100 tracking-tight">Conexão Natureza</h1>
+        <p class="text-emerald-400 font-extrabold text-lg md:text-xl uppercase tracking-wider mt-1">Cadeia Alimentar 🌳</p>
       </div>
 
-      <p class="text-slate-500 font-semibold max-w-md text-base md:text-lg">
+      <p class="text-slate-400 font-semibold max-w-md text-base md:text-lg">
         Os seres vivos dependem uns dos outros para obter energia! Ordene as peças para equilibrar o fluxo de energia dos ecossistemas.
       </p>
 
-      <button onclick="startGame()" class="btn-3d-forest bg-forestGreen hover:bg-forestDark text-white text-xl font-extrabold px-10 py-4 rounded-2xl w-full max-w-xs transition-all pulse-animation">
+      <button onclick="startGame()" class="btn-3d-forest bg-emerald-650 hover:bg-emerald-700 text-white text-xl font-extrabold px-10 py-4 rounded-2xl w-full max-w-xs transition-all pulse-animation">
         Equilibrar Ecossistema 🌍
       </button>
     </section>
 
     <!-- TELA DE GAMEPLAY -->
-    <section id="screen-game" class="w-full bg-white rounded-3xl border-4 border-slate-200 p-5 md:p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] flex flex-col gap-6 hidden animate-pop-in">
+    <section id="screen-game" class="w-full bg-slate-900/90 backdrop-blur-md rounded-3xl border border-slate-800/60 p-5 md:p-8 shadow-[0_12px_0_0_rgba(15,23,42,0.8)] flex flex-col gap-6 hidden animate-pop-in">
       
       <!-- Cabeçalho do Gameplay (Fase e Progresso) -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b-2 border-slate-100">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/60">
         <div>
-          <h2 id="ecosystem-title" class="text-2xl font-black text-slate-800">Ecossistema: Jardim Florestal</h2>
-          <p id="ecosystem-desc" class="text-slate-500 font-bold text-sm">Organize a cadeia alimentar do menor nível de energia para o maior.</p>
+          <h2 id="ecosystem-title" class="text-2xl font-black text-slate-100">Ecossistema: Jardim Florestal</h2>
+          <p id="ecosystem-desc" class="text-slate-400 font-bold text-sm">Organize a cadeia alimentar do menor nível de energia para o maior.</p>
         </div>
-        <div class="flex items-center gap-2 font-extrabold text-forestDark whitespace-nowrap text-lg">
+        <div class="flex items-center gap-2 font-extrabold text-emerald-450 whitespace-nowrap text-lg">
           <i data-lucide="compass" class="w-5 h-5 animate-spin-slow"></i>
           <span id="phase-indicator">Ecossistema 1 de 3</span>
         </div>
       </div>
 
       <!-- Barra de Progresso do Ecossistema -->
-      <div class="bg-slate-100 h-3 rounded-full border border-slate-200 overflow-hidden">
+      <div class="bg-slate-950 h-3 rounded-full border border-slate-800/60 overflow-hidden">
         <div id="phase-progress-bar" class="bg-brandGreen h-full w-0 transition-all duration-500 ease-out"></div>
       </div>
 
       <!-- INSTRUÇÃO RÁPIDA E AJUDA ECOLÓGICA -->
-      <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-3 flex gap-2.5 items-center">
+      <div class="bg-emerald-950/25 border border-emerald-900/30 rounded-2xl p-3 flex gap-2.5 items-center">
         <span class="bg-forestGreen text-white text-xs font-extrabold px-2 py-1 rounded-lg">💡 Como Jogar</span>
-        <p class="text-slate-600 font-bold text-xs md:text-sm">
+        <p class="text-slate-400 font-bold text-xs md:text-sm">
           Arraste o card até o slot desejado OU clique no card e depois no slot correspondente! Ao final, verifique o ecossistema!
         </p>
       </div>
 
       <!-- SLOTS DE DESTINO (ONDE ENCAIXAR OS CARDS) -->
       <div>
-        <h3 class="font-extrabold text-slate-500 text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
+        <h3 class="font-extrabold text-slate-400 text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5">
           <i data-lucide="milestone" class="w-4 h-4"></i>
           Fluxo de Energia (Ordem Crescente)
         </h3>
@@ -237,8 +238,8 @@
       </div>
 
       <!-- BANDEJA DE CARDS EMBARALHADOS (DECK) -->
-      <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-5 mt-2">
-        <h3 class="font-extrabold text-slate-500 text-xs uppercase tracking-wider mb-4 flex items-center gap-1.5">
+      <div class="bg-slate-950/40 border-2 border-dashed border-slate-800 rounded-3xl p-5 mt-2">
+        <h3 class="font-extrabold text-slate-450 text-xs uppercase tracking-wider mb-4 flex items-center gap-1.5">
           <i data-lucide="layers" class="w-4 h-4"></i>
           Seres Vivos a Organizar
         </h3>
@@ -258,25 +259,25 @@
         </div>
 
         <!-- PAINEL DE CURIOSIDADES ECOLÓGICAS (DICAS SUTIS) -->
-        <div id="curiosity-box" class="bg-indigo-50/80 border-2 border-indigo-200 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300 animate-pop-in">
+        <div id="curiosity-box" class="bg-indigo-950/30 border border-indigo-900/40 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300 animate-pop-in">
           <div class="bg-indigo-500 text-white p-2 rounded-xl">
             <i data-lucide="book-open" class="w-5 h-5 animate-pulse"></i>
           </div>
           <div>
-            <h4 id="curiosity-title" class="font-extrabold text-indigo-700 text-base">Curiosidade:</h4>
-            <p id="curiosity-text" class="text-slate-600 font-semibold text-sm mt-0.5"></p>
+            <h4 id="curiosity-title" class="font-extrabold text-indigo-400 text-base">Curiosidade:</h4>
+            <p id="curiosity-text" class="text-slate-350 font-semibold text-sm mt-0.5"></p>
           </div>
         </div>
       </div>
 
       <!-- DICA PEDAGÓGICA (ON ERROR) -->
-      <div id="hint-box" class="bg-blue-50 border-2 border-brandBlue/30 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300">
+      <div id="hint-box" class="bg-blue-950/30 border border-blue-800/40 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300">
         <div class="bg-brandBlue text-white p-2 rounded-xl">
           <i data-lucide="help-circle" class="w-5 h-5"></i>
         </div>
         <div>
-          <h4 class="font-extrabold text-brandBlueDark text-base">Dica da Professora Clara:</h4>
-          <p id="hint-text" class="text-slate-600 font-semibold text-sm mt-0.5"></p>
+          <h4 class="font-extrabold text-blue-400 text-base">Dica da Professora Clara:</h4>
+          <p id="hint-text" class="text-slate-350 font-semibold text-sm mt-0.5"></p>
         </div>
       </div>
 
@@ -291,39 +292,39 @@
     </section>
 
     <!-- TELA DE VITÓRIA GERAL -->
-    <section id="screen-victory" class="w-full max-w-2xl bg-white rounded-3xl border-4 border-slate-200 p-8 shadow-[0_12px_0_0_rgba(226,232,240,1)] text-center flex flex-col items-center gap-6 hidden animate-pop-in">
+    <section id="screen-victory" class="w-full max-w-2xl bg-slate-900/90 backdrop-blur-md rounded-3xl border border-slate-800/60 p-8 shadow-[0_12px_0_0_rgba(15,23,42,0.8)] text-center flex flex-col items-center gap-6 hidden animate-pop-in">
       
       <!-- Troféu e Estrelas de ouro -->
       <div class="relative flex flex-col items-center gap-2">
         <div class="flex gap-2 justify-center mb-1">
-          <i id="star-1" data-lucide="star" class="w-10 h-10 text-slate-300"></i>
-          <i id="star-2" data-lucide="star" class="w-12 h-12 text-slate-300 -translate-y-2"></i>
-          <i id="star-3" data-lucide="star" class="w-10 h-10 text-slate-300"></i>
+          <i id="star-1" data-lucide="star" class="w-10 h-10 text-slate-700"></i>
+          <i id="star-2" data-lucide="star" class="w-12 h-12 text-slate-700 -translate-y-2"></i>
+          <i id="star-3" data-lucide="star" class="w-10 h-10 text-slate-700"></i>
         </div>
-        <div class="w-32 h-32 bg-emerald-100 rounded-full flex items-center justify-center border-4 border-emerald-300 relative shadow-inner">
-          <i data-lucide="globe" class="w-20 h-20 text-emerald-600 fill-emerald-100"></i>
+        <div class="w-32 h-32 bg-emerald-950/40 rounded-full flex items-center justify-center border border-emerald-900/50 relative shadow-inner">
+          <i data-lucide="globe" class="w-20 h-20 text-emerald-500 fill-emerald-950"></i>
         </div>
       </div>
 
       <div>
-        <h2 class="text-3xl font-black text-slate-800 tracking-tight">Protetor da Natureza!</h2>
-        <p class="text-forestGreen font-extrabold text-lg uppercase tracking-wider mt-1">Ecossistemas em Equilíbrio 🌲</p>
+        <h2 class="text-3xl font-black text-slate-100 tracking-tight">Protetor da Natureza!</h2>
+        <p class="text-emerald-400 font-extrabold text-lg uppercase tracking-wider mt-1">Ecossistemas em Equilíbrio 🌲</p>
       </div>
 
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 w-full max-w-sm flex justify-around">
+      <div class="bg-slate-950/50 border border-slate-800/60 rounded-2xl p-4 w-full max-w-sm flex justify-around">
         <div class="text-center">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Erros</div>
-          <div id="victory-errors" class="text-2xl font-black text-brandRed">0</div>
+          <div id="victory-errors" class="text-2xl font-black text-red-400">0</div>
         </div>
-        <div class="w-px bg-slate-200"></div>
+        <div class="w-px bg-slate-800"></div>
         <div class="text-center">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
           <div id="victory-score" class="text-2xl font-black text-brandOrange">0</div>
         </div>
-        <div class="w-px bg-slate-200"></div>
+        <div class="w-px bg-slate-800"></div>
         <div class="text-center">
           <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Desempenho</div>
-          <div id="victory-perf" class="text-2xl font-black text-brandBlue">Excelente</div>
+          <div id="victory-perf" class="text-2xl font-black text-indigo-400">Excelente</div>
         </div>
       </div>
 
@@ -335,8 +336,8 @@
   </main>
 
   <!-- Rodapé Educacional -->
-  <footer class="w-full text-center py-4 text-xs font-bold text-slate-400 border-t border-slate-200/50 mt-4 bg-white/50">
-    Desenvolvido em Conformidade com a BNCC (4º ano EF - Biologia)
+  <footer class="w-full text-center py-4 text-xs font-bold text-slate-500 border-t border-slate-800/40 mt-4 bg-slate-950/40">
+    GamesForVitória 💖 • Desenvolvido em Conformidade com a BNCC (4º ano EF)
   </footer>
 
   <!-- Container de Confete -->
@@ -349,7 +350,7 @@
       {
         title: "Ecossistema: Jardim Florestal 🌳",
         desc: "Organize a cadeia alimentar do menor nível de energia até o Decompositor.",
-        bgColor: "from-emerald-50 via-teal-50 to-green-100",
+        bgColor: "from-slate-950 via-[#0B1A16] to-slate-950",
         items: [
           { roleId: 0, name: "Flor", role: "Produtor", emoji: "🌱", hint: "Os Produtores (plantas e flores) captam energia solar e dão início a toda cadeia! O 1º nível precisa ser um Produtor.", curiosity: "A flor cresce forte sob o sol e produz o seu próprio alimento, fornecendo energia inicial para os seres vivos!" },
           { roleId: 1, name: "Lagarta", role: "Consumidor 1º", emoji: "🐛", hint: "O 2º nível deve ser o Consumidor Primário (um herbívoro que come a planta diretamente).", curiosity: "Esta lagarta adora roer as folhas verdes das flores e plantas para crescer e virar borboleta." },
@@ -361,11 +362,11 @@
       {
         title: "Ecossistema: Oceano Atlântico 🌊",
         desc: "Os oceanos têm cadeias marinhas impressionantes. Ajude a organizá-las!",
-        bgColor: "from-blue-50 via-indigo-50 to-cyan-100",
+        bgColor: "from-slate-950 via-[#0A1224] to-slate-950",
         items: [
           { roleId: 0, name: "Algas", role: "Produtor", emoji: "🌿", hint: "O 1º nível de energia do oceano precisa ser o Produtor marinho.", curiosity: "As algas marinhas vivem sob a luz solar e realizam a fotossíntese para produzir energia, iniciando o ciclo da vida marinha!" },
           { roleId: 1, name: "Camarão", role: "Consumidor 1º", emoji: "🦐", hint: "O 2º nível é o Consumidor Primário marinho, que come as algas microscópicas.", curiosity: "Pequenos camarões nadam perto dos recifes e se alimentam de algas microscópicas." },
-          { roleId: 2, name: "Peixe Médio", role: "Consumidor 2º", emoji: "🐟", hint: "O 3º nível é o Consumidor Secundário marinho, que come pequenos crustáceos.", curiosity: "O peixe médio nada em cardumes e se alimenta de camarões e pequenos crustáceos." },
+          { roleId: 2, name: "Peixe Médio", role: "Consumidor 2º", emoji: "🐟", hint: "O 3º nível é o Consumidor Secundário marinho, que come camarões e pequenos crustáceos.", curiosity: "O peixe médio nada em cardumes e se alimenta de camarões e pequenos crustáceos." },
           { roleId: 3, name: "Tubarão", role: "Consumidor 3º", emoji: "🦈", hint: "O 4º nível é o Consumidor Terciário marinho (predador de topo).", curiosity: "O tubarão é o grande caçador do oceano. Ele se alimenta de outros peixes e mantém a vida marinha equilibrada." },
           { roleId: 4, name: "Bactérias", role: "Decompositor", emoji: "🦠", hint: "O 5º nível é o Decompositor marinho que atua no fundo do mar.", curiosity: "As bactérias marinhas vivem em todo o oceano decompondo os restos orgânicos que caem no fundo do mar." }
         ]
@@ -373,7 +374,7 @@
       {
         title: "Ecossistema: Savana Africana 🌾",
         desc: "Nas planícies, herbívoros e grandes predadores dividem a energia natural.",
-        bgColor: "from-amber-50 via-yellow-50 to-orange-100",
+        bgColor: "from-slate-950 via-[#1C160B] to-slate-950",
         items: [
           { roleId: 0, name: "Capim", role: "Produtor", emoji: "🌾", hint: "O 1º nível da savana deve ser o Produtor que fornece energia para os herbívoros.", curiosity: "O capim da savana brota com as chuvas e produz energia com a luz solar para alimentar os grandes bandos de herbívoros!" },
           { roleId: 1, name: "Zebra", role: "Consumidor 1º", emoji: "🦓", hint: "O 2º nível é o Consumidor Primário que pasta a vegetação da savana.", curiosity: "A zebra viaja em bandos e passa o dia pastando, alimentando-se diretamente do capim." },
@@ -541,7 +542,7 @@
       
       // Mudar fundo do corpo dependendo do ecossistema para dar experiência visual premium
       const body = document.getElementById('game-body');
-      body.className = `bg-gradient-to-br ${data.bgColor} min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden transition-all duration-750`;
+      body.className = `bg-gradient-to-br ${data.bgColor} min-h-screen text-slate-200 flex flex-col justify-between overflow-x-hidden transition-all duration-750`;
 
       // Atualizar textos
       document.getElementById('ecosystem-title').innerText = data.title;
@@ -581,7 +582,7 @@
         // Slot receptor do drag/drop
         const receptor = document.createElement('div');
         receptor.id = `slot-${item.roleId}`;
-        receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-white/70 border-3 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-white/90 transition-all duration-200";
+        receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-slate-900/60 border-3 border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-slate-900/80 transition-all duration-200";
         receptor.dataset.expectedRole = index; // Armazena a ordem de energia esperada (0 a 4)
 
         // Label interior descritiva (Ocultando o papel biológico literal)
@@ -595,17 +596,17 @@
         receptor.addEventListener('dragover', (e) => {
           e.preventDefault();
           if (!filledSlots[index]) {
-            receptor.classList.add('border-brandYellow', 'bg-yellow-50/50');
+            receptor.classList.add('border-brandYellow', 'bg-amber-950/20');
           }
         });
 
         receptor.addEventListener('dragleave', () => {
-          receptor.classList.remove('border-brandYellow', 'bg-yellow-50/50');
+          receptor.classList.remove('border-brandYellow', 'bg-amber-950/20');
         });
 
         receptor.addEventListener('drop', (e) => {
           e.preventDefault();
-          receptor.classList.remove('border-brandYellow', 'bg-yellow-50/50');
+          receptor.classList.remove('border-brandYellow', 'bg-amber-950/20');
           
           const cardId = e.dataTransfer.getData('text/plain');
           const cardEl = document.getElementById(cardId);
@@ -635,7 +636,7 @@
       items.forEach((item) => {
         const card = document.createElement('div');
         card.id = `card-${item.roleId}`;
-        card.className = "w-28 h-36 bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-grab select-none card-float shadow-[0_6px_0_0_rgba(226,232,240,1)] hover:shadow-[0_8px_0_0_rgba(226,232,240,1)] hover:-translate-y-1 transition-all duration-150 active:cursor-grabbing";
+        card.className = "w-28 h-36 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-grab select-none card-float shadow-[0_6px_0_0_rgba(2,6,23,0.8)] hover:shadow-[0_8px_0_0_rgba(2,6,23,0.9)] hover:-translate-y-1 transition-all duration-150 active:cursor-grabbing";
         card.setAttribute('draggable', 'true');
         card.dataset.roleId = item.roleId;
 
@@ -643,7 +644,7 @@
         card.innerHTML = `
           <span class="text-3xl filter drop-shadow-md select-none pointer-events-none">${item.emoji}</span>
           <div class="text-center pointer-events-none select-none">
-            <h4 class="font-extrabold text-sm text-slate-800 leading-tight">${item.name}</h4>
+            <h4 class="font-extrabold text-sm text-slate-200 leading-tight">${item.name}</h4>
           </div>
         `;
 
@@ -712,7 +713,7 @@
       const curiosityText = document.getElementById('curiosity-text');
       const curiosityTitle = document.getElementById('curiosity-title');
       
-      curiosityTitle.innerHTML = `Curiosidade: <span class="text-indigo-900">${item.name} ${item.emoji}</span>`;
+      curiosityTitle.innerHTML = `Curiosidade: <span class="text-indigo-300">${item.name} ${item.emoji}</span>`;
       curiosityText.innerText = item.curiosity;
       
       curiosityBox.classList.remove('hidden');
@@ -749,16 +750,16 @@
       playSound('click');
 
       // Desenhar o card encaixado no slot (Estilo azul/indigo neutro de "encaixado")
-      slotEl.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-indigo-50 border-3 border-indigo-200 rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md text-center";
+      slotEl.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md text-center";
       
       slotEl.innerHTML = `
-        <button onclick="event.stopPropagation(); removeCardFromSlot(${slotIndex})" class="absolute -top-2 -right-2 bg-slate-200 hover:bg-brandRed text-slate-600 hover:text-white rounded-full p-1 transition-colors shadow-sm z-20">
+        <button onclick="event.stopPropagation(); removeCardFromSlot(${slotIndex})" class="absolute -top-2 -right-2 bg-slate-800 hover:bg-brandRed text-slate-400 hover:text-white rounded-full p-1 transition-colors shadow-sm z-20">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
         <span class="text-3xl filter drop-shadow-md select-none mt-1 pointer-events-none">${itemData.emoji}</span>
         <div class="text-center select-none mt-1 pointer-events-none">
-          <h4 class="font-extrabold text-xs text-slate-800 leading-tight">${itemData.name}</h4>
-          <span class="text-[9px] font-bold text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">Encaixado</span>
+          <h4 class="font-extrabold text-xs text-slate-200 leading-tight">${itemData.name}</h4>
+          <span class="text-[9px] font-bold text-slate-400 bg-slate-950 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">Encaixado</span>
         </div>
       `;
 
@@ -789,7 +790,7 @@
       const item = data.items[slotIndex];
       const receptor = document.getElementById(`slot-${item.roleId}`);
       
-      receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-white/70 border-3 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-white/90 transition-all duration-200";
+      receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-slate-900/60 border-3 border-dashed border-slate-800 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-slate-900/80 transition-all duration-200";
       receptor.innerHTML = `
         <div class="pointer-events-none flex flex-col items-center text-center">
           <span class="text-xs font-black text-slate-400 uppercase tracking-wider">${slotIndex + 1}º Nível</span>
@@ -839,15 +840,15 @@
         for (let i = 0; i < 5; i++) {
           const itemData = filledSlots[i];
           const receptor = document.getElementById(`slot-${data.items[i].roleId}`);
-          receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-green-50 border-3 border-brandGreen rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md text-center";
+          receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-emerald-950/40 border-3 border-brandGreen rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md text-center";
           receptor.innerHTML = `
             <div class="absolute top-1.5 right-1.5 bg-brandGreen text-white rounded-full p-0.5">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <span class="text-3xl filter drop-shadow-md select-none mt-1 pointer-events-none">${itemData.emoji}</span>
             <div class="text-center select-none mt-1 pointer-events-none">
-              <h4 class="font-extrabold text-xs text-slate-800 leading-tight">${itemData.name}</h4>
-              <span class="text-[9px] font-black text-brandGreenDark bg-green-200/50 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">Correto</span>
+              <h4 class="font-extrabold text-xs text-slate-200 leading-tight">${itemData.name}</h4>
+              <span class="text-[9px] font-black text-emerald-300 bg-emerald-900/40 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">Correto</span>
             </div>
           `;
         }
@@ -877,10 +878,10 @@
           const dataItem = data.items[slotIndex];
           const receptor = document.getElementById(`slot-${dataItem.roleId}`);
           
-          receptor.classList.add('animate-shake', 'border-brandRed', 'bg-red-50');
+          receptor.classList.add('animate-shake', 'border-brandRed', 'bg-red-950/20');
           
           setTimeout(() => {
-            receptor.classList.remove('animate-shake', 'border-brandRed', 'bg-red-50');
+            receptor.classList.remove('animate-shake', 'border-brandRed', 'bg-red-950/20');
             
             // Ejetar o card
             const cardData = filledSlots[slotIndex];
@@ -901,7 +902,7 @@
         const hintBox = document.getElementById('hint-box');
         const hintText = document.getElementById('hint-text');
         
-        hintText.innerHTML = `Identifiquei um desequilíbrio ecológico! <br><span class="text-brandBlueDark">${expectedItem.hint}</span>`;
+        hintText.innerHTML = `Identifiquei um desequilíbrio ecológico! <br><span class="text-blue-355 text-blue-400">${expectedItem.hint}</span>`;
         hintBox.classList.remove('hidden');
       }
     }

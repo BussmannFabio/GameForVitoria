@@ -90,34 +90,34 @@
     /* Cards premium que afundam levemente com sombra física */
     .card-premium {
       transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 10px 0 0 #E2E8F0;
+      box-shadow: 0 10px 0 0 #020617;
     }
     .card-premium:hover {
       transform: translateY(-6px);
-      box-shadow: 0 16px 0 0 #CBD5E1;
+      box-shadow: 0 16px 0 0 #000000;
     }
     .card-premium:active {
       transform: translateY(4px);
-      box-shadow: 0 4px 0 0 #CBD5E1;
+      box-shadow: 0 4px 0 0 #000000;
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-blue-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+<body class="bg-gradient-to-br from-slate-950 via-[#0D1527] to-slate-950 min-h-screen text-slate-200 flex flex-col justify-between overflow-x-hidden">
 
   <!-- Header da Central -->
   <header class="w-full max-w-5xl mx-auto px-6 pt-6 flex justify-between items-center z-10">
     <div class="flex items-center gap-2.5">
-      <div class="bg-indigo-600 text-white p-2.5 rounded-2xl shadow-lg">
-        <i data-lucide="gamepad-2" class="w-6 h-6"></i>
+      <div class="bg-indigo-650 text-white p-2.5 rounded-2xl shadow-lg border border-indigo-500/25">
+        <i data-lucide="heart" class="w-6 h-6 text-red-400 fill-red-400"></i>
       </div>
       <div>
-        <span class="text-xl font-black tracking-wide text-indigo-700 block leading-tight">Portal EdTech</span>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Escolas Premium</span>
+        <span class="text-xl font-black tracking-wide text-white block leading-tight">GamesForVitória 💖</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Portal de Jogos da Prô Vitória</span>
       </div>
     </div>
     
     <div class="flex items-center gap-3">
-      <button id="sound-btn" onclick="toggleSound()" class="bg-white p-2.5 rounded-2xl border-2 border-slate-200 hover:bg-slate-100 transition-colors shadow-sm text-slate-500">
+      <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800 hover:bg-slate-800 transition-colors shadow-sm text-slate-400">
         <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
       </button>
     </div>
@@ -127,12 +127,13 @@
   <main class="flex-grow flex flex-col items-center justify-center p-6 w-full max-w-5xl mx-auto gap-8">
     
     <!-- Título Principal -->
-    <div class="text-center max-w-xl animate-pop-in">
-      <h1 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight leading-tight">
+    <div class="text-center max-w-xl animate-pop-in flex flex-col items-center">
+      <img src="./logo.png" alt="GamesForVitória Logo" class="w-72 md:w-80 rounded-3xl shadow-2xl border-2 border-indigo-500/20 mb-6 animate-float-slow">
+      <h1 class="text-3xl md:text-5xl font-black text-slate-100 tracking-tight leading-tight">
         Missões Educativas <br>
-        <span class="text-indigo-600 font-extrabold text-2xl md:text-3xl uppercase tracking-wider block mt-2">Ensino Fundamental (4º Ano)</span>
+        <span class="text-indigo-400 font-extrabold text-2xl md:text-3xl uppercase tracking-wider block mt-2">Ensino Fundamental (4º Ano)</span>
       </h1>
-      <p class="text-slate-500 font-semibold text-base md:text-lg mt-3">
+      <p class="text-slate-400 font-semibold text-base md:text-lg mt-3">
         Escolha uma das aventuras interativas abaixo criadas em conformidade com as diretrizes e habilidades da BNCC.
       </p>
     </div>
@@ -141,32 +142,32 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-2">
       
       <!-- CARD JOGO 1: PIZZA GOURMET -->
-      <div class="card-premium bg-white rounded-3xl border-4 border-slate-200 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden animate-float-slow"
+      <div class="card-premium bg-slate-900/80 backdrop-blur-md rounded-3xl border border-amber-500/20 hover:border-amber-500/50 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-slow"
            onclick="launchGame('fracoes')" onmouseenter="playHoverSound()">
         
         <!-- Fundo decorativo sutil -->
-        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-orange-100 rounded-full opacity-30 pointer-events-none"></div>
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-amber-950/20 rounded-full opacity-30 pointer-events-none"></div>
         
         <div>
           <!-- Cabeçalho do Card -->
           <div class="flex justify-between items-start mb-4">
             <span class="text-5xl filter drop-shadow-md select-none">🍕</span>
-            <span class="bg-orange-100 text-brandOrange font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Matemática</span>
+            <span class="bg-amber-950/60 text-amber-400 border border-amber-800/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Matemática</span>
           </div>
 
-          <h2 class="text-2xl font-black text-slate-800 leading-tight">Mestre das Frações</h2>
-          <p class="text-brandOrange font-extrabold text-xs uppercase tracking-widest mt-0.5">Pizza Gourmet</p>
+          <h2 class="text-2xl font-black text-slate-100 leading-tight">Mestre das Frações</h2>
+          <p class="text-amber-400 font-extrabold text-xs uppercase tracking-widest mt-0.5">Pizza Gourmet</p>
 
-          <p class="text-slate-500 font-semibold text-sm mt-3 leading-relaxed">
+          <p class="text-slate-400 font-semibold text-sm mt-3 leading-relaxed">
             Ajude o Chef a fatiar, pintar e entregar as pizzas ideais para os bichinhos. Domine numeradores e denominadores na prática de forma visual e deliciosa!
           </p>
         </div>
 
         <div class="space-y-4">
           <!-- Habilidades BNCC Tag -->
-          <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-start gap-2">
-            <i data-lucide="tag" class="text-brandOrange w-4 h-4 mt-0.5 flex-shrink-0"></i>
-            <span class="text-[11px] font-bold text-slate-500 leading-snug">
+          <div class="bg-amber-950/25 border border-amber-900/30 rounded-xl p-2.5 flex items-start gap-2 text-amber-450">
+            <i data-lucide="tag" class="text-amber-400 w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-400 leading-snug">
               <strong>BNCC EF04MA09</strong>: Representar e associar frações maiores e menores que a unidade.
             </span>
           </div>
@@ -180,32 +181,32 @@
       </div>
 
       <!-- CARD JOGO 2: CADEIA ALIMENTAR -->
-      <div class="card-premium bg-white rounded-3xl border-4 border-slate-200 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden animate-float-reverse"
+      <div class="card-premium bg-slate-900/80 backdrop-blur-md rounded-3xl border border-emerald-500/20 hover:border-emerald-500/50 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-reverse"
            onclick="launchGame('natureza')" onmouseenter="playHoverSound()">
         
         <!-- Fundo decorativo sutil -->
-        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-100 rounded-full opacity-30 pointer-events-none"></div>
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-950/20 rounded-full opacity-30 pointer-events-none"></div>
 
         <div>
           <!-- Cabeçalho do Card -->
           <div class="flex justify-between items-start mb-4">
             <span class="text-5xl filter drop-shadow-md select-none">🌳</span>
-            <span class="bg-emerald-100 text-brandGreenDark font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Ciências</span>
+            <span class="bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Ciências</span>
           </div>
 
-          <h2 class="text-2xl font-black text-slate-800 leading-tight">Conexão Natureza</h2>
-          <p class="text-brandGreenDark font-extrabold text-xs uppercase tracking-widest mt-0.5">Cadeia Alimentar</p>
+          <h2 class="text-2xl font-black text-slate-100 leading-tight">Conexão Natureza</h2>
+          <p class="text-brandGreen font-extrabold text-xs uppercase tracking-widest mt-0.5">Cadeia Alimentar</p>
 
-          <p class="text-slate-500 font-semibold text-sm mt-3 leading-relaxed">
+          <p class="text-slate-400 font-semibold text-sm mt-3 leading-relaxed">
             Organize o fluxo de energia dos produtores aos decompositores em 3 ecossistemas incríveis: Jardim, Oceano e Savana. Equilibre a biodiversidade!
           </p>
         </div>
 
         <div class="space-y-4">
           <!-- Habilidades BNCC Tag -->
-          <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-start gap-2">
-            <i data-lucide="tag" class="text-brandGreenDark w-4 h-4 mt-0.5 flex-shrink-0"></i>
-            <span class="text-[11px] font-bold text-slate-500 leading-snug">
+          <div class="bg-emerald-950/25 border border-emerald-900/30 rounded-xl p-2.5 flex items-start gap-2 text-emerald-450">
+            <i data-lucide="tag" class="text-brandGreen w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-400 leading-snug">
               <strong>BNCC EF04CI04</strong>: Analisar e construir cadeias alimentares, reconhecendo produtores, consumidores e decompositores.
             </span>
           </div>
@@ -219,20 +220,20 @@
       </div>
 
       <!-- CARD JOGO 3: ECO-TACTICS -->
-      <div class="card-premium bg-slate-900 border-4 border-indigo-950 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-slow"
+      <div class="card-premium bg-slate-900/80 backdrop-blur-md rounded-3xl border border-indigo-500/20 hover:border-indigo-500/50 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-slow"
            onclick="launchGame('ecotactics')" onmouseenter="playHoverSound()">
         
         <!-- Fundo decorativo sutil -->
-        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-indigo-950 rounded-full opacity-30 pointer-events-none"></div>
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-indigo-950/20 rounded-full opacity-30 pointer-events-none"></div>
 
         <div>
           <!-- Cabeçalho do Card -->
           <div class="flex justify-between items-start mb-4">
             <span class="text-5xl filter drop-shadow-md select-none">⚔️</span>
-            <span class="bg-indigo-950/80 text-indigo-400 border border-indigo-900/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Estratégia</span>
+            <span class="bg-indigo-950/60 text-indigo-400 border border-indigo-850/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Estratégia</span>
           </div>
 
-          <h2 class="text-2xl font-black text-white leading-tight">Eco-Tactics</h2>
+          <h2 class="text-2xl font-black text-slate-100 leading-tight">Eco-Tactics</h2>
           <p class="text-indigo-400 font-extrabold text-xs uppercase tracking-widest mt-0.5">Batalha pelo Ecossistema</p>
 
           <p class="text-slate-400 font-semibold text-sm mt-3 leading-relaxed">
@@ -242,7 +243,7 @@
 
         <div class="space-y-4">
           <!-- Habilidades BNCC Tag -->
-          <div class="bg-indigo-950/40 border border-indigo-900/40 rounded-xl p-2.5 flex items-start gap-2">
+          <div class="bg-indigo-950/25 border border-indigo-900/30 rounded-xl p-2.5 flex items-start gap-2">
             <i data-lucide="tag" class="text-indigo-400 w-4 h-4 mt-0.5 flex-shrink-0"></i>
             <span class="text-[11px] font-bold text-slate-400 leading-snug">
               <strong>BNCC EF04CI04</strong>: Analisar relações ecológicas e impactos no equilíbrio do ecossistema.
@@ -262,8 +263,8 @@
   </main>
 
   <!-- Rodapé Educacional -->
-  <footer class="w-full text-center py-5 text-xs font-bold text-slate-400 border-t border-slate-200/50 mt-6 bg-white/50">
-    Diretrizes da BNCC (4º ano) • Escola de Alto Padrão
+  <footer class="w-full text-center py-5 text-xs font-bold text-slate-400 border-t border-slate-800/40 mt-6 bg-slate-950/40">
+    GamesForVitória 💖 • Criado com Amor para a Melhor Professora • Diretrizes da BNCC (4º ano)
   </footer>
 
   <!-- SCRIPT DE ÁUDIO E CONTROLES -->

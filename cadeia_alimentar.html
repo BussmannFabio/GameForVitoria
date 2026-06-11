@@ -212,7 +212,7 @@
       <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-3 flex gap-2.5 items-center">
         <span class="bg-forestGreen text-white text-xs font-extrabold px-2 py-1 rounded-lg">💡 Como Jogar</span>
         <p class="text-slate-600 font-bold text-xs md:text-sm">
-          Arraste o card até o slot correto OU clique no card e depois no slot correspondente!
+          Arraste o card até o slot desejado OU clique no card e depois no slot correspondente! Ao final, verifique o ecossistema!
         </p>
       </div>
 
@@ -239,6 +239,26 @@
         <!-- Deck de Peças -->
         <div id="deck-container" class="flex flex-wrap gap-4 items-center justify-center min-h-[160px] p-2">
           <!-- Gerado dinamicamente no JS -->
+        </div>
+      </div>
+
+      <!-- BOTÃO DE VALIDAR E CURIOSIDADES -->
+      <div class="flex flex-col gap-4 mt-2">
+        <div id="validate-container" class="flex justify-center">
+          <button id="validate-btn" onclick="validateEcosystem()" class="btn-3d-green bg-brandGreen hover:bg-brandGreenDark text-white font-extrabold text-lg px-10 py-3 rounded-2xl flex items-center gap-2 transition-all">
+            Verificar Ecossistema 🌍
+          </button>
+        </div>
+
+        <!-- PAINEL DE CURIOSIDADES ECOLÓGICAS (DICAS SUTIS) -->
+        <div id="curiosity-box" class="bg-indigo-50/80 border-2 border-indigo-200 rounded-2xl p-4 flex gap-3 items-start hidden transition-all duration-300 animate-pop-in">
+          <div class="bg-indigo-500 text-white p-2 rounded-xl">
+            <i data-lucide="book-open" class="w-5 h-5 animate-pulse"></i>
+          </div>
+          <div>
+            <h4 id="curiosity-title" class="font-extrabold text-indigo-700 text-base">Curiosidade:</h4>
+            <p id="curiosity-text" class="text-slate-600 font-semibold text-sm mt-0.5"></p>
+          </div>
         </div>
       </div>
 
@@ -321,14 +341,14 @@
     const ECOSYSTEMS = [
       {
         title: "Ecossistema: Jardim Florestal 🌳",
-        desc: "Organize a cadeia alimentar do menor nível (Produtor) até o Decompositor.",
+        desc: "Organize a cadeia alimentar do menor nível de energia até o Decompositor.",
         bgColor: "from-emerald-50 via-teal-50 to-green-100",
         items: [
-          { roleId: 0, name: "Flor", role: "Produtor", emoji: "🌱", color: "bg-green-100 text-green-700 border-green-300", hint: "Os Produtores (plantas) captam energia solar e dão início a toda cadeia!" },
-          { roleId: 1, name: "Lagarta", role: "Consumidor 1º", emoji: "🐛", color: "bg-amber-100 text-amber-700 border-amber-300", hint: "O Consumidor Primário se alimenta diretamente da planta (herbívoros)." },
-          { roleId: 2, name: "Passarinho", role: "Consumidor 2º", emoji: "🐦", color: "bg-blue-100 text-blue-700 border-blue-300", hint: "O Consumidor Secundário é um carnívoro pequeno que come insetos como lagartas." },
-          { roleId: 3, name: "Gavião", role: "Consumidor 3º", emoji: "🦅", color: "bg-red-100 text-red-700 border-red-300", hint: "O Consumidor Terciário é um predador topo de linha como as grandes aves." },
-          { roleId: 4, name: "Cogumelo", role: "Decompositor", emoji: "🍄", color: "bg-purple-100 text-purple-700 border-purple-300", hint: "Os Decompositores reciclam a matéria morta do ecossistema, fechando a cadeia!" }
+          { roleId: 0, name: "Flor", role: "Produtor", emoji: "🌱", hint: "Os Produtores (plantas e flores) captam energia solar e dão início a toda cadeia! O 1º nível precisa ser um Produtor.", curiosity: "A flor cresce forte sob o sol e produz o seu próprio alimento, fornecendo energia inicial para os seres vivos!" },
+          { roleId: 1, name: "Lagarta", role: "Consumidor 1º", emoji: "🐛", hint: "O 2º nível deve ser o Consumidor Primário (um herbívoro que come a planta diretamente).", curiosity: "Esta lagarta adora roer as folhas verdes das flores e plantas para crescer e virar borboleta." },
+          { roleId: 2, name: "Passarinho", role: "Consumidor 2º", emoji: "🐦", hint: "O 3º nível deve ser o Consumidor Secundário (um pequeno carnívoro que caça o consumidor primário).", curiosity: "O passarinho canta feliz no jardim e se alimenta de pequenos insetos e lagartas." },
+          { roleId: 3, name: "Gavião", role: "Consumidor 3º", emoji: "🦅", hint: "O 4º nível deve ser o Consumidor Terciário (um grande predador de topo de cadeia).", curiosity: "O gavião tem uma visão super afiada e caça pequenos pássaros e roedores do topo das árvores." },
+          { roleId: 4, name: "Cogumelo", role: "Decompositor", emoji: "🍄", hint: "O 5º nível deve ser o Decompositor (organismos que reciclam restos mortais).", curiosity: "Os cogumelos se alimentam de folhas caídas e galhos secos no solo, devolvendo nutrientes importantes para a terra." }
         ]
       },
       {
@@ -336,11 +356,11 @@
         desc: "Os oceanos têm cadeias marinhas impressionantes. Ajude a organizá-las!",
         bgColor: "from-blue-50 via-indigo-50 to-cyan-100",
         items: [
-          { roleId: 0, name: "Algas", role: "Produtor", emoji: "🌿", color: "bg-green-100 text-green-700 border-green-300", hint: "Algas marinhas usam a fotossíntese para produzir energia, iniciando o ciclo!" },
-          { roleId: 1, name: "Camarão", role: "Consumidor 1º", emoji: "🦐", color: "bg-amber-100 text-amber-700 border-amber-300", hint: "Pequenos crustáceos como camarão comem as algas microscópicas." },
-          { roleId: 2, name: "Peixe Médio", role: "Consumidor 2º", emoji: "🐟", color: "bg-blue-100 text-blue-700 border-blue-300", hint: "Os peixes médios caçam camarões e outros pequenos animais marinhos." },
-          { roleId: 3, name: "Tubarão", role: "Consumidor 3º", emoji: "🦈", color: "bg-red-100 text-red-700 border-red-300", hint: "O tubarão é um predador grande, o consumidor de nível mais alto aqui." },
-          { roleId: 4, name: "Bactérias", role: "Decompositor", emoji: "🦠", color: "bg-purple-100 text-purple-700 border-purple-300", hint: "Bactérias decompõem restos orgânicos no fundo do mar, reciclando nutrientes." }
+          { roleId: 0, name: "Algas", role: "Produtor", emoji: "🌿", hint: "O 1º nível de energia do oceano precisa ser o Produtor marinho.", curiosity: "As algas marinhas vivem sob a luz solar e realizam a fotossíntese para produzir energia, iniciando o ciclo da vida marinha!" },
+          { roleId: 1, name: "Camarão", role: "Consumidor 1º", emoji: "🦐", hint: "O 2º nível é o Consumidor Primário marinho, que come as algas microscópicas.", curiosity: "Pequenos camarões nadam perto dos recifes e se alimentam de algas microscópicas." },
+          { roleId: 2, name: "Peixe Médio", role: "Consumidor 2º", emoji: "🐟", hint: "O 3º nível é o Consumidor Secundário marinho, que come pequenos crustáceos.", curiosity: "O peixe médio nada em cardumes e se alimenta de camarões e pequenos crustáceos." },
+          { roleId: 3, name: "Tubarão", role: "Consumidor 3º", emoji: "🦈", hint: "O 4º nível é o Consumidor Terciário marinho (predador de topo).", curiosity: "O tubarão é o grande caçador do oceano. Ele se alimenta de outros peixes e mantém a vida marinha equilibrada." },
+          { roleId: 4, name: "Bactérias", role: "Decompositor", emoji: "🦠", hint: "O 5º nível é o Decompositor marinho que atua no fundo do mar.", curiosity: "As bactérias marinhas vivem em todo o oceano decompondo os restos orgânicos que caem no fundo do mar." }
         ]
       },
       {
@@ -348,11 +368,11 @@
         desc: "Nas planícies, herbívoros e grandes predadores dividem a energia natural.",
         bgColor: "from-amber-50 via-yellow-50 to-orange-100",
         items: [
-          { roleId: 0, name: "Capim", role: "Produtor", emoji: "🌾", color: "bg-green-100 text-green-700 border-green-300", hint: "O capim e os arbustos da savana são os produtores de energia!" },
-          { roleId: 1, name: "Zebra", role: "Consumidor 1º", emoji: "🦓", color: "bg-amber-100 text-amber-700 border-amber-300", hint: "A zebra consome o capim diretamente para obter sua energia inicial." },
-          { roleId: 2, name: "Leão", role: "Consumidor 2º", emoji: "🦁", color: "bg-blue-100 text-blue-700 border-blue-300", hint: "O leão é o consumidor secundário que caça herbívoros como a zebra." },
-          { roleId: 3, name: "Urubu", role: "Consumidor 3º", emoji: "🦅", color: "bg-red-100 text-red-700 border-red-300", hint: "O urubu age como consumidor terciário e carniceiro, limpando a savana." },
-          { roleId: 4, name: "Fungos", role: "Decompositor", emoji: "🍄", color: "bg-purple-100 text-purple-700 border-purple-300", hint: "Fungos e micróbios decompõem a matéria orgânica no solo fértil da savana." }
+          { roleId: 0, name: "Capim", role: "Produtor", emoji: "🌾", hint: "O 1º nível da savana deve ser o Produtor que fornece energia para os herbívoros.", curiosity: "O capim da savana brota com as chuvas e produz energia com a luz solar para alimentar os grandes bandos de herbívoros!" },
+          { roleId: 1, name: "Zebra", role: "Consumidor 1º", emoji: "🦓", hint: "O 2º nível é o Consumidor Primário que pasta a vegetação da savana.", curiosity: "A zebra viaja em bandos e passa o dia pastando, alimentando-se diretamente do capim." },
+          { roleId: 2, name: "Leão", role: "Consumidor 2º", emoji: "🦁", hint: "O 3º nível é o Consumidor Secundário que se alimenta de herbívoros.", curiosity: "O leão é o rei da savana! Ele é um predador que caça herbívoros velozes como as zebras." },
+          { roleId: 3, name: "Urubu", role: "Consumidor 3º", emoji: "🦅", hint: "O 4º nível é o Consumidor Terciário que se alimenta de restos orgânicos no topo da cadeia.", curiosity: "O urubu voa alto em círculos procurando carcaças de animais que já morreram, limpando o ecossistema." },
+          { roleId: 4, name: "Fungos", role: "Decompositor", emoji: "🍄", hint: "O 5º nível é o Decompositor que devolve nutrientes para o solo da savana.", curiosity: "Fungos e bactérias do solo quebram as folhas e galhos caídos na savana, enriquecendo a terra com minerais." }
         ]
       }
     ];
@@ -529,7 +549,9 @@
       filledSlots = Array(5).fill(null);
       selectedCard = null;
       document.getElementById('hint-box').classList.add('hidden');
+      document.getElementById('curiosity-box').classList.add('hidden');
       document.getElementById('next-phase-container').classList.add('hidden');
+      document.getElementById('validate-container').classList.remove('hidden');
 
       // Gerar Slots Vazios
       renderSlots(data.items);
@@ -553,20 +575,19 @@
         const receptor = document.createElement('div');
         receptor.id = `slot-${item.roleId}`;
         receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-white/70 border-3 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-white/90 transition-all duration-200";
-        receptor.dataset.expectedRole = item.roleId;
+        receptor.dataset.expectedRole = index; // Armazena a ordem de energia esperada (0 a 4)
 
-        // Label interior descritiva
+        // Label interior descritiva (Ocultando o papel biológico literal)
         receptor.innerHTML = `
           <div class="pointer-events-none flex flex-col items-center text-center">
             <span class="text-xs font-black text-slate-400 uppercase tracking-wider">${index + 1}º Nível</span>
-            <span class="text-[10px] font-bold text-slate-400 bg-slate-200/50 px-2 py-0.5 rounded-md mt-1 uppercase">${item.role}</span>
           </div>
         `;
 
         // --- LISTENERS DE TOQUE / DRAG & DROP PARA O RECEPTOR ---
         receptor.addEventListener('dragover', (e) => {
           e.preventDefault();
-          if (!filledSlots[item.roleId]) {
+          if (!filledSlots[index]) {
             receptor.classList.add('border-brandYellow', 'bg-yellow-50/50');
           }
         });
@@ -582,21 +603,18 @@
           const cardId = e.dataTransfer.getData('text/plain');
           const cardEl = document.getElementById(cardId);
           if (cardEl) {
-            validatePlacement(cardEl, receptor);
+            placeCardInSlot(cardEl, receptor);
           }
         });
 
         // Clique no slot (para a mecânica híbrida toque)
         receptor.addEventListener('click', () => {
-          if (selectedCard && !filledSlots[item.roleId]) {
-            validatePlacement(selectedCard, receptor);
+          if (selectedCard) {
+            placeCardInSlot(selectedCard, receptor);
           }
         });
 
         slotDiv.appendChild(receptor);
-
-        // Se não for o último, podemos colocar um indicador visual de fluxo (seta) entre os slots no grid do Desktop
-        // No celular, as setas podem aparecer de outra forma. Para manter responsivo, as setas serão adicionadas via CSS ou posicionadas lateralmente.
         container.appendChild(slotDiv);
       });
     }
@@ -605,20 +623,20 @@
     function renderDeck(items) {
       const container = document.getElementById('deck-container');
       container.innerHTML = '';
+      const data = ECOSYSTEMS[currentPhase];
 
       items.forEach((item) => {
         const card = document.createElement('div');
         card.id = `card-${item.roleId}`;
-        card.className = "w-28 h-36 bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-between p-3 cursor-grab select-none card-float shadow-[0_6px_0_0_rgba(226,232,240,1)] hover:shadow-[0_8px_0_0_rgba(226,232,240,1)] hover:-translate-y-1 transition-all duration-150 active:cursor-grabbing";
+        card.className = "w-28 h-36 bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-grab select-none card-float shadow-[0_6px_0_0_rgba(226,232,240,1)] hover:shadow-[0_8px_0_0_rgba(226,232,240,1)] hover:-translate-y-1 transition-all duration-150 active:cursor-grabbing";
         card.setAttribute('draggable', 'true');
         card.dataset.roleId = item.roleId;
 
-        // Conteúdo visual do card (Estilo Duolingo)
+        // Conteúdo do card (Ocultando o papel biológico literal!)
         card.innerHTML = `
           <span class="text-3xl filter drop-shadow-md select-none pointer-events-none">${item.emoji}</span>
           <div class="text-center pointer-events-none select-none">
             <h4 class="font-extrabold text-sm text-slate-800 leading-tight">${item.name}</h4>
-            <span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full mt-1 inline-block uppercase">${item.role}</span>
           </div>
         `;
 
@@ -629,6 +647,10 @@
           e.dataTransfer.setData('text/plain', card.id);
           card.classList.add('opacity-50');
           playSound('click');
+          
+          // Exibe curiosidade sutil
+          const currentItem = data.items.find(i => i.roleId === item.roleId);
+          showCuriosity(currentItem);
         });
 
         card.addEventListener('dragend', () => {
@@ -640,13 +662,13 @@
           e.stopPropagation();
           playSound('click');
           
-          // Se o card já está em algum slot, ele não pode ser selecionado novamente
           if (card.classList.contains('placed')) return;
 
-          // Se clicar no mesmo card, desmarca
+          // Se clicar no mesmo card, desmarca e esconde curiosidade
           if (selectedCard === card) {
             card.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
             selectedCard = null;
+            document.getElementById('curiosity-box').classList.add('hidden');
             return;
           }
 
@@ -658,117 +680,222 @@
           // Marcar atual
           selectedCard = card;
           card.classList.add('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+          
+          // Exibir Curiosidade Biológica
+          const currentItem = data.items.find(i => i.roleId === item.roleId);
+          showCuriosity(currentItem);
         });
 
         container.appendChild(card);
       });
 
-      // Clique fora dos cards desmarca
+      // Clique fora dos cards desmarca e esconde a curiosidade
       document.addEventListener('click', () => {
         if (selectedCard) {
           selectedCard.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
           selectedCard = null;
+          document.getElementById('curiosity-box').classList.add('hidden');
         }
       });
     }
 
-    // --- VALIDAÇÃO DA TENTATIVA DE ENCAIXE ---
-    function validatePlacement(cardEl, slotEl) {
-      const expectedRoleId = parseInt(slotEl.dataset.expectedRole);
+    // Exibir Curiosidade
+    function showCuriosity(item) {
+      const curiosityBox = document.getElementById('curiosity-box');
+      const curiosityText = document.getElementById('curiosity-text');
+      const curiosityTitle = document.getElementById('curiosity-title');
+      
+      curiosityTitle.innerHTML = `Curiosidade: <span class="text-indigo-900">${item.name} ${item.emoji}</span>`;
+      curiosityText.innerText = item.curiosity;
+      
+      curiosityBox.classList.remove('hidden');
+    }
+
+    // --- COLOCAR CARD NO SLOT ---
+    function placeCardInSlot(cardEl, slotEl) {
+      const slotIndex = parseInt(slotEl.dataset.expectedRole); // index do slot (0 a 4)
       const cardRoleId = parseInt(cardEl.dataset.roleId);
       
-      const gameBox = document.getElementById('screen-game');
       const data = ECOSYSTEMS[currentPhase];
       const itemData = data.items.find(i => i.roleId === cardRoleId);
 
-      if (expectedRoleId === cardRoleId) {
-        // ENCAIXE CORRETO!
-        playSound('success');
-        
-        // Marcar slot como preenchido
-        filledSlots[expectedRoleId] = cardEl;
+      // Se o slot já está preenchido, removemos o card antigo primeiro
+      if (filledSlots[slotIndex]) {
+        const oldItem = filledSlots[slotIndex];
+        const oldCard = document.getElementById(`card-${oldItem.roleId}`);
+        if (oldCard) {
+          oldCard.classList.remove('hidden');
+        }
+      }
 
-        // Remover da seleção
-        cardEl.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30', 'card-float');
-        cardEl.classList.add('placed');
-        cardEl.setAttribute('draggable', 'false');
-        
-        // Efeito visual no slot (Brilho verde e borda cheia)
-        slotEl.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-green-50 border-3 border-brandGreen rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md animate-pop-in text-center";
-        
-        // Desenhar card dentro do slot
-        slotEl.innerHTML = `
-          <div class="absolute top-1.5 right-1.5 bg-brandGreen text-white rounded-full p-0.5">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <span class="text-3xl filter drop-shadow-md select-none mt-1">${itemData.emoji}</span>
-          <div class="text-center select-none mt-1">
-            <h4 class="font-extrabold text-xs text-slate-800 leading-tight">${itemData.name}</h4>
-            <span class="text-[9px] font-black text-brandGreenDark bg-green-200/50 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">${itemData.role}</span>
-          </div>
-        `;
+      // Marcar slot como preenchido temporariamente com este card
+      filledSlots[slotIndex] = itemData;
 
-        // Sumir com o card original da bandeja
-        cardEl.classList.add('hidden');
-        
-        // Adicionar pontuação
-        score += 50;
-        document.getElementById('score-text').innerText = `${score} Pontos`;
+      // Resetar seleções visuais do card na bandeja
+      cardEl.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
+      cardEl.classList.add('hidden'); // Oculta na bandeja
+      
+      // Esconde curiosidade
+      document.getElementById('curiosity-box').classList.add('hidden');
+      
+      // Toca som de clique/encaixe neutro
+      playSound('click');
 
-        // Ocultar dica anterior de erro
+      // Desenhar o card encaixado no slot (Estilo azul/indigo neutro de "encaixado")
+      slotEl.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-indigo-50 border-3 border-indigo-200 rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md text-center";
+      
+      slotEl.innerHTML = `
+        <button onclick="event.stopPropagation(); removeCardFromSlot(${slotIndex})" class="absolute -top-2 -right-2 bg-slate-200 hover:bg-brandRed text-slate-600 hover:text-white rounded-full p-1 transition-colors shadow-sm z-20">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <span class="text-3xl filter drop-shadow-md select-none mt-1 pointer-events-none">${itemData.emoji}</span>
+        <div class="text-center select-none mt-1 pointer-events-none">
+          <h4 class="font-extrabold text-xs text-slate-800 leading-tight">${itemData.name}</h4>
+          <span class="text-[9px] font-bold text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">Encaixado</span>
+        </div>
+      `;
+
+      // Se o card selecionado era esse, limpa
+      selectedCard = null;
+      
+      // Esconder dicas de erro antigas
+      document.getElementById('hint-box').classList.add('hidden');
+    }
+
+    // --- REMOVER CARD DO SLOT ---
+    function removeCardFromSlot(slotIndex) {
+      playSound('click');
+      const itemData = filledSlots[slotIndex];
+      if (itemData) {
+        const cardEl = document.getElementById(`card-${itemData.roleId}`);
+        if (cardEl) {
+          cardEl.classList.remove('hidden');
+        }
+        resetSlotToEmpty(slotIndex);
         document.getElementById('hint-box').classList.add('hidden');
-
-        // Resetar seleção assistida
-        selectedCard = null;
-
-        // Verificar se todos os slots foram completados
-        checkPhaseCompletion();
-
-      } else {
-        // ENCAIXE INCORRETO!
-        playSound('error');
-        errorsCount++;
-
-        // Tremor (shake) visual no slot
-        slotEl.classList.add('animate-shake', 'border-brandRed', 'bg-red-50/50');
-        setTimeout(() => {
-          slotEl.classList.remove('animate-shake', 'border-brandRed', 'bg-red-50/50');
-        }, 400);
-
-        // Tremor no card selecionado
-        cardEl.classList.add('animate-shake');
-        setTimeout(() => {
-          cardEl.classList.remove('animate-shake');
-        }, 400);
-
-        // Desmarcar seleção do card
-        cardEl.classList.remove('border-brandYellow', 'ring-4', 'ring-brandYellow/30');
-        selectedCard = null;
-
-        // Mostrar Dica Biológica sobre o card arrastado
-        const hintBox = document.getElementById('hint-box');
-        const hintText = document.getElementById('hint-text');
-        
-        hintText.innerHTML = `Você tentou colocar <strong>${itemData.name} (${itemData.role})</strong> no lugar errado. <br><span class="text-brandBlueDark">${itemData.hint}</span>`;
-        hintBox.classList.remove('hidden');
       }
     }
 
-    // --- VERIFICAR FASE COMPLETA ---
-    function checkPhaseCompletion() {
-      // Se todos os 5 slots estiverem preenchidos (diferente de null)
-      const finished = filledSlots.every(slot => slot !== null);
+    // --- RESETAR SLOT PARA VAZIO ---
+    function resetSlotToEmpty(slotIndex) {
+      const data = ECOSYSTEMS[currentPhase];
+      const item = data.items[slotIndex];
+      const receptor = document.getElementById(`slot-${item.roleId}`);
+      
+      receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-white/70 border-3 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center p-3 relative shadow-inner hover:bg-white/90 transition-all duration-200";
+      receptor.innerHTML = `
+        <div class="pointer-events-none flex flex-col items-center text-center">
+          <span class="text-xs font-black text-slate-400 uppercase tracking-wider">${slotIndex + 1}º Nível</span>
+        </div>
+      `;
+      filledSlots[slotIndex] = null;
+    }
 
-      if (finished) {
+    // --- VALIDAR ECOSSISTEMA INTEIRO (BOTÃO FINAL) ---
+    function validateEcosystem() {
+      const data = ECOSYSTEMS[currentPhase];
+      
+      // 1. Verificar se todos os 5 slots estão preenchidos
+      const allFilled = filledSlots.every(slot => slot !== null);
+      if (!allFilled) {
+        playSound('error');
+        const hintBox = document.getElementById('hint-box');
+        const hintText = document.getElementById('hint-text');
+        
+        hintText.innerHTML = "Por favor, encaixe todos os 5 seres vivos nos slots para podermos verificar o equilíbrio do ecossistema!";
+        hintBox.classList.remove('hidden');
+        return;
+      }
+
+      // 2. Validar cada slot
+      let allCorrect = true;
+      let firstErrorIndex = -1;
+      const incorrectSlots = [];
+
+      for (let i = 0; i < 5; i++) {
+        const cardData = filledSlots[i];
+        if (cardData.roleId !== i) {
+          allCorrect = false;
+          incorrectSlots.push(i);
+          if (firstErrorIndex === -1) {
+            firstErrorIndex = i;
+          }
+        }
+      }
+
+      if (allCorrect) {
+        // ACERTOU TUDO!
         playSound('complete');
         spawnConfetti();
 
-        // Expandir barra de progresso da fase para 100%
+        // Mudar estilo de todos os slots para verde brilhante e travar
+        for (let i = 0; i < 5; i++) {
+          const itemData = filledSlots[i];
+          const receptor = document.getElementById(`slot-${data.items[i].roleId}`);
+          receptor.className = "w-full aspect-[4/5] sm:aspect-square md:h-36 md:w-32 bg-green-50 border-3 border-brandGreen rounded-2xl flex flex-col items-center justify-between p-3 relative shadow-md text-center";
+          receptor.innerHTML = `
+            <div class="absolute top-1.5 right-1.5 bg-brandGreen text-white rounded-full p-0.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <span class="text-3xl filter drop-shadow-md select-none mt-1 pointer-events-none">${itemData.emoji}</span>
+            <div class="text-center select-none mt-1 pointer-events-none">
+              <h4 class="font-extrabold text-xs text-slate-800 leading-tight">${itemData.name}</h4>
+              <span class="text-[9px] font-black text-brandGreenDark bg-green-200/50 px-1.5 py-0.5 rounded-full mt-0.5 inline-block uppercase">Correto</span>
+            </div>
+          `;
+        }
+
+        // Esconder botão de validar
+        document.getElementById('validate-container').classList.add('hidden');
+        document.getElementById('hint-box').classList.add('hidden');
+        document.getElementById('curiosity-box').classList.add('hidden');
+
+        // Dar pontos e expandir barra
+        score += 100;
+        document.getElementById('score-text').innerText = `${score} Pontos`;
+
         const progressPercent = ((currentPhase + 1) / ECOSYSTEMS.length) * 100;
         document.getElementById('phase-progress-bar').style.width = `${progressPercent}%`;
 
         // Mostrar botão de avançar
         document.getElementById('next-phase-container').classList.remove('hidden');
+
+      } else {
+        // ERROU ALGUNS!
+        playSound('error');
+        errorsCount++;
+
+        // Shake nos slots errados e ejeta os cards incorretos de volta para a bandeja
+        incorrectSlots.forEach(slotIndex => {
+          const dataItem = data.items[slotIndex];
+          const receptor = document.getElementById(`slot-${dataItem.roleId}`);
+          
+          receptor.classList.add('animate-shake', 'border-brandRed', 'bg-red-50');
+          
+          setTimeout(() => {
+            receptor.classList.remove('animate-shake', 'border-brandRed', 'bg-red-50');
+            
+            // Ejetar o card
+            const cardData = filledSlots[slotIndex];
+            if (cardData) {
+              const cardEl = document.getElementById(`card-${cardData.roleId}`);
+              if (cardEl) {
+                cardEl.classList.remove('hidden');
+                cardEl.classList.add('animate-shake');
+                setTimeout(() => cardEl.classList.remove('animate-shake'), 400);
+              }
+              resetSlotToEmpty(slotIndex);
+            }
+          }, 450);
+        });
+
+        // Dica baseada no primeiro erro encontrado da esquerda para a direita
+        const expectedItem = data.items[firstErrorIndex];
+        const hintBox = document.getElementById('hint-box');
+        const hintText = document.getElementById('hint-text');
+        
+        hintText.innerHTML = `Identifiquei um desequilíbrio ecológico! <br><span class="text-brandBlueDark">${expectedItem.hint}</span>`;
+        hintBox.classList.remove('hidden');
       }
     }
 

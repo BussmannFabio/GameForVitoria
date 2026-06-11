@@ -112,6 +112,26 @@
     .animate-float {
       animation: float 3s infinite ease-in-out;
     }
+
+    /* Animação de assar fatia */
+    @keyframes cook-slice {
+      0% { fill: #FDF2E9; }
+      30% { fill: #EF4444; } /* Molho de tomate */
+      100% { fill: #FFD54F; } /* Queijo */
+    }
+    .animate-cook {
+      animation: cook-slice 0.4s ease-out forwards;
+    }
+
+    /* Animação para itens de calabresa pulando */
+    @keyframes pop-topping {
+      0% { transform: scale(0); opacity: 0; }
+      75% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-topping {
+      animation: pop-topping 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
@@ -247,8 +267,8 @@
             </svg>
           </div>
           
-          <!-- Estatística de seleção atual da fração -->
-          <div class="mt-4 flex flex-col items-center gap-1">
+          <!-- Estatística de seleção atual da fração (Oculto para forçar contagem visual, revelado no erro) -->
+          <div id="fraction-container" class="mt-4 flex flex-col items-center gap-1 hidden">
             <div class="text-slate-500 font-semibold text-sm">Fração Selecionada:</div>
             <div id="fraction-visual" class="flex flex-col items-center font-black text-2xl text-slate-800 relative leading-none bg-slate-100/80 px-4 py-1.5 rounded-xl border border-slate-200">
               <span id="fraction-numerator">0</span>
@@ -483,13 +503,13 @@
     ];
 
     // Banco de Perguntas (Rodadas 1 a 5)
-    // Cada rodada pede uma fração diferente de pizza gourmet
+    // Cada rodada pede uma fração escrita por extenso para interpretação do aluno
     const ROUNDS = [
-      { numerator: 1, denominator: 2, pizzaType: 'Margherita 🧀', hint: 'Uma pizza de 1/2 significa que cortamos ela em 2 partes iguais e o cliente quer apenas 1 dessas partes!' },
-      { numerator: 3, denominator: 4, pizzaType: 'Calabresa Especial 🍕', hint: 'O cliente pediu 3/4. Ou seja, a pizza está dividida em 4 partes. Você deve clicar em 3 fatias para pintá-las!' },
-      { numerator: 2, denominator: 3, pizzaType: 'Quatro Queijos 🧀', hint: 'Essa pizza está cortada em 3 fatias iguais. Pinte 2 fatias para entregar o pedido de 2/3.' },
-      { numerator: 5, denominator: 8, pizzaType: 'Portuguesa Delícia 🧅', hint: 'Aqui a pizza está dividida em 8 fatias menores. Conte com cuidado e selecione exatamente 5 delas!' },
-      { numerator: 3, denominator: 5, pizzaType: 'Chocolate com Morango 🍓', hint: 'A pizza foi fatiada em 5 partes. Para preencher 3/5, clique em exatamente 3 pedaços!' }
+      { numerator: 1, denominator: 2, fractionText: 'metade', pizzaType: 'Margherita 🧀', hint: 'O cliente pediu "metade". Lembre-se que metade significa 1 parte de uma pizza que foi cortada em 2 fatias iguais!' },
+      { numerator: 3, denominator: 4, fractionText: 'três quartos', pizzaType: 'Calabresa Especial 🍕', hint: 'O cliente pediu "três quartos". Ou seja, a pizza está dividida em 4 partes e você deve pintar 3 delas!' },
+      { numerator: 2, denominator: 3, fractionText: 'dois terços', pizzaType: 'Quatro Queijos 🧀', hint: 'O cliente quer "dois terços". A pizza foi cortada em 3 pedaços iguais, você deve servir 2 pedaços.' },
+      { numerator: 5, denominator: 8, fractionText: 'cinco oitavos', pizzaType: 'Portuguesa Delícia 🧅', hint: 'O cliente quer "cinco oitavos". A pizza tem 8 fatias no total. Conte com calma e pinte 5 fatias!' },
+      { numerator: 3, denominator: 5, fractionText: 'três quintos', pizzaType: 'Chocolate com Morango 🍓', hint: 'O cliente quer "três quintos". A pizza está cortada em 5 fatias. Coloque 3 fatias recheadas na tábua!' }
     ];
 
     // --- SINTETIZADOR DE ÁUDIO WEB AUDIO API ---
@@ -646,8 +666,9 @@
       const data = ROUNDS[currentRound];
       const client = CLIENTS[currentRound % CLIENTS.length];
       
-      // Esconder dica da rodada anterior
+      // Esconder dica e painel numérico da rodada anterior
       document.getElementById('hint-box').classList.add('hidden');
+      document.getElementById('fraction-container').classList.add('hidden');
       
       // Configurar Barra de Progresso
       const progressPercent = (currentRound / ROUNDS.length) * 100;
@@ -657,7 +678,7 @@
       // Carregar Cliente e Fala
       document.getElementById('client-avatar-container').innerHTML = client.avatarSvg;
       document.getElementById('client-speech-bubble').innerHTML = `
-        "Olá, eu sou o <strong>${client.name}</strong>! <br>Quero comer <span class="text-brandOrange font-black text-xl">${data.numerator}/${data.denominator}</span> da pizza de <span class="underline decoration-wavy decoration-amber-500">${data.pizzaType}</span>."
+        "Olá, eu sou o <strong>${client.name}</strong>! <br>Quero comer <span class="text-brandOrange font-black text-xl">${data.fractionText}</span> da pizza de <span class="underline decoration-wavy decoration-amber-500">${data.pizzaType}</span>."
       `;
 
       // Resetar estado das fatias
@@ -749,6 +770,8 @@
           pep.setAttribute("fill", "#EF4444"); // Vermelho calabresa
           pep.setAttribute("stroke", "#991B1B");
           pep.setAttribute("stroke-width", "1.5");
+          pep.setAttribute("class", "pepperoni-item opacity-0");
+          pep.setAttribute("style", `transform-origin: ${px}px ${py}px;`);
           
           // Efeito realista (brilho da gordurinha da calabresa)
           const pepShine = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -756,6 +779,8 @@
           pepShine.setAttribute("cy", py - 2.5);
           pepShine.setAttribute("r", 2.5);
           pepShine.setAttribute("fill", "#FCA5A5");
+          pepShine.setAttribute("class", "pepperoni-item opacity-0");
+          pepShine.setAttribute("style", `transform-origin: ${px}px ${py}px;`);
           
           toppingsGroup.appendChild(pep);
           toppingsGroup.appendChild(pepShine);
@@ -837,23 +862,43 @@
       const sliceGroup = slicePath.parentNode;
       
       if (selectedSlices[index]) {
-        // Pinta com queijo derretido dourado delicioso
-        slicePath.setAttribute("fill", "#FFD54F");
+        // Pinta com queijo derretido dourado delicioso usando animação
+        slicePath.classList.remove("animate-cook");
+        void slicePath.offsetWidth; // Trigger reflow
+        slicePath.classList.add("animate-cook");
         slicePath.setAttribute("stroke", "#F59E0B");
         slicePath.setAttribute("stroke-width", "3");
+
         // Mostra calabresa/orégano
         toppingsGroup.classList.remove("opacity-0");
         toppingsGroup.classList.add("opacity-100");
+        
+        // Dispara animação nos pepperonis
+        const peps = toppingsGroup.querySelectorAll(".pepperoni-item");
+        peps.forEach(pep => {
+          pep.classList.remove("opacity-0");
+          pep.classList.add("animate-topping");
+        });
+
         // Desloca um tiquinho fixo
         sliceGroup.style.transform = `translate(${dx/3}px, ${dy/3}px)`;
       } else {
         // Volta ao cru/vazio
+        slicePath.classList.remove("animate-cook");
         slicePath.setAttribute("fill", "#FDF2E9");
         slicePath.setAttribute("stroke", "#E2E8F0");
         slicePath.setAttribute("stroke-width", "3");
+
         // Esconde calabresa
         toppingsGroup.classList.remove("opacity-100");
         toppingsGroup.classList.add("opacity-0");
+
+        const peps = toppingsGroup.querySelectorAll(".pepperoni-item");
+        peps.forEach(pep => {
+          pep.classList.remove("animate-topping");
+          pep.classList.add("opacity-0");
+        });
+
         // Volta para a tábua
         sliceGroup.style.transform = "translate(0px, 0px)";
       }
@@ -871,11 +916,19 @@
       groups.forEach(group => {
         const path = group.querySelector(".slice-path");
         const toppings = group.querySelector(".toppings");
+        path.classList.remove("animate-cook");
         path.setAttribute("fill", "#FDF2E9");
         path.setAttribute("stroke", "#E2E8F0");
         path.setAttribute("stroke-width", "3");
         toppings.classList.remove("opacity-100");
         toppings.classList.add("opacity-0");
+
+        const peps = toppings.querySelectorAll(".pepperoni-item");
+        peps.forEach(pep => {
+          pep.classList.remove("animate-topping");
+          pep.classList.add("opacity-0");
+        });
+
         group.style.transform = "translate(0px, 0px)";
       });
       
@@ -931,7 +984,9 @@
           gameBox.classList.remove('animate-shake');
         }, 400);
 
-        // Exibir Dica Pedagógica
+        // Exibir Dica Pedagógica e REVELAR o painel de fração como feedback de correção
+        document.getElementById('fraction-container').classList.remove('hidden');
+
         const hintBox = document.getElementById('hint-box');
         const hintText = document.getElementById('hint-text');
         

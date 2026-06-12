@@ -433,11 +433,18 @@
             keys[e.code] = false;
         });
 
-        // Detect Touch device
         function checkMobile() {
-            isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+            isMobile = ('ontouchstart' in window) || 
+                       (navigator.maxTouchPoints > 0) || 
+                       /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
         }
         checkMobile();
+
+        // Fallback: first touch guarantees mobile layout on touch screen
+        window.addEventListener('touchstart', function onFirstTouch() {
+            isMobile = true;
+            window.removeEventListener('touchstart', onFirstTouch);
+        }, { passive: true });
 
         // Mouse/Touch clicks (Desktop & Mobile)
         canvas.addEventListener('mousedown', handleMouseDown);
@@ -1187,7 +1194,6 @@
             ctx.fillText('Teclas A/D ou Setas para andar | W ou Espaço para pular (Pulo duplo suportado)', 400, 415);
         }
 
-        // Draw HUD
         function drawHUD() {
             // Background bar for stats
             ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
@@ -1199,7 +1205,7 @@
                 heartsStr += i < lives ? '❤️' : '🖤';
             }
             ctx.textAlign = 'left';
-            ctx.font = '16px Nunito';
+            ctx.font = 'bold 14px Nunito';
             ctx.fillStyle = '#fff';
             ctx.fillText(`Vidas: ${heartsStr}`, 25, 34);
 
@@ -1208,10 +1214,12 @@
                 ctx.fillStyle = '#38bdf8';
                 ctx.fillText('🛡️ Escudo Ativo', 180, 34);
             }
-                    ctx.textAlign = 'center';
+
+            // World/Level (now right-aligned to prevent overlap)
+            ctx.textAlign = 'right';
             ctx.fillStyle = '#e2e8f0';
-            ctx.font = 'bold 16px Nunito';
-            ctx.fillText(`${WORLDS[currentWorld].text} - Fase ${currentLevel}/2`, 400, 34);
+            ctx.font = 'bold 14px Nunito';
+            ctx.fillText(`${WORLDS[currentWorld].text} - Fase ${currentLevel}/2`, 650, 34);
 
             // Score
             ctx.textAlign = 'right';

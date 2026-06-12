@@ -488,9 +488,17 @@
         });
 
         function checkMobile() {
-            isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+            isMobile = ('ontouchstart' in window) || 
+                       (navigator.maxTouchPoints > 0) || 
+                       /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
         }
         checkMobile();
+
+        // Fallback: first touch guarantees mobile layout on touch screen
+        window.addEventListener('touchstart', function onFirstTouch() {
+            isMobile = true;
+            window.removeEventListener('touchstart', onFirstTouch);
+        }, { passive: true });
 
 // Mouse/Touch clicks (Desktop & Mobile)
         canvas.addEventListener('mousedown', handleMouseDown);
@@ -1303,19 +1311,19 @@
                 heartsStr += i < lives ? '❤️' : '🖤';
             }
             ctx.textAlign = 'left';
-            ctx.font = '16px Nunito';
+            ctx.font = 'bold 14px Nunito';
             ctx.fillStyle = '#fff';
             ctx.fillText(`HP: ${heartsStr}`, 25, 36);
 
             // Document Scrolls count
             ctx.fillStyle = '#fbbf24';
-            ctx.fillText(`Documentos: 📜 ${scrollsCollected}/3`, 175, 36);
+            ctx.fillText(`Documentos: 📜 ${scrollsCollected}/3`, 160, 36);
 
-            // Current Era
-            ctx.textAlign = 'center';
+            // Current Era (now right-aligned to prevent overlap)
+            ctx.textAlign = 'right';
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 16px Nunito';
-            ctx.fillText(`${ERAS[currentEra].name} (${ERAS[currentEra].period})`, 440, 36);
+            ctx.font = 'bold 14px Nunito';
+            ctx.fillText(`${ERAS[currentEra].name} (${ERAS[currentEra].period})`, 650, 36);
 
             // Score
             ctx.textAlign = 'right';

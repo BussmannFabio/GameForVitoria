@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Eco-Tactics: A Batalha pelo Ecossistema</title>
+  <!-- Tailwind CSS v4 CDN oficial de browser -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <!-- Google Fonts - Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;750;850;950&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Style Sheet -->
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body class="h-screen overflow-hidden select-none bg-slate-950 text-slate-100">
+
+  <!-- Device Rotation Alert Overlay -->
+  <div id="rotate-overlay" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#05070f] text-white text-center p-6">
+    <div class="animate-bounce text-6xl mb-4">📱🔄</div>
+    <h2 class="text-2xl font-black mb-2 text-rose-400">Gire o seu aparelho!</h2>
+    <p class="text-slate-400 max-w-sm">Para uma melhor experiência de jogo, gire o seu celular para a horizontal (modo paisagem).</p>
+  </div>
+
+  <!-- Container de Confetes -->
+  <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
+
+  <!-- MODAL DE VITÓRIA -->
+  <div id="screen-victory" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-emerald-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-5 text-center">
+      <div class="w-20 h-20 bg-emerald-950/40 rounded-full flex items-center justify-center border border-emerald-500/50 shadow-inner">
+        <i data-lucide="trophy" class="w-12 h-12 text-emerald-400 fill-emerald-400"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-100 tracking-tight">Vitória do Ecossistema!</h2>
+        <p class="text-emerald-400 font-extrabold text-sm uppercase tracking-wider mt-1">Equilíbrio Restabelecido 🎉</p>
+      </div>
+      <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 w-full flex justify-around">
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
+          <div id="vic-score" class="text-2xl font-black text-brandOrange">0</div>
+        </div>
+        <div class="w-px bg-slate-800"></div>
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Criaturas Salvas</div>
+          <div id="vic-saves" class="text-2xl font-black text-indigo-400">0</div>
+        </div>
+      </div>
+      <button onclick="resetGame()" class="btn-3d bg-brandGreen hover:bg-brandGreenDark text-slate-950 font-black text-base py-3 px-8 rounded-2xl border-b-4 border-green-800 w-full transition-all shadow-md">
+        Jogar Novamente 🔄
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DE DERROTA (GAME OVER) -->
+  <div id="screen-gameover" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border-2 border-red-500/30 rounded-3xl p-6 max-w-md w-full shadow-2xl flex flex-col items-center gap-5 text-center">
+      <div class="w-20 h-20 bg-red-950/40 rounded-full flex items-center justify-center border border-red-500/50 shadow-inner">
+        <i data-lucide="skull" class="w-12 h-12 text-red-400"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-100 tracking-tight">Ecossistema Colapsou!</h2>
+        <p class="text-red-400 font-extrabold text-sm uppercase tracking-wider mt-1">A Poluição Venceu 😩</p>
+      </div>
+      <div class="bg-slate-950/50 border border-slate-800 rounded-2xl p-4 w-full flex justify-around">
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Pontuação</div>
+          <div id="go-score" class="text-2xl font-black text-brandOrange">0</div>
+        </div>
+        <div class="w-px bg-slate-800"></div>
+        <div class="text-center">
+          <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Eliminações</div>
+          <div id="go-kills" class="text-2xl font-black text-indigo-400">0</div>
+        </div>
+      </div>
+      <button onclick="resetGame()" class="btn-3d bg-brandOrange hover:bg-brandOrange/95 text-white font-black text-base py-3 px-8 rounded-2xl border-b-4 border-amber-700 w-full transition-all shadow-md">
+        Tentar Novamente 🔄
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL TUTORIAL / MANUAL ECOLOGICO INTERATIVO -->
+  <div id="manual-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(5,8,20,0.92); backdrop-filter: blur(12px);">
+    <div class="w-full max-w-lg flex flex-col gap-3 max-h-[95vh] overflow-y-auto" style="background: linear-gradient(145deg, #0f172a, #1e293b); border: 1.5px solid rgba(99,102,241,0.35); border-radius: 28px; padding: 22px; box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04) inset;">
+
+      <!-- Cabeçalho -->
+      <div class="text-center" style="padding-bottom: 4px;">
+        <h2 style="font-size: 1.6rem; font-weight: 900; color: #fff; letter-spacing: -0.03em; margin: 0 0 4px;">Eco-Tactics 🛡️</h2>
+        <p style="font-size: 9px; font-weight: 800; color: #818cf8; text-transform: uppercase; letter-spacing: 0.18em; margin: 0;">GamesForVitória · Como Jogar</p>
+      </div>
+
+      <!-- ═══ SELETOR DE ECOSSISTEMA ═══ -->
+      <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(99,102,241,0.25); border-radius: 20px; padding: 12px 14px;">
+        <p style="text-align:center; font-size:9px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.15em; margin:0 0 10px;">🌍 Escolha o Ecossistema</p>
+        <div style="display:grid; grid-template-columns: repeat(3,1fr); gap: 8px;">
+
+          <button id="eco-btn-forest" onclick="selectEcosystemTheme('forest')"
+            style="background: linear-gradient(145deg,#052e16,#064e3b); border: 2px solid #10b981; border-radius: 16px; padding: 12px 4px 10px; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; transition: all 0.2s; box-shadow: 0 0 16px rgba(16,185,129,0.35);">
+            <span style="font-size:24px; line-height:1;">🌳</span>
+            <span style="font-size:9px; font-weight:900; color:#6ee7b7; text-transform:uppercase; letter-spacing:0.08em;">Floresta</span>
+            <span style="font-size:8px; color:#34d399; font-weight:700;">Planta · Coelho · Cobra</span>
+          </button>
+
+          <button id="eco-btn-ocean" onclick="selectEcosystemTheme('ocean')"
+            style="background: rgba(15,23,60,0.7); border: 2px solid rgba(56,189,248,0.3); border-radius: 16px; padding: 12px 4px 10px; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; transition: all 0.2s;">
+            <span style="font-size:24px; line-height:1;">🌊</span>
+            <span style="font-size:9px; font-weight:900; color:#7dd3fc; text-transform:uppercase; letter-spacing:0.08em;">Oceano</span>
+            <span style="font-size:8px; color:#38bdf8; font-weight:700;">Algas · Camarão · Peixe</span>
+          </button>
+
+          <button id="eco-btn-savanna" onclick="selectEcosystemTheme('savanna')"
+            style="background: rgba(30,20,5,0.7); border: 2px solid rgba(245,158,11,0.3); border-radius: 16px; padding: 12px 4px 10px; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; transition: all 0.2s;">
+            <span style="font-size:24px; line-height:1;">🌾</span>
+            <span style="font-size:9px; font-weight:900; color:#fcd34d; text-transform:uppercase; letter-spacing:0.08em;">Savana</span>
+            <span style="font-size:8px; color:#f59e0b; font-weight:700;">Capim · Zebra · Leão</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- ═══ REGRAS COMPACTAS ═══ -->
+      <div style="display:flex; flex-direction:column; gap:7px;">
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.7); border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:12px;">
+          <span style="font-size:22px; flex-shrink:0;">☀️</span>
+          <div>
+            <strong style="color:#fff; font-size:12px;">Energia Solar — seu recurso</strong>
+            <p style="color:#94a3b8; font-size:10px; margin:2px 0 0;">Carrega passivamente. Plantas geram +10☀️ a cada 5s.</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.7); border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:12px;">
+          <span id="man-produtor-emoji" style="font-size:22px; flex-shrink:0;">🌿</span>
+          <div>
+            <strong id="man-produtor-title" style="color:#6ee7b7; font-size:12px;">Planta (Produtor) — 30☀️</strong>
+            <p id="man-produtor-desc" style="color:#94a3b8; font-size:10px; margin:2px 0 0;">Clique na raia para plantar. Alimenta o herbívoro e gera energia.</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.7); border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:12px;">
+          <span id="man-primario-emoji" style="font-size:22px; flex-shrink:0;">🐰</span>
+          <div>
+            <strong id="man-primario-title" style="color:#fcd34d; font-size:12px;">Herbívoro — 50☀️</strong>
+            <p id="man-primario-desc" style="color:#94a3b8; font-size:10px; margin:2px 0 0;">Avança pela arena. Come plantas para sobreviver e ganhar escudo.</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.7); border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:12px;">
+          <span id="man-secundario-emoji" style="font-size:22px; flex-shrink:0;">🐍</span>
+          <div>
+            <strong id="man-secundario-title" style="color:#fca5a5; font-size:12px;">Carnívoro — 70☀️</strong>
+            <p id="man-secundario-desc" style="color:#94a3b8; font-size:10px; margin:2px 0 0;">Dispara projéteis. Caçar herbívoros ativa Super Velocidade!</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.7); border-radius:16px; padding:10px 12px; display:flex; align-items:center; gap:12px;">
+          <span id="man-decompositor-emoji" style="font-size:22px; flex-shrink:0;">🍄</span>
+          <div>
+            <strong id="man-decompositor-title" style="color:#d8b4fe; font-size:12px;">Decompositor — 25☀️</strong>
+            <p id="man-decompositor-desc" style="color:#94a3b8; font-size:10px; margin:2px 0 0;">Recicla corpos próximos (raio 150px) devolvendo +60☀️.</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(127,29,29,0.25); border:1px solid rgba(239,68,68,0.25); border-radius:14px; padding:8px 12px; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:16px;">⚠️</span>
+          <span style="color:#fca5a5; font-size:10px; font-weight:700;">Inanição mata! Sem comida na raia, seus aliados morrem de fome.</span>
+        </div>
+
+      </div>
+
+      <!-- ═══ BOTÃO INICIAR ═══ -->
+      <button onclick="closeManual()"
+        style="width:100%; padding:15px; border-radius:18px; border:none; cursor:pointer; font-weight:900; font-size:15px; letter-spacing:0.02em; color:#052e16; background:linear-gradient(135deg, #4ade80, #22c55e, #16a34a); box-shadow: 0 6px 0 #14532d, 0 10px 30px rgba(34,197,94,0.4); transition: all 0.12s ease; position:relative; top:0;"
+        onmousedown="this.style.top='4px'; this.style.boxShadow='0 2px 0 #14532d, 0 4px 20px rgba(34,197,94,0.3)';"
+        onmouseup="this.style.top='0'; this.style.boxShadow='0 6px 0 #14532d, 0 10px 30px rgba(34,197,94,0.4)';"
+        onmouseleave="this.style.top='0'; this.style.boxShadow='0 6px 0 #14532d, 0 10px 30px rgba(34,197,94,0.4)';">
+        🚀 Começar Missão Ecológica
+      </button>
+
+    </div>
+  </div>
+
+  <!-- TELA DO JOGO (CONTEÚDO PRINCIPAL) -->
+  <div id="screen-game" class="h-full flex flex-col justify-between">
+
+    <!-- CABEÇALHO DO JOGO -->
+    <header class="w-full max-w-6xl mx-auto px-3 pt-2.5 pb-1 flex justify-between items-center z-10 flex-shrink-0">
+      <div class="flex items-center gap-2">
+        <!-- Retornar ao Hub -->
+        <a href="../../index.html" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Central de Jogos">
+          <i data-lucide="home" class="w-4.5 h-4.5"></i>
+        </a>
+        <!-- Ajuda / Abrir Manual -->
+        <button onclick="openManual()" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Como Jogar">
+          <i data-lucide="help-circle" class="w-4.5 h-4.5"></i>
+        </button>
+        <!-- Tela Cheia Opcional -->
+        <button onclick="toggleFullscreen()" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Tela Cheia">
+          <i id="fullscreen-icon" data-lucide="maximize" class="w-4.5 h-4.5"></i>
+        </button>
+
+        <!-- Seletor de Ecossistema em Jogo -->
+        <select id="eco-select" onchange="changeEcosystemTheme(this.value)" class="bg-slate-800 border-2 border-indigo-500/50 text-slate-100 text-xs font-black rounded-2xl px-2.5 py-2 focus:outline-none cursor-pointer hover:bg-slate-700 transition-colors shadow-md focus:ring-2 focus:ring-indigo-500/30" style="min-width:90px">
+          <option value="forest">🌳 Floresta</option>
+          <option value="ocean">🌊 Oceano</option>
+          <option value="savanna">🌾 Savana</option>
+        </select>
+        
+        <!-- Título de Navegação -->
+        <div class="hidden sm:flex items-center gap-2 ml-1">
+          <div class="bg-indigo-650 text-white p-2 rounded-xl border border-indigo-500/20">
+            <i data-lucide="heart" class="w-4 h-4 text-red-400 fill-red-400"></i>
+          </div>
+          <div>
+            <span class="text-sm font-black tracking-wide text-white block leading-tight font-nunito">GamesForVitória 💖</span>
+            <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Eco-Tactics</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CONTROLES PEDAGÓGICOS E ESTADO -->
+      <div class="flex items-center gap-2.5">
+        <button id="pause-btn" onclick="togglePauseClassroom()" class="btn-3d bg-indigo-600 hover:bg-indigo-700 text-white font-black px-3.5 py-1.5 border-b-4 border-indigo-900 rounded-2xl text-[11px] md:text-xs flex items-center gap-1 transition-all shadow-md">
+          <i id="pause-icon" data-lucide="pause-circle" class="w-3.5 h-3.5"></i>
+          <span id="pause-text">Pausar Aula ⏱️</span>
+        </button>
+
+        <!-- Energia e Vida com Coração Pulsante -->
+        <div class="bg-slate-900/90 border border-slate-700 px-3.5 py-1.5 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-3.5 shadow-md transition-all" id="base-life-card">
+          <div class="flex items-center gap-1">
+            <i data-lucide="sun" class="text-brandYellow w-4 h-4 fill-brandYellow animate-spin-slow"></i>
+            <span id="solar-text" class="text-brandYellow font-black">200</span>
+          </div>
+          <div class="w-px h-3.5 bg-slate-700"></div>
+          <div class="flex items-center gap-1.5">
+            <span id="heart-icon" class="animate-heartbeat inline-block">❤️</span>
+            <span id="base-life-text" class="text-brandRed font-black">Vida: 100%</span>
+          </div>
+        </div>
+
+        <!-- Mudo/Som -->
+        <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/90 p-2 rounded-2xl border border-slate-700 hover:bg-slate-800 transition-colors shadow-md text-slate-400">
+          <i id="sound-icon" data-lucide="volume-2" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAINEL DE AVISO DE PAUSA PEDAGÓGICA (TELA DA PROFESSORA) -->
+    <div id="classroom-panel" class="absolute inset-0 bg-slate-950/95 border-4 border-indigo-500 rounded-3xl z-40 p-5 flex flex-col md:flex-row gap-5 hidden animate-pop-in">
+      <!-- Lado Esquerdo: Lousa de Discussão -->
+      <div class="flex-grow bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between overflow-y-auto">
+        <div>
+          <div class="flex items-center gap-2 text-indigo-400 font-extrabold uppercase text-xs tracking-wider mb-2">
+            <i data-lucide="presentation" class="w-4 h-4"></i>
+            Lousa Pedagógica (Modo Aula)
+          </div>
+          <h3 class="text-lg font-black text-slate-100">Análise do Ecossistema</h3>
+          
+          <!-- Dinâmicas Ecológicas dinâmicas -->
+          <div id="classroom-analysis" class="mt-3 text-slate-300 space-y-2.5 font-semibold text-xs md:text-sm leading-relaxed"></div>
+        </div>
+
+        <div class="border-t border-slate-800/80 pt-3 mt-3 flex items-start gap-3 bg-indigo-950/20 p-3 rounded-xl border border-indigo-900/30 flex-shrink-0">
+          <i data-lucide="help-circle" class="text-indigo-400 w-5 h-5 flex-shrink-0 mt-0.5 animate-pulse"></i>
+          <p class="text-[10px] md:text-xs text-slate-400 leading-normal font-bold">
+            Professora: O jogo está pausado. Use os dados acima para guiar perguntas científicas com seus alunos!
+          </p>
+        </div>
+      </div>
+
+      <!-- Lado Direito: Eventos Climáticos -->
+      <div class="w-full md:w-72 flex-shrink-0 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+        <div class="flex items-center gap-2 text-brandOrange font-extrabold uppercase text-xs tracking-wider">
+          <i data-lucide="zap" class="w-4 h-4"></i>
+          Disparar Eventos
+        </div>
+        <p class="text-[11px] text-slate-400 font-semibold leading-normal">Incite alterações climáticas e simule o impacto direto na cadeia:</p>
+
+        <div class="flex flex-col gap-2">
+          <button onclick="triggerWeatherEvent('sun')" class="btn-3d bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2 border-b-4 border-amber-700 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+            Super Sol (+Fotossíntese)
+          </button>
+          <button onclick="triggerWeatherEvent('acid_rain')" class="btn-3d bg-red-500 hover:bg-red-600 text-white font-black py-2 border-b-4 border-red-800 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="cloud-lightning" class="w-3.5 h-3.5"></i>
+            Chuva Ácida (Dano Plantas)
+          </button>
+          <button onclick="triggerWeatherEvent('toxic')" class="btn-3d bg-purple-600 hover:bg-purple-700 text-white font-black py-2 border-b-4 border-purple-900 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all">
+            <i data-lucide="skull" class="w-3.5 h-3.5"></i>
+            Descarte Químico (Pragas)
+          </button>
+        </div>
+
+        <button onclick="togglePauseClassroom()" class="btn-3d bg-brandGreen hover:bg-brandGreenDark text-white font-black py-2.5 border-b-4 border-green-800 rounded-xl text-xs flex items-center justify-center gap-2 transition-all mt-auto shadow-md">
+          Retomar Simulação 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- TABULEIRO DO JOGO (ARENA RESPONSIVA) -->
+    <main class="flex-grow w-full max-w-6xl mx-auto px-3 flex items-center justify-center h-0">
+      <div id="game-board-container" class="relative w-full h-full bg-slate-950/60 rounded-3xl border-4 border-slate-800 overflow-hidden select-none shadow-inner cursor-crosshair">
+        
+        <!-- Ghost Preview Element -->
+        <div id="ghost-preview" class="absolute pointer-events-none opacity-45 z-30 hidden text-3.5xl ghost-preview"></div>
+        
+        <!-- Container de Elementos Absolutos (Poluição, Projéteis e Efeitos Flutuantes) -->
+        <div id="entities-container" class="absolute inset-0 pointer-events-none overflow-hidden z-20"></div>
+      </div>
+    </main>
+
+    <!-- DECK DE INVOCAÇÃO INFERIOR -->
+    <footer class="w-full max-w-6xl mx-auto px-3 pt-1 pb-3 flex flex-col gap-2 flex-shrink-0 z-10">
+      <!-- Feedback de Informações -->
+      <div id="info-panel" class="bg-slate-900/80 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-xl flex gap-2.5 items-center min-h-[44px]">
+        <i data-lucide="info" class="w-4 h-4 text-indigo-400 flex-shrink-0"></i>
+        <span id="info-desc" class="text-[10px] md:text-xs text-slate-400 font-semibold leading-tight">Escolha uma criatura abaixo e toque na raia do ecossistema para invocar de forma livre.</span>
+      </div>
+
+      <!-- Grid dos Cards do Deck -->
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl p-2.5" style="box-shadow: inset 0 1px 0 rgba(255,255,255,0.05)">
+        <!-- Labels do deck -->
+        <div class="flex justify-between mb-1.5 px-0.5">
+          <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">🃏 Deck de Invocação</span>
+          <span class="text-[9px] font-bold text-slate-500">Selecione e clique na arena</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2 w-full">
+          
+          <!-- CARD 1: PLANTA / PRODUTOR -->
+          <button id="card-produtor" class="deck-card rounded-xl p-2 flex flex-col items-center justify-between gap-1.5 min-h-[60px] relative overflow-hidden">
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="text-2xl md:text-3xl select-none" id="card-produtor-emoji">🌿</span>
+              <span class="font-extrabold text-[10px] text-emerald-300 leading-none" id="card-produtor-name">Planta</span>
+            </div>
+            <span class="cost-badge" id="cost-produtor">30☀️</span>
+            <div class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400" style="box-shadow:0 0 6px #10b981"></div>
+          </button>
+
+          <!-- CARD 2: COELHO / PRIMÁRIO -->
+          <button id="card-primario" class="deck-card rounded-xl p-2 flex flex-col items-center justify-between gap-1.5 min-h-[60px] relative overflow-hidden">
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="text-2xl md:text-3xl select-none" id="card-primario-emoji">🐰</span>
+              <span class="font-extrabold text-[10px] text-amber-300 leading-none" id="card-primario-name">Herbívoro</span>
+            </div>
+            <span class="cost-badge" id="cost-primario">50☀️</span>
+            <div class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-amber-400" style="box-shadow:0 0 6px #f59e0b"></div>
+          </button>
+
+          <!-- CARD 3: SERPENTE / SECUNDÁRIO -->
+          <button id="card-secundario" class="deck-card rounded-xl p-2 flex flex-col items-center justify-between gap-1.5 min-h-[60px] relative overflow-hidden">
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="text-2xl md:text-3xl select-none" id="card-secundario-emoji">🐍</span>
+              <span class="font-extrabold text-[10px] text-rose-300 leading-none" id="card-secundario-name">Carnívoro</span>
+            </div>
+            <span class="cost-badge" id="cost-secundario">70☀️</span>
+            <div class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-rose-400" style="box-shadow:0 0 6px #f43f5e"></div>
+          </button>
+
+          <!-- CARD 4: COGUMELO / DECOMPOSITOR -->
+          <button id="card-decompositor" class="deck-card rounded-xl p-2 flex flex-col items-center justify-between gap-1.5 min-h-[60px] relative overflow-hidden">
+            <div class="flex flex-col items-center gap-0.5">
+              <span class="text-2xl md:text-3xl select-none" id="card-decompositor-emoji">🍄</span>
+              <span class="font-extrabold text-[10px] text-purple-300 leading-none" id="card-decompositor-name">Decompositor</span>
+            </div>
+            <span class="cost-badge" id="cost-decompositor">25☀️</span>
+            <div class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-purple-400" style="box-shadow:0 0 6px #a855f7"></div>
+          </button>
+
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modular Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/jogo.js"></script>
+</body>
+</html>

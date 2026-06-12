@@ -1,0 +1,172 @@
+@theme {
+  --font-nunito: 'Nunito', sans-serif;
+  --color-brandGreen: #58CC02;
+  --color-brandGreenDark: #46A302;
+  --color-brandBlue: #1CB0F6;
+  --color-brandBlueDark: #1899D6;
+  --color-brandYellow: #FFC800;
+  --color-brandOrange: #FF9600;
+  --color-brandRed: #EA2B2B;
+}
+
+html, body {
+  font-family: 'Nunito', sans-serif;
+  background-color: #0B0F19;
+  overscroll-behavior-y: contain; /* Impede pull-to-refresh em celulares */
+  height: 100vh;
+  height: 100svh; /* Suporte para viewport dinâmico móvel */
+  overflow: hidden;
+}
+
+/* Glows bioluminescentes das raias de bioma */
+.glow-forest {
+  box-shadow: inset 0 0 25px rgba(16, 185, 129, 0.2), 0 0 10px rgba(16, 185, 129, 0.05);
+}
+.glow-savannah {
+  box-shadow: inset 0 0 25px rgba(245, 158, 11, 0.2), 0 0 10px rgba(245, 158, 11, 0.05);
+}
+.glow-water {
+  box-shadow: inset 0 0 25px rgba(14, 165, 233, 0.25), 0 0 10px rgba(14, 165, 233, 0.05);
+}
+
+/* Botão 3D Mobile-Friendly */
+.btn-3d {
+  position: relative;
+  transition: all 0.1s ease;
+  touch-action: manipulation;
+}
+.btn-3d:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+/* Animação do Coração Pulsante */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.15); }
+  35% { transform: scale(1.05); }
+  45% { transform: scale(1.2); }
+}
+.animate-heartbeat {
+  animation: heartbeat 1s infinite ease-in-out;
+}
+
+/* Shake visual no dano da base */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px) rotate(-1deg); }
+  40%, 80% { transform: translateX(6px) rotate(1deg); }
+}
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Flutuante de Textos */
+@keyframes float-text {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  20% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+  80% { transform: translateY(-25px) scale(1); opacity: 0.9; }
+  100% { transform: translateY(-35px) scale(0.85); opacity: 0; }
+}
+.animate-float-text {
+  animation: float-text 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Efeitos de Neon do Buff */
+@keyframes gold-shield {
+  0%, 100% { box-shadow: 0 0 10px #FFC800; border-color: #FFC800; }
+  50% { box-shadow: 0 0 25px #FF9600; border-color: #FF9600; }
+}
+.animate-gold-shield {
+  animation: gold-shield 1.2s infinite ease-in-out;
+}
+
+@keyframes supercharge {
+  0%, 100% { box-shadow: 0 0 10px #0EA5E9; border-color: #0EA5E9; }
+  50% { box-shadow: 0 0 25px #a855f7; border-color: #a855f7; }
+}
+.animate-supercharge {
+  animation: supercharge 0.8s infinite ease-in-out;
+}
+
+/* Animação de pulsar vermelho na Fome */
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+.animate-pulse-red {
+  animation: pulse-red 1.3s infinite;
+}
+
+@keyframes pulse-neon {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+.animate-pulse-neon {
+  animation: pulse-neon 2s infinite ease-in-out;
+}
+
+.ghost-preview {
+  transition: left 0.05s linear, top 0.05s linear;
+}
+
+/* Cards do Deck - contraste premium */
+.deck-card {
+  background: rgba(30, 41, 59, 0.9) !important; /* slate-800 com opacidade */
+  border: 2px solid rgba(100, 116, 139, 0.5) !important;
+  transition: all 0.15s ease;
+}
+.deck-card:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  border-color: rgba(251, 191, 36, 0.6) !important;
+}
+.deck-card.selected-card {
+  background: rgba(41, 37, 10, 0.95) !important;
+  border: 2px solid #FFC800 !important;
+  box-shadow: 0 0 18px rgba(255, 200, 0, 0.5), inset 0 0 12px rgba(255, 200, 0, 0.1) !important;
+  transform: translateY(-4px) scale(1.04);
+}
+.deck-card.card-locked {
+  opacity: 0.4 !important;
+  filter: grayscale(0.9);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+.deck-card .cost-badge {
+  background: rgba(255, 200, 0, 0.2);
+  border: 1px solid rgba(255, 200, 0, 0.4);
+  color: #FFC800;
+  font-weight: 800;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+.eco-type-btn {
+  transition: all 0.18s ease;
+  border: 2px solid transparent;
+}
+.eco-type-btn.active {
+  border-color: #58CC02;
+  background: rgba(88, 204, 2, 0.15);
+  transform: scale(1.05);
+}
+#rotate-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #05070f;
+  color: #ffffff;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+.hidden {
+  display: none !important;
+}

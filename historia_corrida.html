@@ -18,11 +18,13 @@
             overflow: hidden;
             user-select: none;
             touch-action: none;
+            width: 100vw;
+            height: 100vh;
         }
         #game-container {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -31,14 +33,23 @@
         canvas {
             display: block;
             background-color: #0b0f19;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.85);
-            border: 2px solid #1e293b;
-            border-radius: 16px;
             width: 100%;
             height: 100%;
             max-width: 100vw;
             max-height: 100vh;
             object-fit: contain;
+            box-shadow: none;
+            border: none;
+            border-radius: 0;
+        }
+        @media (min-width: 768px) {
+            canvas {
+                box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+                border: 2px solid #1e293b;
+                border-radius: 16px;
+                max-width: 95vw;
+                max-height: 95vh;
+            }
         }
         #rotate-overlay {
             position: fixed;
@@ -379,13 +390,14 @@
             portal.active = false;
 
             const era = ERAS[eraIdx];
+            const groundY = canvas.height - 60;
 
             // Base ground
-            platforms.push({ x: 0, y: 390, w: 500, h: 60, type: 'ground' });
+            platforms.push({ x: 0, y: groundY, w: 500, h: 60, type: 'ground' });
 
             // Set NPC Guide
             npc.x = 240;
-            npc.y = 390 - 32;
+            npc.y = groundY - 32;
             npc.fact = era.npcFact;
 
             // Simple deterministic LCG random generator based on era
@@ -401,13 +413,13 @@
                 const step = rand();
                 const gap = 80 + step * 80;
                 const platW = 150 + rand() * 150;
-                const platY = 240 + Math.floor(rand() * 4) * 40; // 240, 280, 320, 360
+                const platY = groundY - (30 + Math.floor(rand() * 4) * 40); // 240, 280, 320, 360 relative to groundY
 
-                platforms.push({ x: nextX + gap, y: platY, w: platW, h: 450 - platY, type: 'platform' });
+                platforms.push({ x: nextX + gap, y: platY, w: platW, h: canvas.height - platY, type: 'platform' });
 
                 // Spikes
                 if (rand() > 0.4 && gap > 100) {
-                    spikes.push({ x: nextX + 10, y: 430, w: gap - 20, h: 20 });
+                    spikes.push({ x: nextX + 10, y: canvas.height - 20, w: gap - 20, h: 20 });
                 }
 
                 // Enemies per Era
@@ -437,11 +449,11 @@
             }
 
             // End flat land
-            platforms.push({ x: 2900, y: 390, w: 300, h: 60, type: 'ground' });
+            platforms.push({ x: 2900, y: groundY, w: 300, h: 60, type: 'ground' });
 
             // Set Portal
             portal.x = 3080;
-            portal.y = 390 - 80;
+            portal.y = groundY - 80;
             portal.w = 50;
             portal.h = 80;
 
@@ -465,7 +477,7 @@
 
             // Reset player
             player.x = 80;
-            player.y = 320;
+            player.y = canvas.height - 130;
             player.vx = 0;
             player.vy = 0;
             player.onGround = false;
@@ -516,7 +528,7 @@
         canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
         function getTouchCoordinates(touch, rect) {
-            const canvasRatio = 16 / 9;
+            const canvasRatio = canvas.width / canvas.height;
             const elementRatio = rect.width / rect.height;
             
             let contentW, contentH;
@@ -539,8 +551,8 @@
             const relativeY = touch.clientY - rect.top - offsetY;
             
             return {
-                x: relativeX * (800 / contentW),
-                y: relativeY * (450 / contentH)
+                x: relativeX * (canvas.width / contentW),
+                y: relativeY * (canvas.height / contentH)
             };
         }
 
@@ -554,8 +566,8 @@
                     const touch = e.changedTouches[i];
                     const pos = getTouchCoordinates(touch, rect);
                     
-                    // Jump zone: X in [620, 800], Y in [230, 450]
-                    if (pos.x >= 620 && pos.x <= 800 && pos.y >= 230 && pos.y <= 450) {
+                    // Jump zone: X in the right 25% of the canvas, Y in bottom 50%
+                    if (pos.x >= canvas.width * 0.75 && pos.y >= canvas.height * 0.5) {
                         touchControls.jump = true;
                         handleJumpPress();
                     }
@@ -585,7 +597,7 @@
                 for (let i = 0; i < e.touches.length; i++) {
                     const touch = e.touches[i];
                     const pos = getTouchCoordinates(touch, rect);
-                    if (pos.x >= 620 && pos.x <= 800 && pos.y >= 230 && pos.y <= 450) {
+                    if (pos.x >= canvas.width * 0.75 && pos.y >= canvas.height * 0.5) {
                         jumpStillTouched = true;
                     }
                 }
@@ -607,12 +619,12 @@
                 const touch = e.touches[i];
                 const pos = getTouchCoordinates(touch, rect);
                 
-                // Left Zone: X in [0, 115], Y in [230, 450]
-                if (pos.x >= 0 && pos.x <= 115 && pos.y >= 230 && pos.y <= 450) {
+                // Left Zone: X in left 18% of canvas, Y in bottom 50%
+                if (pos.x >= 0 && pos.x <= canvas.width * 0.18 && pos.y >= canvas.height * 0.5) {
                     touchControls.left = true;
                 }
-                // Right Zone: X in [115, 240], Y in [230, 450]
-                if (pos.x > 115 && pos.x <= 240 && pos.y >= 230 && pos.y <= 450) {
+                // Right Zone: X in 18% to 35% of canvas, Y in bottom 50%
+                if (pos.x > canvas.width * 0.18 && pos.x <= canvas.width * 0.35 && pos.y >= canvas.height * 0.5) {
                     touchControls.right = true;
                 }
             }
@@ -620,41 +632,44 @@
 
         function handleInteractionStart(pos) {
             if (gameState === STATES.MENU) {
+                const rects = getButtonRects();
                 // Check play button
-                if (pos.x >= 300 && pos.x <= 500 && pos.y >= 270 && pos.y <= 325) {
+                if (pos.x >= rects.play.x && pos.x <= rects.play.x + rects.play.w &&
+                    pos.y >= rects.play.y && pos.y <= rects.play.y + rects.play.h) {
                     playSound('jump');
                     startGame();
                 }
                 // Hub button
-                if (pos.x >= 300 && pos.x <= 500 && pos.y >= 345 && pos.y <= 395) {
+                if (pos.x >= rects.hub.x && pos.x <= rects.hub.x + rects.hub.w &&
+                    pos.y >= rects.hub.y && pos.y <= rects.hub.y + rects.hub.h) {
                     window.location.href = './index.html';
                 }
             } else if (gameState === STATES.PORTAL_QUIZ) {
                 if (showFeedbackTimer > 0) return;
-
-                // Check 4 options buttons
-                // Box coordinates: Option A/B (y=180 to 240), Option C/D (y=260 to 320)
-                // Left column: x=120 to 390. Right column: x=410 to 680.
+                const layout = getQuizLayout();
                 let clickedOpt = -1;
-                if (pos.y >= 180 && pos.y <= 240) {
-                    if (pos.x >= 120 && pos.x <= 390) clickedOpt = 0;
-                    if (pos.x >= 410 && pos.x <= 680) clickedOpt = 1;
-                } else if (pos.y >= 260 && pos.y <= 320) {
-                    if (pos.x >= 120 && pos.x <= 390) clickedOpt = 2;
-                    if (pos.x >= 410 && pos.x <= 680) clickedOpt = 3;
+                for (let i = 0; i < 4; i++) {
+                    const coord = layout.options[i];
+                    if (pos.x >= coord.x && pos.x <= coord.x + coord.w &&
+                        pos.y >= coord.y && pos.y <= coord.y + coord.h) {
+                        clickedOpt = i;
+                        break;
+                    }
                 }
-
                 if (clickedOpt !== -1) {
                     checkQuizAnswer(clickedOpt);
                 }
             } else if (gameState === STATES.GAMEOVER || gameState === STATES.VICTORY) {
+                const rects = getEndScreenRects();
                 // Restart Button
-                if (pos.x >= 220 && pos.x <= 380 && pos.y >= 310 && pos.y <= 360) {
+                if (pos.x >= rects.restart.x && pos.x <= rects.restart.x + rects.restart.w &&
+                    pos.y >= rects.restart.y && pos.y <= rects.restart.y + rects.restart.h) {
                     playSound('jump');
                     restartGame();
                 }
                 // Hub Button
-                if (pos.x >= 420 && pos.x <= 580 && pos.y >= 310 && pos.y <= 360) {
+                if (pos.x >= rects.hub.x && pos.x <= rects.hub.x + rects.hub.w &&
+                    pos.y >= rects.hub.y && pos.y <= rects.hub.y + rects.hub.h) {
                     window.location.href = './index.html';
                 }
             }
@@ -817,11 +832,11 @@
 
                 // Boundary check
                 if (player.x < 0) player.x = 0;
-                if (player.y > 450) {
+                if (player.y > canvas.height) {
                     playSound('hit');
                     lives--;
                     player.x = Math.max(80, player.x - 300);
-                    player.y = 150;
+                    player.y = canvas.height - 300;
                     player.vy = 0;
                     if (lives <= 0) {
                         gameState = STATES.GAMEOVER;
@@ -830,9 +845,9 @@
                 }
 
                 // Camera scroll
-                const targetCamX = player.x - 300;
+                const targetCamX = player.x - (canvas.width * 0.35);
                 camX += (targetCamX - camX) * 0.1;
-                camX = Math.max(0, Math.min(camX, LEVEL_WIDTH - 800));
+                camX = Math.max(0, Math.min(camX, LEVEL_WIDTH - canvas.width));
 
                 // Scroll pickup
                 scrolls.forEach(sc => {
@@ -898,8 +913,8 @@
                     p.y += p.vy;
                     p.rot += p.rotSpeed;
                     if (p.x < -10) {
-                        p.x = 810;
-                        p.y = Math.random() * 450;
+                        p.x = canvas.width + 10;
+                        p.y = Math.random() * canvas.height;
                     }
                 });
             } else if (gameState === STATES.PORTAL_QUIZ) {
@@ -947,8 +962,8 @@
                     p.x += p.vx * 0.4;
                     p.y += p.vy * 0.4;
                     if (p.x < -10) {
-                        p.x = 810;
-                        p.y = Math.random() * 450;
+                        p.x = canvas.width + 10;
+                        p.y = Math.random() * canvas.height;
                     }
                 });
             }
@@ -1301,68 +1316,124 @@
 
         // Draw HUD
         function drawHUD() {
+            const isSmall = canvas.width < 600;
+            const hudHeight = isSmall ? 70 : 42;
+            
             // Stats bar container
             ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
-            drawRoundRect(10, 10, 780, 42, 8, 'rgba(15,23,42,0.75)', 'rgba(30,41,59,0.5)');
+            drawRoundRect(10, 10, canvas.width - 20, hudHeight, 8, 'rgba(15,23,42,0.75)', 'rgba(30,41,59,0.5)');
 
-            // Hearts (lives)
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px Nunito';
+            
             let heartsStr = '';
             for (let i = 0; i < 3; i++) {
                 heartsStr += i < lives ? '❤️' : '🖤';
             }
-            ctx.textAlign = 'left';
-            ctx.font = 'bold 14px Nunito';
-            ctx.fillStyle = '#fff';
-            ctx.fillText(`HP: ${heartsStr}`, 25, 36);
 
-            // Document Scrolls count
-            ctx.fillStyle = '#fbbf24';
-            ctx.fillText(`Documentos: 📜 ${scrollsCollected}/3`, 160, 36);
+            if (isSmall) {
+                // Row 1
+                ctx.textAlign = 'left';
+                ctx.fillText(`HP: ${heartsStr}`, 25, 32);
+                
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#f59e0b';
+                ctx.fillText(`Pontos: ${score}`, canvas.width - 25, 32);
+                
+                // Row 2
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`${ERAS[currentEra].name}`, 25, 62);
+                
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#fbbf24';
+                ctx.fillText(`Docs: 📜 ${scrollsCollected}/3`, canvas.width - 25, 62);
+            } else {
+                // Landscape layout
+                ctx.textAlign = 'left';
+                ctx.fillText(`HP: ${heartsStr}`, 25, 36);
 
-            // Current Era (now right-aligned to prevent overlap)
-            ctx.textAlign = 'right';
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Nunito';
-            ctx.fillText(`${ERAS[currentEra].name} (${ERAS[currentEra].period})`, 650, 36);
+                ctx.fillStyle = '#fbbf24';
+                ctx.fillText(`Documentos: 📜 ${scrollsCollected}/3`, 160, 36);
 
-            // Score
-            ctx.textAlign = 'right';
-            ctx.fillStyle = '#f59e0b';
-            ctx.fillText(`Pontos: ${score}`, 775, 36);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#fff';
+                ctx.fillText(`${ERAS[currentEra].name} (${ERAS[currentEra].period})`, canvas.width - 160, 36);
+
+                ctx.fillStyle = '#f59e0b';
+                ctx.fillText(`Pontos: ${score}`, canvas.width - 25, 36);
+            }
+        }
+
+        function getButtonRects() {
+            const centerX = canvas.width / 2;
+            
+            const playWidth = 200;
+            const playHeight = 55;
+            const playX = centerX - playWidth / 2;
+            const playY = canvas.height * 0.55;
+
+            const hubWidth = 200;
+            const hubHeight = 45;
+            const hubX = centerX - hubWidth / 2;
+            const hubY = canvas.height * 0.65;
+            
+            return {
+                play: { x: playX, y: playY, w: playWidth, h: playHeight },
+                hub: { x: hubX, y: hubY, w: hubWidth, h: hubHeight }
+            };
         }
 
         // Draw Menu
         function drawMenu() {
-            ctx.fillStyle = '#fff';
-            ctx.font = 'black 46px Nunito';
-            ctx.textAlign = 'center';
-            ctx.fillText('HistóriaCorrida 🧭', 400, 110);
-
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '700 19px Nunito';
-            ctx.fillText('Fuga pelo Tempo - O Brasil Através das Eras', 400, 150);
-
-            ctx.fillStyle = '#fda4af';
-            ctx.font = 'bold 15px Nunito';
-            ctx.fillText('GamesForVitória 💖 Para a Professora Vitória com Amor', 400, 190);
-
-            // Play button card
-            ctx.fillStyle = '#10b981';
-            drawRoundRect(300, 270, 200, 55, 12, '#10b981', '#059669');
+            const centerX = canvas.width / 2;
+            const rects = getButtonRects();
             
             ctx.fillStyle = '#fff';
+            const titleSize = Math.min(46, canvas.width * 0.09);
+            ctx.font = `black ${titleSize}px Nunito`;
+            ctx.textAlign = 'center';
+            ctx.fillText('HistóriaCorrida 🧭', centerX, canvas.height * 0.2);
+
+            ctx.fillStyle = '#94a3b8';
+            const subSize = Math.min(19, canvas.width * 0.045);
+            ctx.font = `700 ${subSize}px Nunito`;
+            const subText = 'Fuga pelo Tempo - O Brasil Através das Eras';
+            if (canvas.width < 500) {
+                ctx.fillText('Fuga pelo Tempo', centerX, canvas.height * 0.28);
+                ctx.fillText('O Brasil Através das Eras', centerX, canvas.height * 0.33);
+            } else {
+                ctx.fillText(subText, centerX, canvas.height * 0.28);
+            }
+
+            ctx.fillStyle = '#fda4af';
+            const dedSize = Math.min(15, canvas.width * 0.035);
+            ctx.font = `bold ${dedSize}px Nunito`;
+            const dedY = canvas.width < 500 ? canvas.height * 0.42 : canvas.height * 0.35;
+            ctx.fillText('GamesForVitória 💖 Para a Professora Vitória com Amor', centerX, dedY);
+
+            // Play button card
+            drawRoundRect(rects.play.x, rects.play.y, rects.play.w, rects.play.h, 12, '#10b981', '#059669');
+            ctx.fillStyle = '#fff';
             ctx.font = 'bold 20px Nunito';
-            ctx.fillText('JOGAR', 400, 305);
+            ctx.fillText('JOGAR', centerX, rects.play.y + 35);
 
             // Back to Hub
-            drawRoundRect(300, 345, 200, 45, 10, '#334155', '#1e293b');
+            drawRoundRect(rects.hub.x, rects.hub.y, rects.hub.w, rects.hub.h, 10, '#334155', '#1e293b');
             ctx.fillStyle = '#e2e8f0';
             ctx.font = 'bold 16px Nunito';
-            ctx.fillText('Voltar ao Hub', 400, 373);
+            ctx.fillText('Voltar ao Hub', centerX, rects.hub.y + 28);
 
             ctx.fillStyle = '#64748b';
-            ctx.font = '14px Nunito';
-            ctx.fillText('A/D ou Setas para andar | W ou Espaço para saltar duplo. Colete os 3 pergaminhos para abrir o portal!', 400, 420);
+            const instSize = Math.min(14, canvas.width * 0.035);
+            ctx.font = `${instSize}px Nunito`;
+            const instText = 'A/D ou Setas para andar | W ou Espaço para saltar duplo. Colete os 3 pergaminhos para abrir o portal!';
+            if (canvas.width < 600) {
+                ctx.fillText('A/D/Setas: andar | W/Espaço: saltar', centerX, canvas.height * 0.82);
+                ctx.fillText('Colete 3 documentos para abrir o portal!', centerX, canvas.height * 0.88);
+            } else {
+                ctx.fillText(instText, centerX, canvas.height * 0.88);
+            }
         }
 
         // Draw Mobile virtual controls
@@ -1370,20 +1441,25 @@
             ctx.save();
             ctx.globalAlpha = 0.55;
             
+            const btnY = canvas.height - 70;
+            const leftX = 60;
+            const rightX = 150;
+            const jumpX = canvas.width - 70;
+            
             // Left Button (Circle with Arrow)
             const leftActive = touchControls.left;
             ctx.fillStyle = leftActive ? '#3b82f6' : '#1e293b';
             ctx.strokeStyle = leftActive ? '#60a5fa' : '#475569';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(70, 385, 36, 0, Math.PI * 2);
+            ctx.arc(leftX, btnY, 36, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 26px Nunito';
             ctx.textAlign = 'center';
-            ctx.fillText('◀', 70, 394);
+            ctx.fillText('◀', leftX, btnY + 9);
 
             // Right Button (Circle with Arrow)
             const rightActive = touchControls.right;
@@ -1391,12 +1467,12 @@
             ctx.strokeStyle = rightActive ? '#60a5fa' : '#475569';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(165, 385, 36, 0, Math.PI * 2);
+            ctx.arc(rightX, btnY, 36, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
-            ctx.fillText('▶', 165, 394);
+            ctx.fillText('▶', rightX, btnY + 9);
 
             // Jump Button (Green circle with text)
             const jumpActive = touchControls.jump;
@@ -1404,52 +1480,122 @@
             ctx.strokeStyle = jumpActive ? '#34d399' : '#047857';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(720, 380, 42, 0, Math.PI * 2);
+            ctx.arc(jumpX, btnY, 42, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 13px Nunito';
-            ctx.fillText('SALTAR', 720, 384);
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('SALTAR', jumpX, btnY + 4);
 
             ctx.restore();
+        }
+
+        function wrapText(text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+            
+            for (let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                let metrics = ctx.measureText(testLine);
+                let testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = words[n] + ' ';
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+            return currentY;
+        }
+
+        function getQuizLayout() {
+            const centerX = canvas.width / 2;
+            const isPortrait = canvas.height > canvas.width;
+            
+            let cardX = 80;
+            let cardY = 40;
+            let cardW = 640;
+            let cardH = 370;
+            
+            if (isPortrait) {
+                cardX = 20;
+                cardY = 50;
+                cardW = canvas.width - 40;
+                cardH = canvas.height - 100;
+            }
+            
+            const optCoords = [];
+            
+            if (isPortrait) {
+                // Stack vertically
+                const btnW = cardW - 40;
+                const btnH = 50;
+                const startY = cardY + 200;
+                const gap = 12;
+                
+                for (let i = 0; i < 4; i++) {
+                    optCoords.push({
+                        x: cardX + 20,
+                        y: startY + i * (btnH + gap),
+                        w: btnW,
+                        h: btnH
+                    });
+                }
+            } else {
+                // 2x2 grid
+                const btnW = 270;
+                const btnH = 60;
+                optCoords.push(
+                    { x: centerX - btnW - 15, y: cardY + 140, w: btnW, h: btnH },
+                    { x: centerX + 15, y: cardY + 140, w: btnW, h: btnH },
+                    { x: centerX - btnW - 15, y: cardY + 220, w: btnW, h: btnH },
+                    { x: centerX + 15, y: cardY + 220, w: btnW, h: btnH }
+                );
+            }
+            
+            return {
+                card: { x: cardX, y: cardY, w: cardW, h: cardH },
+                options: optCoords
+            };
         }
 
         // Draw Quiz Portal Overlay
         function drawQuizOverlay() {
             ctx.fillStyle = 'rgba(5, 7, 15, 0.92)';
-            ctx.fillRect(0, 0, 800, 450);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            const centerX = canvas.width / 2;
             const eraAccent = ERAS[currentEra].accent;
-            drawRoundRect(80, 40, 640, 370, 16, '#0f172a', eraAccent);
+            const layout = getQuizLayout();
+
+            drawRoundRect(layout.card.x, layout.card.y, layout.card.w, layout.card.h, 16, '#0f172a', eraAccent);
 
             ctx.fillStyle = eraAccent;
-            ctx.font = 'bold 15px Nunito';
+            ctx.font = 'bold 14px Nunito';
             ctx.textAlign = 'center';
-            ctx.fillText(`PORTAL DO TEMPO ATIVO: QUESTÃO DA ERA`, 400, 70);
+            ctx.fillText(`PORTAL DO TEMPO ATIVO: QUESTÃO DA ERA`, centerX, layout.card.y + 30);
 
-            // Question text
+            // Question text (wrapped)
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 18px Nunito';
-            ctx.fillText(activeQuiz.q, 400, 110);
+            ctx.font = 'bold 16px Nunito';
+            const qMaxW = layout.card.w - 40;
+            const finalQY = wrapText(activeQuiz.q, centerX, layout.card.y + 65, qMaxW, 22);
 
             // Timer bar
+            const timerY = finalQY + 20;
             const timerPct = quizTimer / 30;
             ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-            ctx.fillRect(120, 145, 560, 10);
+            ctx.fillRect(layout.card.x + 20, timerY, layout.card.w - 40, 10);
             ctx.fillStyle = timerPct > 0.3 ? '#10b981' : '#ef4444';
-            ctx.fillRect(120, 145, 560 * timerPct, 10);
+            ctx.fillRect(layout.card.x + 20, timerY, (layout.card.w - 40) * timerPct, 10);
 
-            // 4 options buttons
-            const optCoords = [
-                { x: 120, y: 180, w: 270, h: 60 },
-                { x: 410, y: 180, w: 270, h: 60 },
-                { x: 120, y: 260, w: 270, h: 60 },
-                { x: 410, y: 260, w: 270, h: 60 }
-            ];
-
+            // Answer options
             activeQuiz.opts.forEach((opt, idx) => {
-                const coord = optCoords[idx];
+                const coord = layout.options[idx];
                 let bgBtn = '#1e293b';
                 let strokeBtn = '#334155';
                 let textBtnColor = '#fff';
@@ -1474,105 +1620,168 @@
                 drawRoundRect(coord.x, coord.y, coord.w, coord.h, 8, bgBtn, strokeBtn);
 
                 ctx.fillStyle = textBtnColor;
-                ctx.font = 'bold 14px Nunito';
+                ctx.font = 'bold 13px Nunito';
                 ctx.textAlign = 'center';
                 
-                // Wrap text if long
-                if (opt.length > 35) {
-                    const words = opt.split(' ');
-                    const half = Math.ceil(words.length / 2);
-                    const line1 = words.slice(0, half).join(' ');
-                    const line2 = words.slice(half).join(' ');
-                    ctx.fillText(line1, coord.x + coord.w/2, coord.y + coord.h/2 - 3);
-                    ctx.fillText(line2, coord.x + coord.w/2, coord.y + coord.h/2 + 13);
+                // Wrap option text if too long
+                const optMaxW = coord.w - 20;
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(coord.x + 5, coord.y + 2, coord.w - 10, coord.h - 4);
+                ctx.clip();
+                if (ctx.measureText(opt).width > optMaxW) {
+                    wrapText(opt, coord.x + coord.w/2, coord.y + 18, optMaxW, 16);
                 } else {
                     ctx.fillText(opt, coord.x + coord.w/2, coord.y + coord.h/2 + 5);
                 }
+                ctx.restore();
             });
 
             // Feedback Message
+            const feedY = layout.card.y + layout.card.h - 35;
+            ctx.font = 'bold 14px Nunito';
+            ctx.textAlign = 'center';
             if (showFeedbackTimer > 0) {
                 ctx.fillStyle = feedbackCorrect ? '#34d399' : '#f87171';
-                ctx.font = 'bold 16px Nunito';
-                ctx.textAlign = 'center';
                 const feedMsg = feedbackCorrect ? '✓ RESPOSTA CORRETA! Viajando no tempo... ⏳' : '✗ RESPOSTA INCORRETA! Portal descarregado, -1 Coração! Pegue os pergaminhos de novo.';
-                ctx.fillText(feedMsg, 400, 360);
+                if (canvas.width < 500) {
+                    ctx.fillText(feedbackCorrect ? '✓ CORRETO!' : '✗ INCORRETO!', centerX, feedY - 12);
+                    ctx.font = '11px Nunito';
+                    ctx.fillText(feedbackCorrect ? 'Viajando no tempo...' : '-1 ❤️ | Colete documentos.', centerX, feedY + 5);
+                } else {
+                    ctx.fillText(feedMsg, centerX, feedY);
+                }
             } else {
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = '13px Nunito';
-                ctx.textAlign = 'center';
-                ctx.fillText('Responda corretamente para ativar o portal temporal e viajar de Era!', 400, 360);
+                ctx.font = '12px Nunito';
+                ctx.fillText('Responda corretamente para ativar o portal temporal e viajar de Era!', centerX, feedY);
             }
+        }
+
+        function getEndScreenRects() {
+            const centerX = canvas.width / 2;
+            const isPortrait = canvas.height > canvas.width;
+            
+            const btnW = 160;
+            const btnH = 50;
+            
+            let restartX, restartY, hubX, hubY;
+            
+            if (isPortrait) {
+                restartX = centerX - btnW / 2;
+                restartY = canvas.height * 0.6;
+                hubX = centerX - btnW / 2;
+                hubY = canvas.height * 0.7;
+            } else {
+                restartX = centerX - btnW - 20;
+                restartY = canvas.height * 0.68;
+                hubX = centerX + 20;
+                hubY = canvas.height * 0.68;
+            }
+            
+            return {
+                restart: { x: restartX, y: restartY, w: btnW, h: btnH },
+                hub: { x: hubX, y: hubY, w: btnW, h: btnH }
+            };
         }
 
         // Draw Game Over Screen
         function drawGameOver() {
             ctx.fillStyle = 'rgba(5, 7, 15, 0.95)';
-            ctx.fillRect(0, 0, 800, 450);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const rects = getEndScreenRects();
 
             ctx.fillStyle = '#ef4444';
-            ctx.font = 'black 48px Nunito';
+            const titleSize = Math.min(44, canvas.width * 0.08);
+            ctx.font = `black ${titleSize}px Nunito`;
             ctx.textAlign = 'center';
-            ctx.fillText('TEMPO ESGOTADO OU SEM VIDAS', 400, 150);
+            if (canvas.width < 500) {
+                ctx.fillText('SEM VIDAS OU', centerX, canvas.height * 0.25);
+                ctx.fillText('TEMPO ESGOTADO', centerX, canvas.height * 0.32);
+            } else {
+                ctx.fillText('TEMPO ESGOTADO OU SEM VIDAS', centerX, canvas.height * 0.3);
+            }
 
             ctx.fillStyle = '#e2e8f0';
-            ctx.font = 'bold 20px Nunito';
-            ctx.fillText(`Sua Pontuação de História: ${score} pontos`, 400, 200);
+            ctx.font = 'bold 18px Nunito';
+            ctx.fillText(`Sua Pontuação de História: ${score} pontos`, centerX, canvas.height * 0.42);
 
             ctx.fillStyle = '#fda4af';
-            ctx.font = '16px Nunito';
-            ctx.fillText('A Prô Vitória incentiva você a revisar a matéria de história e tentar de novo!', 400, 240);
+            ctx.font = '14px Nunito';
+            const msgY = canvas.height * 0.5;
+            if (canvas.width < 600) {
+                ctx.fillText('Revise a matéria e tente de novo!', centerX, msgY);
+            } else {
+                ctx.fillText('A Prô Vitória incentiva você a revisar a matéria de história e tentar de novo!', centerX, msgY);
+            }
 
             // Restart Button
-            drawRoundRect(220, 310, 160, 50, 8, '#ef4444', '#b91c1c');
+            drawRoundRect(rects.restart.x, rects.restart.y, rects.restart.w, rects.restart.h, 8, '#ef4444', '#b91c1c');
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 18px Nunito';
-            ctx.fillText('REINICIAR', 300, 342);
+            ctx.font = 'bold 16px Nunito';
+            ctx.fillText('REINICIAR', rects.restart.x + rects.restart.w/2, rects.restart.y + 32);
 
             // Hub Button
-            drawRoundRect(420, 310, 160, 50, 8, '#334155', '#1e293b');
+            drawRoundRect(rects.hub.x, rects.hub.y, rects.hub.w, rects.hub.h, 8, '#334155', '#1e293b');
             ctx.fillStyle = '#fff';
-            ctx.fillText('VOLTAR AO HUB', 500, 342);
+            ctx.fillText('VOLTAR AO HUB', rects.hub.x + rects.hub.w/2, rects.hub.y + 32);
         }
 
         // Draw Victory Screen
         function drawVictory() {
             ctx.fillStyle = 'rgba(5, 7, 15, 0.95)';
-            ctx.fillRect(0, 0, 800, 450);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const rects = getEndScreenRects();
 
             // Confetti in yellow and green (Brazilian theme)
             for (let i = 0; i < 24; i++) {
-                const cx = (i * 37 + Date.now()/12) % 800;
-                const cy = (i * 29 + Date.now()/10) % 450;
+                const cx = (i * 37 + Date.now()/12) % canvas.width;
+                const cy = (i * 29 + Date.now()/10) % canvas.height;
                 ctx.fillStyle = i % 2 === 0 ? '#22c55e' : '#eab308';
                 ctx.fillRect(cx, cy, 7, 7);
             }
 
             ctx.fillStyle = '#22c55e';
-            ctx.font = 'black 44px Nunito';
+            const titleSize = Math.min(40, canvas.width * 0.075);
+            ctx.font = `black ${titleSize}px Nunito`;
             ctx.textAlign = 'center';
-            ctx.fillText('EXPLORADOR HISTÓRICO MÁXIMO! 🏆🎉', 400, 140);
+            if (canvas.width < 500) {
+                ctx.fillText('EXPLORADOR', centerX, canvas.height * 0.2);
+                ctx.fillText('HISTÓRICO MÁXIMO! 🏆', centerX, canvas.height * 0.28);
+            } else {
+                ctx.fillText('EXPLORADOR HISTÓRICO MÁXIMO! 🏆🎉', centerX, canvas.height * 0.25);
+            }
 
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 20px Nunito';
-            ctx.fillText(`Parabéns! Você completou com sucesso a Linha do Tempo do Brasil!`, 400, 190);
-            ctx.fillStyle = '#fbbf24';
-            ctx.fillText(`Pontuação Final: ${score} pontos históricos!`, 400, 225);
-
-            ctx.fillStyle = '#fda4af';
-            ctx.font = '16px Nunito';
-            ctx.fillText('GamesForVitória 💖 Criado com carinho pedagógico para a Prô Vitória.', 400, 260);
-
-            // Play again Button
-            drawRoundRect(220, 310, 160, 50, 8, '#10b981', '#047857');
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 18px Nunito';
-            ctx.fillText('JOGAR DE NOVO', 300, 342);
+            const victorySubY = canvas.height * 0.38;
+            if (canvas.width < 600) {
+                ctx.fillText('Parabéns! Você completou a Linha do Tempo!', centerX, victorySubY);
+            } else {
+                ctx.fillText('Parabéns! Você completou com sucesso a Linha do Tempo do Brasil!', centerX, victorySubY);
+            }
+            
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillText(`Pontuação Final: ${score} pontos históricos!`, centerX, canvas.height * 0.44);
+
+            ctx.fillStyle = '#fda4af';
+            ctx.font = '14px Nunito';
+            ctx.fillText('GamesForVitória 💖 Criado com carinho pedagógico para a Prô Vitória.', centerX, canvas.height * 0.51);
+
+            // Play again Button
+            drawRoundRect(rects.restart.x, rects.restart.y, rects.restart.w, rects.restart.h, 8, '#10b981', '#047857');
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px Nunito';
+            ctx.fillText('JOGAR DE NOVO', rects.restart.x + rects.restart.w/2, rects.restart.y + 32);
 
             // Hub Button
-            drawRoundRect(420, 310, 160, 50, 8, '#334155', '#1e293b');
+            drawRoundRect(rects.hub.x, rects.hub.y, rects.hub.w, rects.hub.h, 8, '#334155', '#1e293b');
             ctx.fillStyle = '#fff';
-            ctx.fillText('VOLTAR AO HUB', 500, 342);
+            ctx.fillText('VOLTAR AO HUB', rects.hub.x + rects.hub.w/2, rects.hub.y + 32);
         }
 
         // Loop
@@ -1582,20 +1791,82 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Orientation Checker for mobile
-        function checkOrientation() {
+        function resizeCanvas() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            
+            const oldWidth = canvas.width;
+            const oldHeight = canvas.height;
+            
+            let targetWidth, targetHeight;
+            if (h > w) {
+                // Portrait mode: vertical gameplay!
+                targetWidth = 450;
+                targetHeight = Math.round(450 * (h / w));
+                // Clamp targetHeight between 650 and 900 to ensure good scale
+                targetHeight = Math.max(650, Math.min(900, targetHeight));
+            } else {
+                // Landscape mode: horizontal gameplay!
+                targetWidth = 800;
+                targetHeight = Math.round(800 * (h / w));
+                targetHeight = Math.max(450, Math.min(600, targetHeight));
+            }
+            
+            if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                adjustEntitiesHeight(oldHeight, targetHeight);
+            }
+            
+            // Hide the rotate overlay completely because we now support vertical play!
             const overlay = document.getElementById('rotate-overlay');
             if (overlay) {
-                if (window.innerHeight > window.innerWidth) {
-                    overlay.classList.remove('hidden');
-                } else {
-                    overlay.classList.add('hidden');
-                }
+                overlay.classList.add('hidden');
             }
         }
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('orientationchange', checkOrientation);
-        checkOrientation();
+        
+        function adjustEntitiesHeight(oldHeight, newHeight) {
+            if (!oldHeight || oldHeight === newHeight) return;
+            
+            // Adjust player
+            player.y = newHeight - (oldHeight - player.y);
+            
+            // Adjust platforms
+            platforms.forEach(plat => {
+                plat.y = newHeight - (oldHeight - plat.y);
+                plat.h = newHeight - plat.y;
+            });
+            
+            // Adjust spikes
+            spikes.forEach(spk => {
+                spk.y = newHeight - (oldHeight - spk.y);
+            });
+            
+            // Adjust scrolls
+            scrolls.forEach(sc => {
+                sc.y = newHeight - (oldHeight - sc.y);
+                sc.baseY = newHeight - (oldHeight - sc.baseY);
+            });
+            
+            // Adjust npc
+            if (npc) {
+                npc.y = newHeight - (oldHeight - npc.y);
+            }
+            
+            // Adjust portal
+            if (portal) {
+                portal.y = newHeight - (oldHeight - portal.y);
+            }
+            
+            // Adjust background particles
+            particles.forEach(p => {
+                p.y = p.y * (newHeight / oldHeight);
+            });
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', resizeCanvas);
+        resizeCanvas();
 
         function toggleFullscreen() {
             const icon = document.getElementById('fullscreen-icon');

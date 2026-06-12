@@ -236,7 +236,7 @@ class Game {
             }
             if (pos.x >= rects.hub.x && pos.x <= rects.hub.x + rects.hub.w &&
                 pos.y >= rects.hub.y && pos.y <= rects.hub.y + rects.hub.h) {
-                window.location.href = './index.html';
+                window.location.href = '../../index.html';
             }
         } else if (this.gameState === STATES.PORTAL_QUIZ) {
             if (this.quizManager.showFeedbackTimer > 0) return;
@@ -262,7 +262,7 @@ class Game {
             }
             if (pos.x >= rects.hub.x && pos.x <= rects.hub.x + rects.hub.w &&
                 pos.y >= rects.hub.y && pos.y <= rects.hub.y + rects.hub.h) {
-                window.location.href = './index.html';
+                window.location.href = '../../index.html';
             }
         }
     }

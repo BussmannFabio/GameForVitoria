@@ -38,6 +38,26 @@
             max-height: 100vh;
             object-fit: contain;
         }
+        #rotate-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #05070f;
+            color: #ffffff;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -428,6 +448,48 @@
         canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
         canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
 
+        function getTouchCoordinates(touch, rect) {
+            const canvasRatio = 16 / 9;
+            const elementRatio = rect.width / rect.height;
+            
+            let contentW, contentH;
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (elementRatio > canvasRatio) {
+                // Side black bars (wider screen)
+                contentH = rect.height;
+                contentW = rect.height * canvasRatio;
+                offsetX = (rect.width - contentW) / 2;
+            } else {
+                // Top/Bottom black bars (taller screen)
+                contentW = rect.width;
+                contentH = rect.width / canvasRatio;
+                offsetY = (rect.height - contentH) / 2;
+            }
+            
+            const relativeX = touch.clientX - rect.left - offsetX;
+            const relativeY = touch.clientY - rect.top - offsetY;
+            
+            return {
+                x: relativeX * (800 / contentW),
+                y: relativeY * (450 / contentH)
+            };
+        }
+
+        function getCanvasCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            let touch;
+            if (e.touches && e.touches.length > 0) {
+                touch = e.touches[0];
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                touch = e.changedTouches[0];
+            } else {
+                touch = e;
+            }
+            return getTouchCoordinates(touch, rect);
+        }
+
         function handleTouchStart(e) {
             e.preventDefault();
             initAudio();
@@ -436,11 +498,10 @@
                 const rect = canvas.getBoundingClientRect();
                 for (let i = 0; i < e.changedTouches.length; i++) {
                     const touch = e.changedTouches[i];
-                    const tx = (touch.clientX - rect.left) * (800 / rect.width);
-                    const ty = (touch.clientY - rect.top) * (450 / rect.height);
+                    const pos = getTouchCoordinates(touch, rect);
                     
-                    // Jump button hit zone: X in [630, 800], Y in [250, 450]
-                    if (tx >= 630 && tx <= 800 && ty >= 250 && ty <= 450) {
+                    // Jump zone: X in [620, 800], Y in [230, 450]
+                    if (pos.x >= 620 && pos.x <= 800 && pos.y >= 230 && pos.y <= 450) {
                         touchControls.jump = true;
                         handleJumpPress();
                     }
@@ -469,9 +530,8 @@
                 let jumpStillTouched = false;
                 for (let i = 0; i < e.touches.length; i++) {
                     const touch = e.touches[i];
-                    const tx = (touch.clientX - rect.left) * (800 / rect.width);
-                    const ty = (touch.clientY - rect.top) * (450 / rect.height);
-                    if (tx >= 630 && tx <= 800 && ty >= 250 && ty <= 450) {
+                    const pos = getTouchCoordinates(touch, rect);
+                    if (pos.x >= 620 && pos.x <= 800 && pos.y >= 230 && pos.y <= 450) {
                         jumpStillTouched = true;
                     }
                 }
@@ -491,15 +551,14 @@
             const rect = canvas.getBoundingClientRect();
             for (let i = 0; i < e.touches.length; i++) {
                 const touch = e.touches[i];
-                const tx = (touch.clientX - rect.left) * (800 / rect.width);
-                const ty = (touch.clientY - rect.top) * (450 / rect.height);
+                const pos = getTouchCoordinates(touch, rect);
                 
-                // Left Zone: X in [0, 130], Y in [250, 450]
-                if (tx >= 0 && tx <= 130 && ty >= 250 && ty <= 450) {
+                // Left Zone: X in [0, 115], Y in [230, 450]
+                if (pos.x >= 0 && pos.x <= 115 && pos.y >= 230 && pos.y <= 450) {
                     touchControls.left = true;
                 }
-                // Right Zone: X in [130, 260], Y in [250, 450]
-                if (tx > 130 && tx <= 260 && ty >= 250 && ty <= 450) {
+                // Right Zone: X in [115, 240], Y in [230, 450]
+                if (pos.x > 115 && pos.x <= 240 && pos.y >= 230 && pos.y <= 450) {
                     touchControls.right = true;
                 }
             }
@@ -545,22 +604,6 @@
                     window.location.href = './index.html';
                 }
             }
-        }
-
-        function getCanvasCoordinates(e) {
-            const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
-            if (e.touches && e.touches.length > 0) {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-            return {
-                x: (clientX - rect.left) * (800 / rect.width),
-                y: (clientY - rect.top) * (450 / rect.height)
-            };
         }
 
         // Game logic
@@ -1174,14 +1217,14 @@
             ctx.strokeStyle = leftActive ? '#60a5fa' : '#475569';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(60, 390, 30, 0, Math.PI * 2);
+            ctx.arc(70, 385, 36, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 24px Nunito';
+            ctx.font = 'bold 26px Nunito';
             ctx.textAlign = 'center';
-            ctx.fillText('◀', 60, 398);
+            ctx.fillText('◀', 70, 394);
 
             // Right Button (Circle with Arrow)
             const rightActive = touchControls.right;
@@ -1189,12 +1232,12 @@
             ctx.strokeStyle = rightActive ? '#60a5fa' : '#475569';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(140, 390, 30, 0, Math.PI * 2);
+            ctx.arc(165, 385, 36, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
-            ctx.fillText('▶', 140, 398);
+            ctx.fillText('▶', 165, 394);
 
             // Jump Button (Green circle with text)
             const jumpActive = touchControls.jump;
@@ -1202,13 +1245,13 @@
             ctx.strokeStyle = jumpActive ? '#34d399' : '#047857';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(730, 385, 35, 0, Math.PI * 2);
+            ctx.arc(720, 380, 42, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
             
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 12px Nunito';
-            ctx.fillText('PULAR', 730, 389);
+            ctx.font = 'bold 13px Nunito';
+            ctx.fillText('PULAR', 720, 384);
 
             ctx.restore();
         }

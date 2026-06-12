@@ -562,8 +562,12 @@
     // --- CONTROLE DOS ESTADOS E TELAS ---
     function startGame() {
       playSound('click');
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      const docEl = document.documentElement;
+      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        try {
+          req.call(docEl).catch(err => console.log(err));
+        } catch(e) { console.log(e); }
       }
       document.getElementById('screen-start').classList.add('hidden');
       document.getElementById('screen-game').classList.remove('hidden');
@@ -997,32 +1001,56 @@
     // --- CONTROLES DE TELA CHEIA ---
     function toggleFullscreen() {
       const icon = document.getElementById('fullscreen-icon');
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => {
-          if (icon) icon.setAttribute('data-lucide', 'minimize');
-          lucide.createIcons();
-        }).catch(err => {
-          console.error("Erro ao entrar em tela cheia:", err);
-        });
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+        if (req) {
+          try {
+            const promise = req.call(docEl);
+            if (promise && promise.then) {
+              promise.then(() => {
+                if (icon) icon.setAttribute('data-lucide', 'minimize');
+                lucide.createIcons();
+              }).catch(err => console.log(err));
+            } else {
+              if (icon) icon.setAttribute('data-lucide', 'minimize');
+              lucide.createIcons();
+            }
+          } catch(e) { console.log(e); }
+        }
       } else {
-        document.exitFullscreen().then(() => {
-          if (icon) icon.setAttribute('data-lucide', 'maximize');
-          lucide.createIcons();
-        });
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exit) {
+          try {
+            const promise = exit.call(document);
+            if (promise && promise.then) {
+              promise.then(() => {
+                if (icon) icon.setAttribute('data-lucide', 'maximize');
+                lucide.createIcons();
+              }).catch(err => console.log(err));
+            } else {
+              if (icon) icon.setAttribute('data-lucide', 'maximize');
+              lucide.createIcons();
+            }
+          } catch(e) { console.log(e); }
+        }
       }
     }
 
-    document.addEventListener('fullscreenchange', () => {
+    function updateFullscreenIcon() {
       const icon = document.getElementById('fullscreen-icon');
       if (icon) {
-        if (document.fullscreenElement) {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
           icon.setAttribute('data-lucide', 'minimize');
         } else {
           icon.setAttribute('data-lucide', 'maximize');
         }
         lucide.createIcons();
       }
-    });
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
 
     // --- ORIENTATION CHECKER PARA MOBILE ---
     function checkOrientation() {
@@ -1041,6 +1069,18 @@
 
     // Inicializar Lucide Icons
     lucide.createIcons();
+
+    // Ocultar botão de tela cheia se não for suportado pelo aparelho (ex: iPhone Safari)
+    const isFullscreenSupported = !!(
+      document.documentElement.requestFullscreen ||
+      document.documentElement.webkitRequestFullscreen ||
+      document.documentElement.mozRequestFullScreen ||
+      document.documentElement.msRequestFullscreen
+    );
+    if (!isFullscreenSupported) {
+      const btn = document.getElementById('fullscreen-btn');
+      if (btn) btn.classList.add('hidden');
+    }
   </script>
 </body>
 </html>

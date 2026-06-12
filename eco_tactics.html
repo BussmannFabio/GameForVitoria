@@ -750,9 +750,13 @@
     function closeManual() {
       document.getElementById('manual-modal').classList.add('hidden');
       isPaused = false;
-      // Solicitar tela cheia opcionalmente no início
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      // Solicitar tela cheia opcionalmente no início de forma segura
+      const docEl = document.documentElement;
+      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        try {
+          req.call(docEl).catch(err => console.log(err));
+        } catch(e) { console.log(e); }
       }
       if (!gameActive) {
         startGame();
@@ -1939,9 +1943,13 @@
       document.getElementById('pause-text').innerText = "Pausar Aula ⏱️";
       lucide.createIcons();
 
-      // Solicitar tela cheia opcionalmente no recomeço
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      // Solicitar tela cheia opcionalmente no recomeço de forma segura
+      const docEl = document.documentElement;
+      const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+      if (req && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        try {
+          req.call(docEl).catch(err => console.log(err));
+        } catch(e) { console.log(e); }
       }
 
       startGame();
@@ -1950,32 +1958,56 @@
     // --- CONTROLES DE TELA CHEIA ---
     function toggleFullscreen() {
       const icon = document.getElementById('fullscreen-icon');
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => {
-          if (icon) icon.setAttribute('data-lucide', 'minimize');
-          lucide.createIcons();
-        }).catch(err => {
-          console.error("Erro ao entrar em tela cheia:", err);
-        });
+      const docEl = document.documentElement;
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullscreen || docEl.msRequestFullscreen;
+        if (req) {
+          try {
+            const promise = req.call(docEl);
+            if (promise && promise.then) {
+              promise.then(() => {
+                if (icon) icon.setAttribute('data-lucide', 'minimize');
+                lucide.createIcons();
+              }).catch(err => console.log(err));
+            } else {
+              if (icon) icon.setAttribute('data-lucide', 'minimize');
+              lucide.createIcons();
+            }
+          } catch(e) { console.log(e); }
+        }
       } else {
-        document.exitFullscreen().then(() => {
-          if (icon) icon.setAttribute('data-lucide', 'maximize');
-          lucide.createIcons();
-        });
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exit) {
+          try {
+            const promise = exit.call(document);
+            if (promise && promise.then) {
+              promise.then(() => {
+                if (icon) icon.setAttribute('data-lucide', 'maximize');
+                lucide.createIcons();
+              }).catch(err => console.log(err));
+            } else {
+              if (icon) icon.setAttribute('data-lucide', 'maximize');
+              lucide.createIcons();
+            }
+          } catch(e) { console.log(e); }
+        }
       }
     }
 
-    document.addEventListener('fullscreenchange', () => {
+    function updateFullscreenIcon() {
       const icon = document.getElementById('fullscreen-icon');
       if (icon) {
-        if (document.fullscreenElement) {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
           icon.setAttribute('data-lucide', 'minimize');
         } else {
           icon.setAttribute('data-lucide', 'maximize');
         }
         lucide.createIcons();
       }
-    });
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
 
     // --- ORIENTATION CHECKER PARA MOBILE ---
     function checkOrientation() {
@@ -2046,6 +2078,18 @@
       
       // Sincronizar deck de acordo com o ecossistema inicial (Floresta)
       selectEcosystemTheme(currentEcosystem);
+
+      // Ocultar botão de tela cheia se não for suportado pelo aparelho (ex: iPhone Safari)
+      const isFullscreenSupported = !!(
+        document.documentElement.requestFullscreen ||
+        document.documentElement.webkitRequestFullscreen ||
+        document.documentElement.mozRequestFullScreen ||
+        document.documentElement.msRequestFullscreen
+      );
+      if (!isFullscreenSupported) {
+        const btn = document.getElementById('fullscreen-btn');
+        if (btn) btn.classList.add('hidden');
+      }
     });
 
     // Inicializar Lucide

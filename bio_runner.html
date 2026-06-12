@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -63,6 +65,10 @@
 <body>
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="450"></canvas>
+        <!-- Botão Flutuante de Tela Cheia -->
+        <button id="fullscreen-btn" onclick="toggleFullscreen()" class="absolute top-4 right-4 bg-slate-900/80 border border-slate-700 hover:bg-slate-800 text-slate-300 p-2.5 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center z-40" title="Tela Cheia">
+            <i id="fullscreen-icon" data-lucide="maximize" class="w-5 h-5"></i>
+        </button>
     </div>
 
     <!-- Device Rotation Alert Overlay -->
@@ -608,6 +614,9 @@
 
         // Game logic
         function startGame() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            }
             score = 0;
             lives = 3;
             currentWorld = 0;
@@ -1435,6 +1444,39 @@
         window.addEventListener('resize', checkOrientation);
         window.addEventListener('orientationchange', checkOrientation);
         checkOrientation();
+
+        function toggleFullscreen() {
+            const icon = document.getElementById('fullscreen-icon');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+                    if (icon) icon.setAttribute('data-lucide', 'minimize');
+                    lucide.createIcons();
+                }).catch(err => {
+                    console.error("Erro ao entrar em tela cheia:", err);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    if (icon) icon.setAttribute('data-lucide', 'maximize');
+                    lucide.createIcons();
+                });
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            if (icon) {
+                if (document.fullscreenElement) {
+                    icon.setAttribute('data-lucide', 'minimize');
+                } else {
+                    icon.setAttribute('data-lucide', 'maximize');
+                }
+                lucide.createIcons();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
 
         // Initialize background particles
         createWorldParticles();

@@ -108,7 +108,34 @@
     .animate-pop-in {
       animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
+    #rotate-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #05070f;
+      color: #ffffff;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .hidden {
+      display: none !important;
+    }
   </style><body id="game-body" class="bg-gradient-to-br from-slate-950 via-[#0E1B17] to-slate-950 min-h-screen text-slate-200 flex flex-col justify-between overflow-x-hidden transition-all duration-750">
+
+  <!-- Device Rotation Alert Overlay -->
+  <div id="rotate-overlay" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#05070f] text-white text-center p-6">
+    <div class="animate-bounce text-6xl mb-4">📱🔄</div>
+    <h2 class="text-2xl font-black mb-2 text-rose-400">Gire o seu aparelho!</h2>
+    <p class="text-slate-400 max-w-sm">Para uma melhor experiência de jogo, gire o seu celular para a horizontal (modo paisagem).</p>
+  </div>
 
   <!-- Cabeçalho do Jogo -->
   <header class="w-full max-w-5xl mx-auto px-4 pt-4 flex flex-col sm:flex-row justify-between items-center gap-3 z-10">
@@ -141,6 +168,9 @@
         <i data-lucide="sparkles" class="text-brandYellow w-5 h-5 fill-brandYellow"></i>
         <span id="score-text" class="font-extrabold text-slate-200">0 Pontos</span>
       </div>
+      <button id="fullscreen-btn" onclick="toggleFullscreen()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800/60 hover:bg-slate-800 transition-colors shadow-sm text-slate-400" title="Tela Cheia">
+        <i id="fullscreen-icon" data-lucide="maximize" class="w-5 h-5"></i>
+      </button>
       <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800/60 hover:bg-slate-800 transition-colors shadow-sm text-slate-400">
         <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
       </button>
@@ -532,6 +562,9 @@
     // --- CONTROLE DOS ESTADOS E TELAS ---
     function startGame() {
       playSound('click');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      }
       document.getElementById('screen-start').classList.add('hidden');
       document.getElementById('screen-game').classList.remove('hidden');
       loadPhase();
@@ -960,6 +993,51 @@
       document.getElementById('screen-victory').classList.add('hidden');
       document.getElementById('screen-start').classList.remove('hidden');
     }
+
+    // --- CONTROLES DE TELA CHEIA ---
+    function toggleFullscreen() {
+      const icon = document.getElementById('fullscreen-icon');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          if (icon) icon.setAttribute('data-lucide', 'minimize');
+          lucide.createIcons();
+        }).catch(err => {
+          console.error("Erro ao entrar em tela cheia:", err);
+        });
+      } else {
+        document.exitFullscreen().then(() => {
+          if (icon) icon.setAttribute('data-lucide', 'maximize');
+          lucide.createIcons();
+        });
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const icon = document.getElementById('fullscreen-icon');
+      if (icon) {
+        if (document.fullscreenElement) {
+          icon.setAttribute('data-lucide', 'minimize');
+        } else {
+          icon.setAttribute('data-lucide', 'maximize');
+        }
+        lucide.createIcons();
+      }
+    });
+
+    // --- ORIENTATION CHECKER PARA MOBILE ---
+    function checkOrientation() {
+      const overlay = document.getElementById('rotate-overlay');
+      if (overlay) {
+        if (window.innerHeight > window.innerWidth) {
+          overlay.classList.remove('hidden');
+        } else {
+          overlay.classList.add('hidden');
+        }
+      }
+    }
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    checkOrientation();
 
     // Inicializar Lucide Icons
     lucide.createIcons();

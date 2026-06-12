@@ -166,9 +166,36 @@
       background: rgba(88, 204, 2, 0.15);
       transform: scale(1.05);
     }
+    #rotate-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #05070f;
+      color: #ffffff;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="h-screen overflow-hidden select-none bg-slate-950 text-slate-100">
+
+  <!-- Device Rotation Alert Overlay -->
+  <div id="rotate-overlay" class="hidden fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#05070f] text-white text-center p-6">
+    <div class="animate-bounce text-6xl mb-4">📱🔄</div>
+    <h2 class="text-2xl font-black mb-2 text-rose-400">Gire o seu aparelho!</h2>
+    <p class="text-slate-400 max-w-sm">Para uma melhor experiência de jogo, gire o seu celular para a horizontal (modo paisagem).</p>
+  </div>
 
   <!-- Container de Confetes -->
   <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
@@ -341,6 +368,10 @@
         <!-- Ajuda / Abrir Manual -->
         <button onclick="openManual()" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Como Jogar">
           <i data-lucide="help-circle" class="w-4.5 h-4.5"></i>
+        </button>
+        <!-- Tela Cheia Opcional -->
+        <button onclick="toggleFullscreen()" class="bg-slate-900 border border-slate-700 text-slate-300 p-2 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center justify-center" title="Tela Cheia">
+          <i id="fullscreen-icon" data-lucide="maximize" class="w-4.5 h-4.5"></i>
         </button>
 
         <!-- Seletor de Ecossistema em Jogo -->
@@ -719,6 +750,10 @@
     function closeManual() {
       document.getElementById('manual-modal').classList.add('hidden');
       isPaused = false;
+      // Solicitar tela cheia opcionalmente no início
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      }
       if (!gameActive) {
         startGame();
       }
@@ -999,22 +1034,41 @@
       const container = document.getElementById('game-board-container');
       const rect = container.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
-      const card = CARDS[selectedType];
       
       // Ajusta Y vertical conforme a raia responsiva
       const laneHeight = rect.height / 3;
       ghost.style.top = `${row * laneHeight + (laneHeight / 2) - 24}px`;
       
-      if (card.type === 'produtor' || card.type === 'decompositor') {
-        ghost.style.left = `${mouseX - 20}px`;
-      } else {
-        ghost.style.left = `${rect.width * 0.20}px`;
-      }
+      // Todos os aliados agora são posicionados livremente no eixo X estilo PvZ
+      ghost.style.left = `${mouseX - 20}px`;
       ghost.classList.remove('hidden');
     }
 
     function executePlacement(row, x) {
       if (!selectedType) return;
+      
+      // Checar limites de capacidade biológica trófica (Predador e Presa)
+      const theme = ECO_THEMES[currentEcosystem];
+      if (selectedType === 'primario') {
+        if (coelhos.length >= plantas.length) {
+          playSound('danger');
+          spawnFloatText(`⚠️ Precisa de mais ${theme.produtor.name}s!`, row, x, '#FF9600');
+          return;
+        }
+      } else if (selectedType === 'secundario') {
+        if (serpentes.length >= coelhos.length) {
+          playSound('danger');
+          spawnFloatText(`⚠️ Precisa de mais ${theme.primario.name}s!`, row, x, '#FF9600');
+          return;
+        }
+      } else if (selectedType === 'decompositor') {
+        if (cogumelos.length >= serpentes.length) {
+          playSound('danger');
+          spawnFloatText(`⚠️ Precisa de mais ${theme.secundario.name}s!`, row, x, '#FF9600');
+          return;
+        }
+      }
+
       const card = CARDS[selectedType];
 
       // Deduzir energia solar
@@ -1022,15 +1076,15 @@
       document.getElementById('solar-text').innerText = solarEnergy;
       playSound('invoke');
 
-      // Spawns
+      // Spawns (Todos passam o X clicado agora)
       if (card.type === 'produtor') {
         spawnPlant(row, x);
       } else if (card.type === 'decompositor') {
         spawnMushroom(row, x);
       } else if (card.type === 'primario') {
-        spawnRabbit(row);
+        spawnRabbit(row, x);
       } else if (card.type === 'secundario') {
-        spawnSnake(row);
+        spawnSnake(row, x);
       }
 
       // Desmarcar card
@@ -1040,25 +1094,55 @@
 
     // --- CONTROLE DOS CARDS DO DECK (HOT/COLD PREMIUM) ---
     function updateDeckUI() {
+      const theme = ECO_THEMES[currentEcosystem];
       Object.keys(CARDS).forEach(key => {
         const card = CARDS[key];
         const btn = document.getElementById(`card-${key}`);
         if (!btn) return;
         
         const canAfford = solarEnergy >= card.cost;
-        
-        if (canAfford) {
+        let meetsTrophicLock = true;
+        let lockReason = "";
+
+        if (key === 'primario' && coelhos.length >= plantas.length) {
+          meetsTrophicLock = false;
+          lockReason = `Precisa: ${theme.produtor.name}`;
+        } else if (key === 'secundario' && serpentes.length >= coelhos.length) {
+          meetsTrophicLock = false;
+          lockReason = `Precisa: ${theme.primario.name}`;
+        } else if (key === 'decompositor' && cogumelos.length >= serpentes.length) {
+          meetsTrophicLock = false;
+          lockReason = `Precisa: ${theme.secundario.name}`;
+        }
+
+        const isLocked = !canAfford || !meetsTrophicLock;
+        const badge = btn.querySelector('.cost-badge');
+
+        if (!isLocked) {
           btn.classList.remove('card-locked');
           btn.style.opacity = '';
           btn.style.pointerEvents = '';
+          if (badge) {
+            badge.innerText = `${card.cost}☀️`;
+            badge.classList.remove('text-red-400');
+          }
         } else {
           btn.classList.add('card-locked');
-          // Se estava selecionado e não tem mais energia, deselecionar
+          // Se estava selecionado e não pode mais colocar, deselecionar
           if (selectedType === key) {
             selectedType = null;
             btn.classList.remove('selected-card');
             updateInfoPanel(null);
             hideGhost();
+          }
+          if (badge) {
+            if (!meetsTrophicLock) {
+              badge.innerText = lockReason;
+              badge.classList.add('text-red-400');
+            } else {
+              badge.innerText = `${card.cost}☀️`;
+              badge.classList.remove('text-red-400');
+            }
           }
         }
       });
@@ -1108,7 +1192,7 @@
       });
     }
 
-    function spawnRabbit(row) {
+    function spawnRabbit(row, x) {
       const theme = ECO_THEMES[currentEcosystem];
       const el = document.createElement('div');
       el.className = "absolute w-12 h-12 flex flex-col items-center justify-between p-1 border-2 border-transparent rounded-xl z-20 transition-all duration-75";
@@ -1122,12 +1206,12 @@
       document.getElementById('entities-container').appendChild(el);
 
       coelhos.push({
-        x: 160, // Spawna no limite da Base (20%)
+        x: x, // Posicionamento livre
         row: row,
-        life: 100,
-        maxLife: 100,
-        speed: 0.65,
-        hunger: 12000,
+        life: 200, // Vida aumentada (Bloqueador)
+        maxLife: 200,
+        speed: 0, // Estacionário estilo PvZ
+        hunger: 20000, // Fome de 20s
         starving: false,
         shield: false,
         shieldTime: 0,
@@ -1136,7 +1220,7 @@
       });
     }
 
-    function spawnSnake(row) {
+    function spawnSnake(row, x) {
       const theme = ECO_THEMES[currentEcosystem];
       const el = document.createElement('div');
       el.className = "absolute w-12 h-12 flex flex-col items-center justify-between p-1 border-2 border-transparent rounded-xl z-20 transition-all duration-75";
@@ -1150,12 +1234,12 @@
       document.getElementById('entities-container').appendChild(el);
 
       serpentes.push({
-        x: 160, // Spawna no limite da Base (20%)
+        x: x, // Posicionamento livre
         row: row,
-        life: 100,
-        maxLife: 100,
-        speed: 0.45,
-        hunger: 15000,
+        life: 150, // Vida aumentada (Atacante Ranged)
+        maxLife: 150,
+        speed: 0, // Estacionário estilo PvZ
+        hunger: 25000, // Fome de 25s
         starving: false,
         supercharged: false,
         superchargeTime: 0,
@@ -1265,54 +1349,38 @@
           }
         }
 
-        // Comer Plantas próximas
-        let atePlant = false;
+        // Comer Plantas próximas (alimentação estacionária)
         for (let j = plantas.length - 1; j >= 0; j--) {
           const plant = plantas[j];
-          if (plant.row === rabbit.row && Math.abs(rabbit.x - plant.x) < 30) {
+          if (plant.row === rabbit.row && Math.abs(rabbit.x - plant.x) < 50) {
             plantas.splice(j, 1);
             plant.el.remove();
             
-            rabbit.hunger = 12000;
+            rabbit.hunger = 20000;
             rabbit.starving = false;
             rabbit.shield = true;
             rabbit.shieldTime = 6000;
-            rabbit.life = Math.min(rabbit.life + 30, 100);
+            rabbit.life = Math.min(rabbit.life + 50, rabbit.maxLife);
             
             playSound('coin');
             spawnFloatText("SUPER ESCUDO 🛡️", rabbit.row, rabbit.x, '#FFC800');
             spawnFloatText(`DEVORADO! ${theme.produtor.emoji}`, plant.row, plant.x, '#EA2B2B');
             triggerDecomposition(plant.row, plant.x);
-            
-            atePlant = true;
             break;
           }
         }
 
-        // Combater pragas
-        let blocked = false;
+        // Combater pragas corpo a corpo
         enemies.forEach(enemy => {
-          if (enemy.row === rabbit.row && Math.abs(rabbit.x - enemy.x) < 25) {
-            blocked = true;
+          if (enemy.row === rabbit.row && Math.abs(rabbit.x - enemy.x) < 30) {
             if (now - rabbit.lastAction >= 1500) {
               enemy.life -= 25;
               playSound('hit');
               spawnFloatText("-25 👾", enemy.row, enemy.x, '#EA2B2B');
               rabbit.lastAction = now;
             }
-            if (now - enemy.lastAction >= 1200) {
-              const damage = rabbit.shield ? 5 : 15;
-              rabbit.life -= damage;
-              playSound('hit');
-              spawnFloatText(`-${damage} ${theme.primario.emoji}`, rabbit.row, rabbit.x, '#FBBF24');
-              enemy.lastAction = now;
-            }
           }
         });
-
-        if (!blocked && !atePlant) {
-          rabbit.x += rabbit.speed;
-        }
 
         if (rabbit.life <= 0) {
           killEntity(rabbit, i, coelhos, `DESTRUIDO! ${theme.primario.emoji}`);
@@ -1339,56 +1407,35 @@
           }
         }
 
-        // Caçar coelho
-        let ateRabbit = false;
+        // Caçar coelho próximo (alimentação estacionária)
         for (let j = coelhos.length - 1; j >= 0; j--) {
           const rabbit = coelhos[j];
-          if (rabbit.row === snake.row && Math.abs(snake.x - rabbit.x) < 30) {
+          if (rabbit.row === snake.row && Math.abs(snake.x - rabbit.x) < 50) {
             coelhos.splice(j, 1);
             rabbit.el.remove();
 
-            snake.hunger = 15000;
+            snake.hunger = 25000;
             snake.starving = false;
             snake.supercharged = true;
             snake.superchargeTime = 6000;
-            snake.life = Math.min(snake.life + 30, 100);
+            snake.life = Math.min(snake.life + 40, snake.maxLife);
 
             playSound('hit');
             spawnFloatText("SUPER CARGA ⚡", snake.row, snake.x, '#0EA5E9');
             spawnFloatText(`PREDAÇÃO! ${theme.primario.emoji}`, rabbit.row, rabbit.x, '#EA2B2B');
             triggerDecomposition(rabbit.row, rabbit.x);
-
-            ateRabbit = true;
             break;
           }
         }
 
-        // Colidir Melee
-        let blocked = false;
-        enemies.forEach(enemy => {
-          if (enemy.row === snake.row && Math.abs(snake.x - enemy.x) < 25) {
-            blocked = true;
-            if (now - enemy.lastAction >= 1200) {
-              snake.life -= 15;
-              playSound('hit');
-              spawnFloatText(`-15 ${theme.secundario.emoji}`, snake.row, snake.x, '#EA2B2B');
-              enemy.lastAction = now;
-            }
-          }
-        });
-
-        // Disparo à distância
+        // Disparo à distância se houver inimigos à direita
         const targetEnemies = enemies.some(e => e.row === snake.row && e.x > snake.x);
-        if (targetEnemies && !blocked && !snake.starving) {
+        if (targetEnemies && !snake.starving) {
           const attackCooldown = snake.supercharged ? 1000 : 2200;
           if (now - snake.lastAction >= attackCooldown) {
             shootProjectile(snake.row, snake.x);
             snake.lastAction = now;
           }
-        }
-
-        if (!blocked && !ateRabbit) {
-          snake.x += snake.speed;
         }
 
         if (snake.life <= 0) {
@@ -1415,54 +1462,82 @@
           continue;
         }
 
-        // Bloqueio por plantas/cogumelos
-        let blockedByStatic = false;
+        // Checar se há alguma unidade bloqueando o inimigo (PvZ blocker check)
+        let blocker = null;
+        let minDistance = 25;
+
         plantas.forEach(p => {
-          if (p.row === enemy.row && Math.abs(enemy.x - p.x) < 25) {
-            blockedByStatic = true;
-            if (now - enemy.lastAction >= 1200) {
-              p.life -= 20;
-              playSound('hit');
-              spawnFloatText(`-20 ${theme.produtor.emoji}`, p.row, p.x, '#EF4444');
-              enemy.lastAction = now;
-              if (p.life <= 0) {
-                const index = plantas.indexOf(p);
-                if (index > -1) plantas.splice(index, 1);
-                p.el.remove();
-                triggerDecomposition(p.row, p.x);
-              }
-            }
+          if (p.row === enemy.row && enemy.x > p.x && (enemy.x - p.x) < minDistance) {
+            blocker = { type: 'plant', ref: p };
+            minDistance = enemy.x - p.x;
           }
         });
-
-        cogumelos.forEach(c => {
-          if (c.row === enemy.row && Math.abs(enemy.x - c.x) < 25) {
-            blockedByStatic = true;
-            if (now - enemy.lastAction >= 1200) {
-              c.life -= 20;
-              playSound('hit');
-              spawnFloatText(`-20 ${theme.decompositor.emoji}`, c.row, c.x, '#EF4444');
-              enemy.lastAction = now;
-              if (c.life <= 0) {
-                const index = cogumelos.indexOf(c);
-                if (index > -1) cogumelos.splice(index, 1);
-                c.el.remove();
-                triggerDecomposition(c.row, c.x);
-              }
-            }
+        cogumelos.forEach(m => {
+          if (m.row === enemy.row && enemy.x > m.x && (enemy.x - m.x) < minDistance) {
+            blocker = { type: 'mushroom', ref: m };
+            minDistance = enemy.x - m.x;
           }
         });
-
-        // Colidir Melee
-        let blockedByMobile = false;
-        coelhos.forEach(c => {
-          if (c.row === enemy.row && Math.abs(enemy.x - c.x) < 25) blockedByMobile = true;
+        coelhos.forEach(r => {
+          if (r.row === enemy.row && enemy.x > r.x && (enemy.x - r.x) < minDistance) {
+            blocker = { type: 'rabbit', ref: r };
+            minDistance = enemy.x - r.x;
+          }
         });
         serpentes.forEach(s => {
-          if (s.row === enemy.row && Math.abs(enemy.x - s.x) < 25) blockedByMobile = true;
+          if (s.row === enemy.row && enemy.x > s.x && (enemy.x - s.x) < minDistance) {
+            blocker = { type: 'snake', ref: s };
+            minDistance = enemy.x - s.x;
+          }
         });
 
-        if (!blockedByStatic && !blockedByMobile) {
+        if (blocker) {
+          // Bloqueado! Atacar unidade
+          if (now - enemy.lastAction >= 1200) {
+            const unit = blocker.ref;
+            let damage = 20;
+            let unitEmoji = "";
+
+            if (blocker.type === 'plant') {
+              damage = 20;
+              unitEmoji = theme.produtor.emoji;
+            } else if (blocker.type === 'mushroom') {
+              damage = 20;
+              unitEmoji = theme.decompositor.emoji;
+            } else if (blocker.type === 'rabbit') {
+              damage = unit.shield ? 5 : 15;
+              unitEmoji = theme.primario.emoji;
+            } else if (blocker.type === 'snake') {
+              damage = 15;
+              unitEmoji = theme.secundario.emoji;
+            }
+
+            unit.life -= damage;
+            playSound('hit');
+            spawnFloatText(`-${damage} ${unitEmoji}`, enemy.row, unit.x, '#EF4444');
+            enemy.lastAction = now;
+
+            if (unit.life <= 0) {
+              if (blocker.type === 'plant') {
+                const idx = plantas.indexOf(unit);
+                if (idx > -1) plantas.splice(idx, 1);
+              } else if (blocker.type === 'mushroom') {
+                const idx = cogumelos.indexOf(unit);
+                if (idx > -1) cogumelos.splice(idx, 1);
+              } else if (blocker.type === 'rabbit') {
+                const idx = coelhos.indexOf(unit);
+                if (idx > -1) coelhos.splice(idx, 1);
+              } else if (blocker.type === 'snake') {
+                const idx = serpentes.indexOf(unit);
+                if (idx > -1) serpentes.splice(idx, 1);
+              }
+              unit.el.remove();
+              triggerDecomposition(enemy.row, unit.x);
+              spawnFloatText(`DESTRUIDO! ${unitEmoji}`, enemy.row, unit.x, '#EA2B2B');
+            }
+          }
+        } else {
+          // Não bloqueado, avançar
           enemy.x -= enemy.speed;
         }
 
@@ -1864,8 +1939,58 @@
       document.getElementById('pause-text').innerText = "Pausar Aula ⏱️";
       lucide.createIcons();
 
+      // Solicitar tela cheia opcionalmente no recomeço
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      }
+
       startGame();
     }
+
+    // --- CONTROLES DE TELA CHEIA ---
+    function toggleFullscreen() {
+      const icon = document.getElementById('fullscreen-icon');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          if (icon) icon.setAttribute('data-lucide', 'minimize');
+          lucide.createIcons();
+        }).catch(err => {
+          console.error("Erro ao entrar em tela cheia:", err);
+        });
+      } else {
+        document.exitFullscreen().then(() => {
+          if (icon) icon.setAttribute('data-lucide', 'maximize');
+          lucide.createIcons();
+        });
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const icon = document.getElementById('fullscreen-icon');
+      if (icon) {
+        if (document.fullscreenElement) {
+          icon.setAttribute('data-lucide', 'minimize');
+        } else {
+          icon.setAttribute('data-lucide', 'maximize');
+        }
+        lucide.createIcons();
+      }
+    });
+
+    // --- ORIENTATION CHECKER PARA MOBILE ---
+    function checkOrientation() {
+      const overlay = document.getElementById('rotate-overlay');
+      if (overlay) {
+        if (window.innerHeight > window.innerWidth) {
+          overlay.classList.remove('hidden');
+        } else {
+          overlay.classList.add('hidden');
+        }
+      }
+    }
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    checkOrientation();
 
     function spawnConfetti() {
       const container = document.getElementById('confetti-container');

@@ -137,6 +137,9 @@
     </div>
     
     <div class="flex items-center gap-3">
+      <button id="fullscreen-btn" onclick="toggleFullscreen()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800 hover:bg-slate-800 transition-colors shadow-sm text-slate-400" title="Tela Cheia">
+        <i id="fullscreen-icon" data-lucide="maximize" class="w-5 h-5"></i>
+      </button>
       <button id="sound-btn" onclick="toggleSound()" class="bg-slate-900/80 p-2.5 rounded-2xl border border-slate-800 hover:bg-slate-800 transition-colors shadow-sm text-slate-400">
         <i id="sound-icon" data-lucide="volume-2" class="w-5 h-5"></i>
       </button>
@@ -454,6 +457,35 @@
       }
       lucide.createIcons();
     }
+
+    function toggleFullscreen() {
+      const icon = document.getElementById('fullscreen-icon');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          if (icon) icon.setAttribute('data-lucide', 'minimize');
+          lucide.createIcons();
+        }).catch(err => {
+          console.error("Erro ao entrar em tela cheia:", err);
+        });
+      } else {
+        document.exitFullscreen().then(() => {
+          if (icon) icon.setAttribute('data-lucide', 'maximize');
+          lucide.createIcons();
+        });
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const icon = document.getElementById('fullscreen-icon');
+      if (icon) {
+        if (document.fullscreenElement) {
+          icon.setAttribute('data-lucide', 'minimize');
+        } else {
+          icon.setAttribute('data-lucide', 'maximize');
+        }
+        lucide.createIcons();
+      }
+    });
 
     function playHoverSound() {
       playSound('hover');

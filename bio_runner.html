@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioRunner: Jornada pelo Corpo Humano</title>
+    <!-- Google Fonts Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #05070f;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+            touch-action: none;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            display: block;
+            background-color: #0a0f1d;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 2px solid #1e293b;
+            border-radius: 16px;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 16/9;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // State Machine
+        const STATES = {
+            MENU: 'menu',
+            PLAYING: 'playing',
+            QUIZ: 'quiz',
+            GAMEOVER: 'gameover',
+            VICTORY: 'victory'
+        };
+        let gameState = STATES.MENU;
+
+        // Sound Synthesis (Web Audio API)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                
+                if (type === 'jump') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                    
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'hit') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.linearRampToValueAtTime(40, now + 0.2);
+                    
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'correct') {
+                    const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        
+                        gain.gain.setValueAtTime(0.12, now + idx * 0.08);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.08 + 0.15);
+                        
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.15);
+                    });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.setValueAtTime(100, now + 0.1);
+                    
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'victory') {
+                    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+                        
+                        gain.gain.setValueAtTime(0.15, now + idx * 0.1);
+                        gain.gain.linearRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
+                        
+                        osc.start(now + idx * 0.1);
+                        osc.stop(now + idx * 0.1 + 0.25);
+                    });
+                } else if (type === 'gameover') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(200, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.6);
+                    
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+                }
+            } catch (e) {
+                console.log("Audio not allowed yet or error: ", e);
+            }
+        }
+
+        // World Definitions
+        const WORLDS = [
+            { name: 'Sistema Circulatório', bgTop: '#1a000d', bgBot: '#450012', platColor: '#881337', accent: '#f43f5e', text: 'Mundo 1: Circulatório' },
+            { name: 'Sistema Digestivo', bgTop: '#13001f', bgBot: '#2b0054', platColor: '#581c87', accent: '#c084fc', text: 'Mundo 2: Digestivo' },
+            { name: 'Sistema Respiratório', bgTop: '#001324', bgBot: '#00335c', platColor: '#0369a1', accent: '#38bdf8', text: 'Mundo 3: Respiratório' }
+        ];
+
+        // Quiz Questions Data (10 questions per World)
+        const QUESTIONS = [
+            // World 1 - Circulatório (Index 0 to 9)
+            { w: 0, q: "Qual é o órgão central do sistema circulatório?", opts: ["Coração", "Pulmão", "Fígado", "Rim"], correct: 0 },
+            { w: 0, q: "Quantas câmaras tem o coração humano?", opts: ["Duas (2)", "Três (3)", "Quatro (4)", "Cinco (5)"], correct: 2 },
+            { w: 0, q: "Qual o líquido que transporta oxigênio no sangue?", opts: ["Plasma", "Hemoglobina nas hemácias", "Leucócito", "Plaqueta"], correct: 1 },
+            { w: 0, q: "O que fazem as artérias principais?", opts: ["Levam sangue ao coração", "Levam sangue DO coração", "Filtram o sangue", "Produzem anticorpos"], correct: 1 },
+            { w: 0, q: "O que é um glóbulo branco?", opts: ["Transportador de O2", "Célula de defesa imune", "Célula nutritiva", "Coagulante sanguíneo"], correct: 1 },
+            { w: 0, q: "Quantos litros de sangue tem um adulto em média?", opts: ["2 Litros", "5 Litros", "8 Litros", "10 Litros"], correct: 1 },
+            { w: 0, q: "Como se chama a maior artéria do corpo?", opts: ["Veia cava", "Aorta", "Artéria femoral", "Artéria jugular"], correct: 1 },
+            { w: 0, q: "O que causa anemia ferropriva?", opts: ["Excesso de leucócitos", "Falta de hemoglobina/ferro", "Muitas plaquetas", "Sangue ácido"], correct: 1 },
+            { w: 0, q: "Qual a função principal das plaquetas?", opts: ["Células de defesa", "Coagulação sanguínea", "Transporte de gases", "Hormônios"], correct: 1 },
+            { w: 0, q: "Qual câmara cardíaca bombeia sangue para o corpo?", opts: ["Átrio direito", "Átrio esquerdo", "Ventrículo direito", "Ventrículo esquerdo"], correct: 3 },
+
+            // World 2 - Digestivo (Index 10 to 19)
+            { w: 1, q: "Qual ácido está presente no estômago?", opts: ["Ácido cítrico", "Ácido clorídrico", "Ácido acético", "Ácido sulfúrico"], correct: 1 },
+            { w: 1, q: "Onde ocorre a maior parte da absorção de nutrientes?", opts: ["Estômago", "Intestino grosso", "Intestino delgado", "Esôfago"], correct: 2 },
+            { w: 1, q: "Qual órgão é responsável por produzir a bile?", opts: ["Pâncreas", "Fígado", "Estômago", "Baço"], correct: 1 },
+            { w: 1, q: "O que é o esôfago?", opts: ["Glândula digestiva", "Tubo condutor boca-estômago", "Parte do intestino", "Respirador"], correct: 1 },
+            { w: 1, q: "Qual nutriente começa a ser digerido na boca?", opts: ["Proteína", "Gordura", "Carboidrato (Amido)", "Vitamina"], correct: 2 },
+            { w: 1, q: "O que é o apêndice cecal?", opts: ["Parte do intestino delgado", "Prolongamento do intestino grosso", "Glândula gástrica", "Canal biliar"], correct: 1 },
+            { w: 1, q: "Qual enzima quebra proteínas no estômago?", opts: ["Amilase", "Lipase", "Pepsina", "Bile"], correct: 2 },
+            { w: 1, q: "Quantos metros tem o intestino delgado em média?", opts: ["1 metro", "3 metros", "6 metros", "12 metros"], correct: 2 },
+            { w: 1, q: "O que é peristaltismo?", opts: ["Troca gasosa", "Movimentos do tubo digestivo", "Filtração renal", "Digestão química"], correct: 1 },
+            { w: 1, q: "Qual a função principal do intestino grosso?", opts: ["Absorver nutrientes", "Absorver água e formar fezes", "Produzir bile", "Quebrar gorduras"], correct: 1 },
+
+            // World 3 - Respiratório (Index 20 to 29)
+            { w: 2, q: "Qual é o órgão principal do sistema respiratório?", opts: ["Coração", "Traqueia", "Pulmão", "Brônquio"], correct: 2 },
+            { w: 2, q: "O que é a traqueia?", opts: ["Músculo de fonação", "Tubo que conduz ar aos brônquios", "Bolsa de oxigênio", "Membrana pulmonar"], correct: 1 },
+            { w: 2, q: "Qual o músculo principal que controla a respiração?", opts: ["Diafragma", "Intercostal externo", "Abdominal reto", "Músculo cardíaco"], correct: 0 },
+            { w: 2, q: "O que são os alvéolos pulmonares?", opts: ["Tubos de ar", "Pequenas bolsas de troca gasosa", "Filtros de impurezas", "Glândulas de muco"], correct: 1 },
+            { w: 2, q: "Quantas vezes respira um adulto saudável em repouso por min?", opts: ["5 vezes", "12 a 20 vezes", "35 vezes", "50 vezes"], correct: 1 },
+            { w: 2, q: "O que o corpo absorve do ar ao inspirar?", opts: ["Nitrogênio", "Gás Carbônico (CO2)", "Oxigênio (O2)", "Argônio"], correct: 2 },
+            { w: 2, q: "O que são os brônquios?", opts: ["Bolsas alveolares", "Ramificações da traqueia", "Músculos pleurais", "Cílios nasais"], correct: 1 },
+            { w: 2, q: "O que é a pleura?", opts: ["Músculo do pulmão", "Membrana dupla que envolve o pulmão", "Ramificação brônquica", "Filtro nasal"], correct: 1 },
+            { w: 2, q: "O que caracteriza a asma?", opts: ["Infecção bacteriana", "Inflamação e estreitamento das vias", "Falta de hemoglobina", "Paralisia do diafragma"], correct: 1 },
+            { w: 2, q: "O que a tosse realiza no sistema respiratório?", opts: ["Limpa vias aéreas de impurezas", "Aumenta a absorção de O2", "Elimina apenas oxigênio", "Refria o pulmão"], correct: 0 }
+        ];
+
+        // Game State Variables
+        let currentWorld = 0;
+        let currentLevel = 1; // 1 or 2 per world (total 6 levels)
+        let score = 0;
+        let lives = 3;
+        let coins = 0; // Shield tokens or score bonus
+        let activeShield = false;
+        let gameTime = 0;
+
+        // Player properties
+        const player = {
+            x: 100,
+            y: 300,
+            w: 26,
+            h: 26,
+            vx: 0,
+            vy: 0,
+            onGround: false,
+            doubleJumpAvailable: true,
+            invincibleTimer: 0,
+            shieldPulse: 0
+        };
+
+        const PHYSICS = {
+            gravity: 0.52,
+            jumpForce: -11.5,
+            moveSpeed: 4.2,
+            friction: 0.82
+        };
+
+        // Inputs
+        const keys = {};
+        let touchControls = {
+            left: false,
+            right: false,
+            jump: false
+        };
+        let isMobile = false;
+
+        // Particles
+        let particles = [];
+        function createWorldParticles() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: Math.random() * 800,
+                    y: Math.random() * 450,
+                    r: 2 + Math.random() * 6,
+                    vx: -0.2 - Math.random() * 0.8,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    alpha: 0.2 + Math.random() * 0.5
+                });
+            }
+        }
+
+        // Quiz State
+        let activeQuiz = null;
+        let quizTimer = 15; // 15 seconds
+        let quizTimerStart = 0;
+        let selectedOption = -1;
+        let showFeedbackTimer = 0; // 2 seconds to show green/red before returning
+        let feedbackCorrect = false;
+        let currentBlockIndex = -1; // to mark solved
+
+        // Level Entities
+        let platforms = [];
+        let enemies = [];
+        let questionBlocks = [];
+        let spikes = [];
+        let portal = { x: 3000, y: 300, w: 60, h: 90 };
+
+        // Level Design
+        // Deterministic layouts for levels 1 to 6
+        const LEVEL_WIDTH = 3200;
+        
+        function loadLevel(wIdx, lIdx) {
+            platforms = [];
+            enemies = [];
+            questionBlocks = [];
+            spikes = [];
+
+            // Base ground parts (always present at start/end)
+            platforms.push({ x: 0, y: 390, w: 500, h: 60, type: 'ground' });
+
+            // Generate levels with platform configs
+            // Let's create varying structures depending on the level
+            const seed = (wIdx * 2 + lIdx) * 123;
+            
+            // Simple deterministic LCG random generator for level builder
+            let randomVal = seed;
+            function rand() {
+                randomVal = (randomVal * 9301 + 49297) % 233280;
+                return randomVal / 233280;
+            }
+
+            let nextX = 500;
+            const worldTheme = WORLDS[wIdx];
+
+            while (nextX < 2900) {
+                const step = rand();
+                const gap = 80 + step * 70;
+                const platW = 140 + rand() * 160;
+                const platY = 240 + Math.floor(rand() * 4) * 40; // 240, 280, 320, 360
+
+                // Ground/Platform
+                platforms.push({ x: nextX + gap, y: platY, w: platW, h: 450 - platY, type: 'platform' });
+
+                // Spikes in the gaps
+                if (rand() > 0.4 && gap > 90) {
+                    spikes.push({ x: nextX + 10, y: 430, w: gap - 20, h: 20 });
+                }
+
+                // Question Block
+                if (rand() > 0.3) {
+                    questionBlocks.push({
+                        x: nextX + gap + (platW / 2) - 20,
+                        y: platY - 110,
+                        w: 36,
+                        h: 36,
+                        solved: false,
+                        questionIndex: Math.floor(rand() * 10) + (wIdx * 10)
+                    });
+                }
+
+                // Enemy
+                if (rand() > 0.4) {
+                    const eType = rand() > 0.5 ? 'virus' : 'bacteria';
+                    enemies.push({
+                        x: nextX + gap + 30,
+                        y: platY - 24,
+                        w: 24,
+                        h: 24,
+                        type: eType,
+                        patrolMin: nextX + gap + 10,
+                        patrolMax: nextX + gap + platW - 34,
+                        dir: 1,
+                        vx: eType === 'virus' ? 1.4 : 1.8,
+                        vy: 0,
+                        floatPhase: rand() * Math.PI
+                    });
+                }
+
+                nextX += gap + platW;
+            }
+
+            // End flat land
+            platforms.push({ x: 2900, y: 390, w: 300, h: 60, type: 'ground' });
+            
+            // Set portal
+            portal.x = 3080;
+            portal.y = 390 - 80;
+
+            // Reset player position
+            player.x = 80;
+            player.y = 320;
+            player.vx = 0;
+            player.vy = 0;
+            player.onGround = false;
+            player.invincibleTimer = 0;
+
+            createWorldParticles();
+        }
+
+        // Setup Controls
+        window.addEventListener('keydown', e => {
+            keys[e.code] = true;
+            if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') {
+                handleJumpPress();
+            }
+            // Trigger audio context on any key
+            initAudio();
+        });
+
+        window.addEventListener('keyup', e => {
+            keys[e.code] = false;
+        });
+
+        // Detect Touch device
+        function checkMobile() {
+            isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+        }
+        checkMobile();
+
+        // Mouse/Touch clicks
+        canvas.addEventListener('mousedown', handlePointerDown);
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            handlePointerDown(e);
+        });
+
+        canvas.addEventListener('mouseup', handlePointerUp);
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            handlePointerUp(e);
+        });
+
+        function handlePointerDown(e) {
+            initAudio();
+            const pos = getCanvasCoordinates(e);
+            
+            if (gameState === STATES.MENU) {
+                // Check play button
+                if (pos.x >= 300 && pos.x <= 500 && pos.y >= 260 && pos.y <= 320) {
+                    playSound('jump');
+                    startGame();
+                }
+                // Back to Hub Button
+                if (pos.x >= 300 && pos.x <= 500 && pos.y >= 340 && pos.y <= 390) {
+                    window.location.href = './index.html';
+                }
+            } else if (gameState === STATES.QUIZ) {
+                if (showFeedbackTimer > 0) return; // ignore clicks during feedback
+
+                // Check 4 options buttons
+                // Box coordinates: Option A/B (y=210), Option C/D (y=290)
+                // Left column: x=120, w=260. Right column: x=420, w=260.
+                let clickedOpt = -1;
+                if (pos.y >= 200 && pos.y <= 260) {
+                    if (pos.x >= 120 && pos.x <= 390) clickedOpt = 0;
+                    if (pos.x >= 410 && pos.x <= 680) clickedOpt = 1;
+                } else if (pos.y >= 280 && pos.y <= 340) {
+                    if (pos.x >= 120 && pos.x <= 390) clickedOpt = 2;
+                    if (pos.x >= 410 && pos.x <= 680) clickedOpt = 3;
+                }
+
+                if (clickedOpt !== -1) {
+                    checkAnswer(clickedOpt);
+                }
+            } else if (gameState === STATES.GAMEOVER || gameState === STATES.VICTORY) {
+                // Restart Button
+                if (pos.x >= 220 && pos.x <= 380 && pos.y >= 300 && pos.y <= 350) {
+                    playSound('jump');
+                    restartGame();
+                }
+                // Hub Button
+                if (pos.x >= 420 && pos.x <= 580 && pos.y >= 300 && pos.y <= 350) {
+                    window.location.href = './index.html';
+                }
+            } else if (gameState === STATES.PLAYING) {
+                // Mobile buttons bounds check
+                if (isMobile) {
+                    // Left Arrow: bottom left
+                    if (pos.x >= 20 && pos.x <= 100 && pos.y >= 360 && pos.y <= 430) {
+                        touchControls.left = true;
+                    }
+                    // Right Arrow: next to left
+                    if (pos.x >= 120 && pos.x <= 200 && pos.y >= 360 && pos.y <= 430) {
+                        touchControls.right = true;
+                    }
+                    // Jump button: bottom right
+                    if (pos.x >= 680 && pos.x <= 780 && pos.y >= 350 && pos.y <= 430) {
+                        touchControls.jump = true;
+                        handleJumpPress();
+                    }
+                }
+            }
+        }
+
+        function handlePointerUp(e) {
+            if (gameState === STATES.PLAYING && isMobile) {
+                touchControls.left = false;
+                touchControls.right = false;
+                touchControls.jump = false;
+            }
+        }
+
+        function getCanvasCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            return {
+                x: (clientX - rect.left) * (800 / rect.width),
+                y: (clientY - rect.top) * (450 / rect.height)
+            };
+        }
+
+        // Game logic
+        function startGame() {
+            score = 0;
+            lives = 3;
+            currentWorld = 0;
+            currentLevel = 1;
+            activeShield = false;
+            loadLevel(currentWorld, currentLevel - 1);
+            gameState = STATES.PLAYING;
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
+        // Jump trigger
+        function handleJumpPress() {
+            if (gameState !== STATES.PLAYING) return;
+            if (player.onGround) {
+                player.vy = PHYSICS.jumpForce;
+                player.onGround = false;
+                player.doubleJumpAvailable = true;
+                playSound('jump');
+            } else if (player.doubleJumpAvailable) {
+                player.vy = PHYSICS.jumpForce * 0.85;
+                player.doubleJumpAvailable = false;
+                playSound('jump');
+                // create splash particles
+                for (let i = 0; i < 8; i++) {
+                    particles.push({
+                        x: player.x + player.w/2,
+                        y: player.y + player.h,
+                        r: 2 + Math.random()*3,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: Math.random() * 2,
+                        alpha: 0.8
+                    });
+                }
+            }
+        }
+
+        // Collisions
+        function checkAABB(a, b) {
+            return a.x < b.x + b.w &&
+                   a.x + a.w > b.x &&
+                   a.y < b.y + b.h &&
+                   a.y + a.h > b.y;
+        }
+
+        // Quiz Handling
+        function openQuiz(block, idx) {
+            gameState = STATES.QUIZ;
+            activeQuiz = QUESTIONS[block.questionIndex];
+            quizTimer = 15;
+            quizTimerStart = Date.now();
+            selectedOption = -1;
+            showFeedbackTimer = 0;
+            currentBlockIndex = idx;
+        }
+
+        function checkAnswer(optIndex) {
+            selectedOption = optIndex;
+            showFeedbackTimer = 120; // ~2 seconds of frames
+            
+            if (optIndex === activeQuiz.correct) {
+                feedbackCorrect = true;
+                score += 150;
+                activeShield = true;
+                playSound('correct');
+            } else {
+                feedbackCorrect = false;
+                if (activeShield) {
+                    activeShield = false; // shield protects HP
+                } else {
+                    lives--;
+                }
+                playSound('wrong');
+            }
+        }
+
+        // Game Loop Update
+        let camX = 0;
+        
+        function update() {
+            if (gameState === STATES.PLAYING) {
+                gameTime++;
+                player.shieldPulse += 0.1;
+
+                // Invincible count
+                if (player.invincibleTimer > 0) player.invincibleTimer--;
+
+                // Movement Inputs
+                let dx = 0;
+                if (keys['ArrowLeft'] || keys['KeyA'] || touchControls.left) {
+                    dx = -PHYSICS.moveSpeed;
+                }
+                if (keys['ArrowRight'] || keys['KeyD'] || touchControls.right) {
+                    dx = PHYSICS.moveSpeed;
+                }
+
+                // Physics
+                player.vx = dx;
+                player.vy += PHYSICS.gravity;
+
+                // Move X
+                player.x += player.vx;
+                platforms.forEach(plat => {
+                    if (checkAABB(player, plat)) {
+                        if (player.vx > 0) player.x = plat.x - player.w;
+                        if (player.vx < 0) player.x = plat.x + plat.w;
+                    }
+                });
+
+                // Move Y
+                player.y += player.vy;
+                player.onGround = false;
+                platforms.forEach(plat => {
+                    if (checkAABB(player, plat)) {
+                        if (player.vy > 0) {
+                            player.y = plat.y - player.h;
+                            player.vy = 0;
+                            player.onGround = true;
+                            player.doubleJumpAvailable = true;
+                        }
+                        if (player.vy < 0) {
+                            player.y = plat.y + plat.h;
+                            player.vy = 0;
+                        }
+                    }
+                });
+
+                // Boundary check
+                if (player.x < 0) player.x = 0;
+                if (player.y > 450) {
+                    // Fell down!
+                    playSound('hit');
+                    lives--;
+                    player.x = Math.max(80, player.x - 300);
+                    player.y = 150;
+                    player.vy = 0;
+                    if (lives <= 0) {
+                        gameState = STATES.GAMEOVER;
+                        playSound('gameover');
+                    }
+                }
+
+                // Camera follow
+                const targetCamX = player.x - 300;
+                camX += (targetCamX - camX) * 0.1;
+                camX = Math.max(0, Math.min(camX, LEVEL_WIDTH - 800));
+
+                // Question blocks check from below
+                questionBlocks.forEach((block, idx) => {
+                    if (!block.solved && checkAABB(player, block)) {
+                        // Check if hitting from below
+                        if (player.vy < 0 && player.y + player.h >= block.y + block.h - 5) {
+                            player.vy = 2; // bounce down
+                            block.solved = true;
+                            openQuiz(block, idx);
+                        }
+                    }
+                });
+
+                // Enemies patrol & damage
+                enemies.forEach(e => {
+                    if (e.type === 'virus') {
+                        // floating bobbing
+                        e.floatPhase += 0.05;
+                        e.y += Math.sin(e.floatPhase) * 0.6;
+                    }
+                    
+                    e.x += e.vx * e.dir;
+                    if (e.x <= e.patrolMin) {
+                        e.x = e.patrolMin;
+                        e.dir = 1;
+                    }
+                    if (e.x >= e.patrolMax) {
+                        e.x = e.patrolMax;
+                        e.dir = -1;
+                    }
+
+                    // Collision with player
+                    if (checkAABB(player, e)) {
+                        if (player.invincibleTimer === 0) {
+                            playSound('hit');
+                            if (activeShield) {
+                                activeShield = false;
+                                // flash effect
+                            } else {
+                                lives--;
+                            }
+                            player.invincibleTimer = 90; // 1.5s
+                            player.vy = -5; // knockback
+                            player.vx = e.dir * 4;
+                            
+                            if (lives <= 0) {
+                                gameState = STATES.GAMEOVER;
+                                playSound('gameover');
+                            }
+                        }
+                    }
+                });
+
+                // Spikes check
+                spikes.forEach(spk => {
+                    if (checkAABB(player, spk)) {
+                        if (player.invincibleTimer === 0) {
+                            playSound('hit');
+                            if (activeShield) {
+                                activeShield = false;
+                            } else {
+                                lives--;
+                            }
+                            player.invincibleTimer = 90;
+                            player.vy = -7;
+                            if (lives <= 0) {
+                                gameState = STATES.GAMEOVER;
+                                playSound('gameover');
+                            }
+                        }
+                    }
+                });
+
+                // Portal check
+                if (checkAABB(player, portal)) {
+                    // Level transition!
+                    if (currentLevel === 1) {
+                        currentLevel = 2;
+                        loadLevel(currentWorld, 1);
+                        playSound('correct');
+                    } else {
+                        // Advance World!
+                        if (currentWorld < 2) {
+                            currentWorld++;
+                            currentLevel = 1;
+                            loadLevel(currentWorld, 0);
+                            playSound('victory');
+                        } else {
+                            // Finished the whole game!
+                            gameState = STATES.VICTORY;
+                            playSound('victory');
+                        }
+                    }
+                }
+
+                // Update background particles
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < -10) {
+                        p.x = 810;
+                        p.y = Math.random() * 450;
+                    }
+                });
+            } else if (gameState === STATES.QUIZ) {
+                // Quiz countdown
+                if (showFeedbackTimer > 0) {
+                    showFeedbackTimer--;
+                    if (showFeedbackTimer === 0) {
+                        gameState = STATES.PLAYING;
+                        // check death
+                        if (lives <= 0) {
+                            gameState = STATES.GAMEOVER;
+                            playSound('gameover');
+                        }
+                    }
+                } else {
+                    const elapsed = (Date.now() - quizTimerStart) / 1000;
+                    quizTimer = Math.max(0, 15 - elapsed);
+                    if (quizTimer <= 0) {
+                        // Time out! Counts as wrong
+                        checkAnswer(-1);
+                    }
+                }
+            } else if (gameState === STATES.MENU) {
+                // Slow drift of background particles
+                particles.forEach(p => {
+                    p.x += p.vx * 0.5;
+                    p.y += p.vy * 0.5;
+                    if (p.x < -10) {
+                        p.x = 810;
+                        p.y = Math.random() * 450;
+                    }
+                });
+            }
+        }
+
+        // Canvas Rendering Helpers
+        function drawRoundRect(x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) {
+                ctx.fillStyle = fill;
+                ctx.fill();
+            }
+            if (stroke) {
+                ctx.strokeStyle = stroke;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+        }
+
+        // Draw Game Components
+        function draw() {
+            ctx.clearRect(0, 0, 800, 450);
+
+            // Draw World Theme Background
+            const theme = WORLDS[currentWorld];
+            let bgGrad = ctx.createLinearGradient(0, 0, 0, 450);
+            bgGrad.addColorStop(0, theme.bgTop);
+            bgGrad.addColorStop(1, theme.bgBot);
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, 800, 450);
+
+            // Draw Parallax / Background Grid or Details
+            ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 800; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i - (camX * 0.3) % 40, 0);
+                ctx.lineTo(i - (camX * 0.3) % 40, 450);
+                ctx.stroke();
+            }
+
+            // Draw background particles
+            particles.forEach(p => {
+                ctx.fillStyle = currentWorld === 0 ? `rgba(244,63,94,${p.alpha})` : 
+                                currentWorld === 1 ? `rgba(192,132,252,${p.alpha})` : 
+                                                     `rgba(56,189,248,${p.alpha})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            if (gameState === STATES.MENU) {
+                drawMenu();
+                return;
+            }
+
+            // WORLD OBJECTS (Scrolled by camera)
+            ctx.save();
+            ctx.translate(-camX, 0);
+
+            // Draw Platforms
+            platforms.forEach(plat => {
+                let platGrad = ctx.createLinearGradient(plat.x, plat.y, plat.x, plat.y + 100);
+                platGrad.addColorStop(0, theme.platColor);
+                platGrad.addColorStop(1, '#0c0f1d');
+                ctx.fillStyle = platGrad;
+                
+                // Draw platform top rim highlight
+                ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
+                ctx.fillStyle = theme.accent;
+                ctx.fillRect(plat.x, plat.y, plat.w, 4);
+            });
+
+            // Draw Spikes
+            spikes.forEach(spk => {
+                ctx.fillStyle = '#ef4444';
+                const sWidth = 16;
+                const count = Math.ceil(spk.w / sWidth);
+                for (let i = 0; i < count; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(spk.x + i * sWidth, spk.y + spk.h);
+                    ctx.lineTo(spk.x + i * sWidth + sWidth/2, spk.y);
+                    ctx.lineTo(spk.x + (i + 1) * sWidth, spk.y + spk.h);
+                    ctx.fill();
+                }
+            });
+
+            // Draw Question Blocks
+            questionBlocks.forEach(block => {
+                if (block.solved) {
+                    // Inactive gray block
+                    ctx.fillStyle = '#475569';
+                    ctx.fillRect(block.x, block.y, block.w, block.h);
+                    ctx.strokeStyle = '#334155';
+                    ctx.strokeRect(block.x, block.y, block.w, block.h);
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = 'bold 16px Nunito';
+                    ctx.fillText('✓', block.x + block.w/2 - 6, block.y + block.h/2 + 6);
+                } else {
+                    // Pulsing golden/amber block
+                    const pulse = Math.sin(Date.now() / 200) * 15;
+                    ctx.fillStyle = `hsl(45, 100%, ${50 + pulse}%)`;
+                    ctx.fillRect(block.x, block.y, block.w, block.h);
+                    ctx.strokeStyle = '#f59e0b';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(block.x, block.y, block.w, block.h);
+                    
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = 'bold 20px Nunito';
+                    ctx.fillText('?', block.x + block.w/2 - 6, block.y + block.h/2 + 7);
+                }
+            });
+
+            // Draw Portal
+            const pTime = Date.now() / 600;
+            ctx.save();
+            ctx.translate(portal.x + portal.w/2, portal.y + portal.h/2);
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2 + pTime;
+                const dist = 14 + Math.sin(pTime * 3 + i) * 6;
+                ctx.fillStyle = `hsla(${200 + i * 25}, 100%, 70%, 0.8)`;
+                ctx.beginPath();
+                ctx.arc(Math.cos(angle) * dist, Math.sin(angle) * dist, 4 + i/2, 0, Math.PI*2);
+                ctx.fill();
+            }
+            ctx.restore();
+            // Draw portal base ring
+            ctx.strokeStyle = theme.accent;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(portal.x + 10, portal.y + 10, portal.w - 20, portal.h - 20);
+
+            // Draw Enemies
+            enemies.forEach(e => {
+                if (e.type === 'virus') {
+                    // Red spiky virus
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath();
+                    ctx.arc(e.x + e.w/2, e.y + e.h/2, e.w/2, 0, Math.PI*2);
+                    ctx.fill();
+                    
+                    // Spikes
+                    ctx.strokeStyle = '#fda4af';
+                    ctx.lineWidth = 2;
+                    const spikesCount = 8;
+                    const r = e.w/2;
+                    const cx = e.x + e.w/2;
+                    const cy = e.y + e.h/2;
+                    for (let i = 0; i < spikesCount; i++) {
+                        const angle = (i / spikesCount) * Math.PI * 2 + (Date.now() / 1000);
+                        ctx.beginPath();
+                        ctx.moveTo(cx + Math.cos(angle)*r, cy + Math.sin(angle)*r);
+                        ctx.lineTo(cx + Math.cos(angle)*(r+5), cy + Math.sin(angle)*(r+5));
+                        ctx.stroke();
+                    }
+                    // Eye
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(cx - 3, cy - 2, 2, 0, Math.PI*2);
+                    ctx.arc(cx + 3, cy - 2, 2, 0, Math.PI*2);
+                    ctx.fill();
+                } else {
+                    // Purple bacteria (hopping look)
+                    const cx = e.x + e.w/2;
+                    const cy = e.y + e.h/2;
+                    ctx.fillStyle = '#a855f7';
+                    ctx.beginPath();
+                    ctx.ellipse(cx, cy, e.w/2, e.h/2 + Math.sin(Date.now()/100)*2, 0, 0, Math.PI*2);
+                    ctx.fill();
+                    
+                    // Nucleus detail
+                    ctx.fillStyle = '#6b21a8';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 4, 0, Math.PI*2);
+                    ctx.fill();
+
+                    // Angry eye
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - 6, cy - 3);
+                    ctx.lineTo(cx - 2, cy - 1);
+                    ctx.moveTo(cx + 6, cy - 3);
+                    ctx.lineTo(cx + 2, cy - 1);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw Player (White Blood Cell)
+            const blink = player.invincibleTimer > 0 && Math.floor(Date.now() / 100) % 2 === 0;
+            if (!blink) {
+                const px = player.x + player.w/2;
+                const py = player.y + player.h/2;
+                
+                // Outer circle
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                ctx.arc(px, py, player.w/2, 0, Math.PI*2);
+                ctx.fill();
+                ctx.strokeStyle = theme.accent;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                // Inner Nucleus
+                ctx.fillStyle = '#3b82f6';
+                ctx.beginPath();
+                ctx.arc(px - 2, py - 1, player.w/4, 0, Math.PI*2);
+                ctx.fill();
+
+                // Shield power-up aura
+                if (activeShield) {
+                    ctx.strokeStyle = `rgba(56, 189, 248, ${0.4 + Math.sin(player.shieldPulse)*0.2})`;
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.arc(px, py, player.w/2 + 6, 0, Math.PI*2);
+                    ctx.stroke();
+                }
+            }
+
+            ctx.restore(); // end camera transform
+
+            // HUD Overlays (Absolute coordinates)
+            drawHUD();
+
+            // Mobile Controls overlay
+            if (isMobile) {
+                drawMobileControls();
+            }
+
+            // Game State Specific Render
+            if (gameState === STATES.QUIZ) {
+                drawQuizOverlay();
+            } else if (gameState === STATES.GAMEOVER) {
+                drawGameOver();
+            } else if (gameState === STATES.VICTORY) {
+                drawVictory();
+            }
+        }
+
+        // Draw Menu
+        function drawMenu() {
+            // Main title
+            ctx.fillStyle = '#fff';
+            ctx.font = 'black 48px Nunito';
+            ctx.textAlign = 'center';
+            ctx.fillText('BioRunner 🔵', 400, 120);
+
+            // Subtitle
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '700 20px Nunito';
+            ctx.fillText('Jornada pelo Corpo Humano', 400, 160);
+
+            // Dedication info
+            ctx.fillStyle = '#fda4af';
+            ctx.font = 'bold 15px Nunito';
+            ctx.fillText('GamesForVitória 💖 Para a Prô Vitória com Amor', 400, 200);
+
+            // Play button card
+            ctx.fillStyle = '#10b981';
+            drawRoundRect(300, 260, 200, 50, 10, '#10b981', '#059669');
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px Nunito';
+            ctx.fillText('JOGAR', 400, 292);
+
+            // Voltar ao Hub button
+            drawRoundRect(300, 330, 200, 45, 10, '#334155', '#1e293b');
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 16px Nunito';
+            ctx.fillText('Voltar ao Hub', 400, 358);
+
+            // Instructions details
+            ctx.fillStyle = '#64748b';
+            ctx.font = '14px Nunito';
+            ctx.fillText('Teclas A/D ou Setas para andar | W ou Espaço para pular (Pulo duplo suportado)', 400, 415);
+        }
+
+        // Draw HUD
+        function drawHUD() {
+            // Background bar for stats
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            drawRoundRect(10, 10, 780, 40, 8, 'rgba(15,23,42,0.7)', 'rgba(30,41,59,0.5)');
+
+            // Lives (Hearts)
+            let heartsStr = '';
+            for (let i = 0; i < 3; i++) {
+                heartsStr += i < lives ? '❤️' : '🖤';
+            }
+            ctx.textAlign = 'left';
+            ctx.font = '16px Nunito';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(`Vidas: ${heartsStr}`, 25, 34);
+
+            // Shield status
+            if (activeShield) {
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillText('🛡️ Escudo Ativo', 180, 34);
+            }
+
+            // World / Level
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 16px Nunito';
+            ctx.fillText(`${WORLDS[currentWorld].text} - Fase ${currentLevel}/2`, 400, 34);
+
+            // Score
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillText(`Pontos: ${score}`, 775, 34);
+        }
+
+        // Draw Mobile Controls
+        function drawMobileControls() {
+            ctx.globalAlpha = 0.5;
+            
+            // Left (←) button
+            drawRoundRect(20, 360, 80, 70, 10, '#475569', '#334155');
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 30px Nunito';
+            ctx.textAlign = 'center';
+            ctx.fillText('←', 60, 405);
+
+            // Right (→) button
+            drawRoundRect(120, 360, 80, 70, 10, '#475569', '#334155');
+            ctx.fillStyle = '#fff';
+            ctx.fillText('→', 160, 405);
+
+            // Jump (↑) button
+            drawRoundRect(680, 350, 100, 80, 10, '#059669', '#047857');
+            ctx.fillStyle = '#fff';
+            ctx.fillText('PULAR', 730, 400);
+
+            ctx.globalAlpha = 1.0;
+        }
+
+        // Draw Quiz Overlay
+        function drawQuizOverlay() {
+            // Darken background
+            ctx.fillStyle = 'rgba(5, 7, 15, 0.9)';
+            ctx.fillRect(0, 0, 800, 450);
+
+            // Center Panel
+            const cardThemeColor = WORLDS[currentWorld].accent;
+            drawRoundRect(80, 40, 640, 370, 16, '#0f172a', cardThemeColor);
+
+            // Header info
+            ctx.fillStyle = cardThemeColor;
+            ctx.font = 'bold 15px Nunito';
+            ctx.textAlign = 'center';
+            ctx.fillText(`DESAFIO CELULAR: ${WORLDS[currentWorld].name.toUpperCase()}`, 400, 70);
+
+            // Question Text
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px Nunito';
+            // Wrap text if needed
+            const qText = activeQuiz.q;
+            ctx.fillText(qText, 400, 110);
+
+            // Timer bar
+            const timerPct = quizTimer / 15;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(120, 145, 560, 10);
+            ctx.fillStyle = timerPct > 0.3 ? '#10b981' : '#f43f5e';
+            ctx.fillRect(120, 145, 560 * timerPct, 10);
+
+            // 4 Answer Options (Buttons mapped to grids)
+            // Left col: X=120, w=270. Right col: X=410, w=270.
+            // Row 1: Y=180, h=60. Row 2: Y=260, h=60.
+            const optCoords = [
+                { x: 120, y: 180, w: 270, h: 60 },
+                { x: 410, y: 180, w: 270, h: 60 },
+                { x: 120, y: 260, w: 270, h: 60 },
+                { x: 410, y: 260, w: 270, h: 60 }
+            ];
+
+            activeQuiz.opts.forEach((opt, idx) => {
+                const coord = optCoords[idx];
+                let bgBtn = '#1e293b';
+                let strokeBtn = '#334155';
+                let textBtnColor = '#fff';
+
+                if (showFeedbackTimer > 0) {
+                    // feedback active
+                    if (idx === activeQuiz.correct) {
+                        bgBtn = '#065f46'; // Correct option always turns green
+                        strokeBtn = '#10b981';
+                    } else if (idx === selectedOption) {
+                        bgBtn = '#7f1d1d'; // Incorrect selection turns red
+                        strokeBtn = '#ef4444';
+                    } else {
+                        bgBtn = '#0f172a';
+                        strokeBtn = '#1e293b';
+                        textBtnColor = '#64748b';
+                    }
+                } else if (selectedOption === idx) {
+                    bgBtn = '#3b82f6';
+                    strokeBtn = '#60a5fa';
+                }
+
+                drawRoundRect(coord.x, coord.y, coord.w, coord.h, 8, bgBtn, strokeBtn);
+
+                ctx.fillStyle = textBtnColor;
+                ctx.font = 'bold 15px Nunito';
+                ctx.textAlign = 'center';
+                // option text wrap/center
+                ctx.fillText(opt, coord.x + coord.w/2, coord.y + coord.h/2 + 6);
+            });
+
+            // Extra feedback message
+            if (showFeedbackTimer > 0) {
+                ctx.fillStyle = feedbackCorrect ? '#34d399' : '#f87171';
+                ctx.font = 'bold 16px Nunito';
+                ctx.textAlign = 'center';
+                const feedMsg = feedbackCorrect ? '✓ RESPOSTA CORRETA! +150 PTS +ESCUDO🛡️' : '✗ RESPOSTA INCORRETA! ESCUDO DESFEITO OU -1 CORAÇÃO';
+                ctx.fillText(feedMsg, 400, 360);
+            } else {
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '13px Nunito';
+                ctx.textAlign = 'center';
+                ctx.fillText('Clique ou toque no retângulo correto para responder!', 400, 360);
+            }
+        }
+
+        // Draw Game Over Screen
+        function drawGameOver() {
+            ctx.fillStyle = 'rgba(5, 7, 15, 0.95)';
+            ctx.fillRect(0, 0, 800, 450);
+
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'black 48px Nunito';
+            ctx.textAlign = 'center';
+            ctx.fillText('JOGO ACABOU', 400, 150);
+
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 20px Nunito';
+            ctx.fillText(`Sua Pontuação Final: ${score} pontos`, 400, 200);
+
+            ctx.fillStyle = '#fda4af';
+            ctx.font = '16px Nunito';
+            ctx.fillText('Vitória tem orgulho de você! Estude mais e tente novamente!', 400, 240);
+
+            // Restart Button
+            drawRoundRect(220, 300, 160, 50, 8, '#ef4444', '#b91c1c');
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px Nunito';
+            ctx.fillText('TENTAR DE NOVO', 300, 332);
+
+            // Hub Button
+            drawRoundRect(420, 300, 160, 50, 8, '#334155', '#1e293b');
+            ctx.fillStyle = '#fff';
+            ctx.fillText('VOLTAR AO HUB', 500, 332);
+        }
+
+        // Draw Victory Screen
+        function drawVictory() {
+            ctx.fillStyle = 'rgba(5, 7, 15, 0.95)';
+            ctx.fillRect(0, 0, 800, 450);
+
+            // Confetti simulation
+            ctx.fillStyle = `hsl(${Math.floor(Date.now()/5)%360}, 100%, 60%)`;
+            for (let i = 0; i < 20; i++) {
+                const cx = (i * 43 + Date.now()/10) % 800;
+                const cy = (i * 27 + Date.now()/8) % 450;
+                ctx.fillRect(cx, cy, 6, 6);
+            }
+
+            ctx.fillStyle = '#10b981';
+            ctx.font = 'black 48px Nunito';
+            ctx.textAlign = 'center';
+            ctx.fillText('VITÓRIA BRILHANTE! 🎉', 400, 140);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px Nunito';
+            ctx.fillText(`Você completou toda a jornada pelo corpo humano!`, 400, 190);
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillText(`Pontuação Final: ${score} pontos!`, 400, 225);
+
+            ctx.fillStyle = '#fda4af';
+            ctx.font = '16px Nunito';
+            ctx.fillText('GamesForVitória 💖 Criado especialmente para uma professora incrível!', 400, 260);
+
+            // Play again Button
+            drawRoundRect(220, 310, 160, 50, 8, '#10b981', '#047857');
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px Nunito';
+            ctx.fillText('JOGAR DE NOVO', 300, 342);
+
+            // Hub Button
+            drawRoundRect(420, 310, 160, 50, 8, '#334155', '#1e293b');
+            ctx.fillStyle = '#fff';
+            ctx.fillText('VOLTAR AO HUB', 500, 342);
+        }
+
+        // Game Loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize background particles
+        createWorldParticles();
+        // Start loop
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

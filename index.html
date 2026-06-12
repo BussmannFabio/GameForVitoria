@@ -70,6 +70,26 @@
       box-shadow: 0 2px 0 0 #312E81;
     }
 
+    .btn-3d-blue {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #0284c7;
+    }
+    .btn-3d-blue:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #0284c7;
+    }
+
+    .btn-3d-purple {
+      position: relative;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 0 #7c3aed;
+    }
+    .btn-3d-purple:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 #7c3aed;
+    }
+
     /* Animações Flutuantes Suaves */
     @keyframes float-slow {
       0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -139,7 +159,7 @@
     </div>
 
     <!-- Grid de Jogos (Cards) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl px-2">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl px-2">
       
       <!-- CARD JOGO 1: PIZZA GOURMET -->
       <div class="card-premium bg-slate-900/80 backdrop-blur-md rounded-3xl border border-amber-500/20 hover:border-amber-500/50 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-slow"
@@ -258,6 +278,84 @@
         </div>
       </div>
 
+      <!-- CARD JOGO 4: BIORUNNER -->
+      <div class="card-premium bg-slate-900/80 backdrop-blur-md rounded-3xl border border-blue-500/20 hover:border-blue-500/50 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-slow"
+           onclick="launchGame('biorunner')" onmouseenter="playHoverSound()">
+        
+        <!-- Fundo decorativo sutil -->
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-blue-950/20 rounded-full opacity-30 pointer-events-none"></div>
+
+        <div>
+          <!-- Cabeçalho do Card -->
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-5xl filter drop-shadow-md select-none">🧬</span>
+            <span class="bg-blue-950/60 text-blue-400 border border-blue-800/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Ciências</span>
+          </div>
+
+          <h2 class="text-2xl font-black text-slate-100 leading-tight">BioRunner</h2>
+          <p class="text-blue-400 font-extrabold text-xs uppercase tracking-widest mt-0.5">Jornada pelo Corpo Humano</p>
+
+          <p class="text-slate-400 font-semibold text-sm mt-3 leading-relaxed">
+            Controle um glóbulo branco defensor em uma jornada pelo corpo! Supere vírus e bactérias e resolva desafios dos sistemas respiratório, circulatório e digestivo.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Habilidades BNCC Tag -->
+          <div class="bg-blue-950/25 border border-blue-900/30 rounded-xl p-2.5 flex items-start gap-2">
+            <i data-lucide="tag" class="text-blue-400 w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-400 leading-snug">
+              <strong>BNCC EF04CI01</strong>: Associar a participação de diferentes sistemas do corpo para a nutrição e a defesa.
+            </span>
+          </div>
+
+          <!-- Botão 3D -->
+          <button class="btn-3d-blue bg-sky-600 hover:bg-sky-700 text-white font-black py-3 rounded-2xl w-full text-base transition-colors flex items-center justify-center gap-2">
+            Iniciar Defesa
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARD JOGO 5: HISTORIACORRIDA -->
+      <div class="card-premium bg-slate-900/80 backdrop-blur-md rounded-3xl border border-purple-500/20 hover:border-purple-500/50 p-6 flex flex-col justify-between gap-6 cursor-pointer relative overflow-hidden text-slate-100 animate-float-reverse"
+           onclick="launchGame('historiacorrida')" onmouseenter="playHoverSound()">
+        
+        <!-- Fundo decorativo sutil -->
+        <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-purple-950/20 rounded-full opacity-30 pointer-events-none"></div>
+
+        <div>
+          <!-- Cabeçalho do Card -->
+          <div class="flex justify-between items-start mb-4">
+            <span class="text-5xl filter drop-shadow-md select-none">🧭</span>
+            <span class="bg-purple-950/60 text-purple-400 border border-purple-800/40 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">História</span>
+          </div>
+
+          <h2 class="text-2xl font-black text-slate-100 leading-tight">HistóriaCorrida</h2>
+          <p class="text-purple-450 font-extrabold text-xs uppercase tracking-widest mt-0.5">Fuga pelo Tempo</p>
+
+          <p class="text-slate-400 font-semibold text-sm mt-3 leading-relaxed">
+            Viaje no tempo e explore o Brasil Pré-Colonial, Colonial, Império e República. Encontre pergaminhos escondidos e decifre os portais temporais da história!
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Habilidades BNCC Tag -->
+          <div class="bg-purple-950/25 border border-purple-900/30 rounded-xl p-2.5 flex items-start gap-2">
+            <i data-lucide="tag" class="text-purple-400 w-4 h-4 mt-0.5 flex-shrink-0"></i>
+            <span class="text-[11px] font-bold text-slate-400 leading-snug">
+              <strong>BNCC EF04HI01</strong>: Identificar a história como resultado da ação do homem e da passagem do tempo.
+            </span>
+          </div>
+
+          <!-- Botão 3D -->
+          <button class="btn-3d-purple bg-violet-600 hover:bg-violet-700 text-white font-black py-3 rounded-2xl w-full text-base transition-colors flex items-center justify-center gap-2">
+            Iniciar Jornada
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
     </div>
 
   </main>
@@ -370,6 +468,10 @@
           window.location.href = './cadeia_alimentar.html';
         } else if (game === 'ecotactics') {
           window.location.href = './eco_tactics.html';
+        } else if (game === 'biorunner') {
+          window.location.href = './bio_runner.html';
+        } else if (game === 'historiacorrida') {
+          window.location.href = './historia_corrida.html';
         }
       }, 250);
     }

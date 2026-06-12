@@ -24,6 +24,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: #04080f;
         }
         canvas {
             display: block;
@@ -31,15 +32,24 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.85);
             border: 2px solid #1e293b;
             border-radius: 16px;
-            max-width: 100%;
-            max-height: 100%;
-            aspect-ratio: 16/9;
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            object-fit: contain;
         }
     </style>
 </head>
 <body>
     <div id="game-container">
         <canvas id="gameCanvas" width="800" height="450"></canvas>
+    </div>
+
+    <!-- Device Rotation Alert Overlay -->
+    <div id="rotate-overlay" class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#04080f] text-white text-center p-6">
+        <div class="animate-bounce text-6xl mb-4">📱🔄</div>
+        <h2 class="text-2xl font-black mb-2 text-rose-400">Gire o seu aparelho!</h2>
+        <p class="text-slate-400 max-w-sm">Para uma melhor experiência de jogo, gire o seu celular para a horizontal (modo paisagem).</p>
     </div>
 
     <script>
@@ -456,25 +466,101 @@
         }
         checkMobile();
 
-        // Mouse/Touch bindings
-        canvas.addEventListener('mousedown', handlePointerDown);
-        canvas.addEventListener('touchstart', e => {
-            e.preventDefault();
-            handlePointerDown(e);
-        });
+        // Mouse/Touch clicks (Desktop & Mobile)
+        canvas.addEventListener('mousedown', handleMouseDown);
 
-        canvas.addEventListener('mouseup', handlePointerUp);
-        canvas.addEventListener('touchend', e => {
-            e.preventDefault();
-            handlePointerUp(e);
-        });
-
-        function handlePointerDown(e) {
+        function handleMouseDown(e) {
             initAudio();
             const pos = getCanvasCoordinates(e);
+            handleInteractionStart(pos);
+        }
 
+        // Multi-touch Events (Mobile Controls)
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            initAudio();
+            
+            if (gameState === STATES.PLAYING) {
+                const rect = canvas.getBoundingClientRect();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const touch = e.changedTouches[i];
+                    const tx = (touch.clientX - rect.left) * (800 / rect.width);
+                    const ty = (touch.clientY - rect.top) * (450 / rect.height);
+                    
+                    // Jump button hit zone: X in [630, 800], Y in [250, 450]
+                    if (tx >= 630 && tx <= 800 && ty >= 250 && ty <= 450) {
+                        touchControls.jump = true;
+                        handleJumpPress();
+                    }
+                }
+                updateTouchControls(e);
+            } else {
+                const pos = getCanvasCoordinates(e.changedTouches[0]);
+                handleInteractionStart(pos);
+            }
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (gameState === STATES.PLAYING) {
+                updateTouchControls(e);
+            }
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            if (gameState === STATES.PLAYING) {
+                updateTouchControls(e);
+                
+                // Check if jump touch was released
+                const rect = canvas.getBoundingClientRect();
+                let jumpStillTouched = false;
+                for (let i = 0; i < e.touches.length; i++) {
+                    const touch = e.touches[i];
+                    const tx = (touch.clientX - rect.left) * (800 / rect.width);
+                    const ty = (touch.clientY - rect.top) * (450 / rect.height);
+                    if (tx >= 630 && tx <= 800 && ty >= 250 && ty <= 450) {
+                        jumpStillTouched = true;
+                    }
+                }
+                if (!jumpStillTouched) {
+                    touchControls.jump = false;
+                }
+            }
+        }
+
+        function updateTouchControls(e) {
+            if (gameState !== STATES.PLAYING) return;
+            
+            // Reset movements
+            touchControls.left = false;
+            touchControls.right = false;
+            
+            const rect = canvas.getBoundingClientRect();
+            for (let i = 0; i < e.touches.length; i++) {
+                const touch = e.touches[i];
+                const tx = (touch.clientX - rect.left) * (800 / rect.width);
+                const ty = (touch.clientY - rect.top) * (450 / rect.height);
+                
+                // Left Zone: X in [0, 130], Y in [250, 450]
+                if (tx >= 0 && tx <= 130 && ty >= 250 && ty <= 450) {
+                    touchControls.left = true;
+                }
+                // Right Zone: X in [130, 260], Y in [250, 450]
+                if (tx > 130 && tx <= 260 && ty >= 250 && ty <= 450) {
+                    touchControls.right = true;
+                }
+            }
+        }
+
+        function handleInteractionStart(pos) {
             if (gameState === STATES.MENU) {
-                // Play button
+                // Check play button
                 if (pos.x >= 300 && pos.x <= 500 && pos.y >= 270 && pos.y <= 325) {
                     playSound('jump');
                     startGame();
@@ -486,12 +572,14 @@
             } else if (gameState === STATES.PORTAL_QUIZ) {
                 if (showFeedbackTimer > 0) return;
 
-                // Box boundaries for answers
+                // Check 4 options buttons
+                // Box coordinates: Option A/B (y=180 to 240), Option C/D (y=260 to 320)
+                // Left column: x=120 to 390. Right column: x=410 to 680.
                 let clickedOpt = -1;
-                if (pos.y >= 200 && pos.y <= 260) {
+                if (pos.y >= 180 && pos.y <= 240) {
                     if (pos.x >= 120 && pos.x <= 390) clickedOpt = 0;
                     if (pos.x >= 410 && pos.x <= 680) clickedOpt = 1;
-                } else if (pos.y >= 280 && pos.y <= 340) {
+                } else if (pos.y >= 260 && pos.y <= 320) {
                     if (pos.x >= 120 && pos.x <= 390) clickedOpt = 2;
                     if (pos.x >= 410 && pos.x <= 680) clickedOpt = 3;
                 }
@@ -500,36 +588,15 @@
                     checkQuizAnswer(clickedOpt);
                 }
             } else if (gameState === STATES.GAMEOVER || gameState === STATES.VICTORY) {
-                // Play Again
+                // Restart Button
                 if (pos.x >= 220 && pos.x <= 380 && pos.y >= 310 && pos.y <= 360) {
                     playSound('jump');
                     restartGame();
                 }
-                // Back to Hub
+                // Hub Button
                 if (pos.x >= 420 && pos.x <= 580 && pos.y >= 310 && pos.y <= 360) {
                     window.location.href = './index.html';
                 }
-            } else if (gameState === STATES.PLAYING) {
-                if (isMobile) {
-                    if (pos.x >= 20 && pos.x <= 100 && pos.y >= 360 && pos.y <= 430) {
-                        touchControls.left = true;
-                    }
-                    if (pos.x >= 120 && pos.x <= 200 && pos.y >= 360 && pos.y <= 430) {
-                        touchControls.right = true;
-                    }
-                    if (pos.x >= 680 && pos.x <= 780 && pos.y >= 350 && pos.y <= 430) {
-                        touchControls.jump = true;
-                        handleJumpPress();
-                    }
-                }
-            }
-        }
-
-        function handlePointerUp(e) {
-            if (gameState === STATES.PLAYING && isMobile) {
-                touchControls.left = false;
-                touchControls.right = false;
-                touchControls.jump = false;
             }
         }
 
@@ -1236,26 +1303,52 @@
 
         // Draw Mobile virtual controls
         function drawMobileControls() {
+            ctx.save();
             ctx.globalAlpha = 0.55;
             
-            // Left
-            drawRoundRect(20, 360, 80, 70, 10, '#475569', '#334155');
+            // Left Button (Circle with Arrow)
+            const leftActive = touchControls.left;
+            ctx.fillStyle = leftActive ? '#3b82f6' : '#1e293b';
+            ctx.strokeStyle = leftActive ? '#60a5fa' : '#475569';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(60, 390, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 30px Nunito';
+            ctx.font = 'bold 24px Nunito';
             ctx.textAlign = 'center';
-            ctx.fillText('←', 60, 405);
+            ctx.fillText('◀', 60, 398);
 
-            // Right
-            drawRoundRect(120, 360, 80, 70, 10, '#475569', '#334155');
+            // Right Button (Circle with Arrow)
+            const rightActive = touchControls.right;
+            ctx.fillStyle = rightActive ? '#3b82f6' : '#1e293b';
+            ctx.strokeStyle = rightActive ? '#60a5fa' : '#475569';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(140, 390, 30, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
             ctx.fillStyle = '#fff';
-            ctx.fillText('→', 160, 405);
+            ctx.fillText('▶', 140, 398);
 
-            // Jump
-            drawRoundRect(680, 350, 100, 80, 10, '#059669', '#047857');
+            // Jump Button (Green circle with text)
+            const jumpActive = touchControls.jump;
+            ctx.fillStyle = jumpActive ? '#10b981' : '#064e3b';
+            ctx.strokeStyle = jumpActive ? '#34d399' : '#047857';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(730, 385, 35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
             ctx.fillStyle = '#fff';
-            ctx.fillText('SALTAR', 730, 400);
+            ctx.font = 'bold 12px Nunito';
+            ctx.fillText('SALTAR', 730, 389);
 
-            ctx.globalAlpha = 1.0;
+            ctx.restore();
         }
 
         // Draw Quiz Portal Overlay
@@ -1424,6 +1517,21 @@
             draw();
             requestAnimationFrame(gameLoop);
         }
+
+        // Orientation Checker for mobile
+        function checkOrientation() {
+            const overlay = document.getElementById('rotate-overlay');
+            if (overlay) {
+                if (window.innerHeight > window.innerWidth) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+        checkOrientation();
 
         createParticles();
         requestAnimationFrame(gameLoop);

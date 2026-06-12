@@ -1,0 +1,60 @@
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #04080f;
+    margin: 0;
+    overflow: hidden;
+    user-select: none;
+    touch-action: none;
+    width: 100vw;
+    height: 100vh;
+}
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #04080f;
+}
+canvas {
+    display: block;
+    background-color: #0b0f19;
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    object-fit: contain;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+}
+@media (min-width: 768px) {
+    canvas {
+        box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+        border: 2px solid #1e293b;
+        border-radius: 16px;
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+}
+#rotate-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #04080f;
+    color: #ffffff;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    box-sizing: border-box;
+}
+.hidden {
+    display: none !important;
+}

@@ -5,3 +5,8 @@
 !*.html
 !*.png
 !.gitignore
+
+# Permitir pasta jogos e todo o seu conteúdo (JS/CSS/subpastas)
+!jogos/
+!jogos/**
+
